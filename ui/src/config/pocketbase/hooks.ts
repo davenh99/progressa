@@ -34,10 +34,6 @@ export function usePB() {
     pb.authStore.clear();
   };
 
-  createEffect(() => {
-    console.log(context.store.loading);
-  });
-
   return { ...context, login, signUp, logout };
 }
 

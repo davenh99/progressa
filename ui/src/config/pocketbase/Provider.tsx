@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, ParentComponent } from "solid-js";
+import { createEffect, onCleanup, ParentComponent } from "solid-js";
 import PocketBase, { ClientResponseError } from "pocketbase";
 import { createStore } from "solid-js/store";
 
@@ -7,15 +7,18 @@ import { User } from "../../../Types";
 
 const apiUrl = import.meta.env.VITE_PUBLIC_API_URL
   ? import.meta.env.VITE_PUBLIC_API_URL
-  : "https://localhost:8090";
+  : "https://127.0.0.1:8090";
 
 export const PBProvider: ParentComponent = (props) => {
-  const [pb] = createStore(new PocketBase(apiUrl));
-
+  const pb = new PocketBase(apiUrl);
   const [pbStore, setPBStore] = createStore({
     user: pb.authStore.record as unknown as User | null,
     loading: true,
     networkError: false,
+  });
+
+  pb.authStore.onChange(() => {
+    setPBStore("user", pb.authStore.record as unknown as User | null);
   });
 
   const checkAuth = async () => {
@@ -39,16 +42,8 @@ export const PBProvider: ParentComponent = (props) => {
     }
   };
 
-  createEffect(() => {
-    const unsubscribe = pb.authStore.onChange(() => {
-      setPBStore("user", pb.authStore.record as unknown as User | null);
-    });
-
-    checkAuth().then(() => {
-      setPBStore("loading", false);
-    });
-
-    onCleanup(unsubscribe);
+  checkAuth().then(() => {
+    setPBStore("loading", false);
   });
 
   createEffect(() => {
