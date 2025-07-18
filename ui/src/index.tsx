@@ -1,5 +1,5 @@
 /* @refresh reload */
-import { createEffect, lazy } from "solid-js";
+import { createEffect, lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 
@@ -28,32 +28,22 @@ render(
 );
 
 function Content() {
-  const { user, loading, networkError } = usePB();
+  const { store } = usePB();
 
   // TODO subscribe: window.addeventlistener('online' & 'offline')
   // and run checkAuth() if offline periodically?
 
-  createEffect(() => {
-    console.log("huzzah", loading);
-  });
-
-  if (loading) {
-    return <p>loading: {loading ? "yes" : "no"}</p>;
-  }
-
-  if (!user) {
-    return <Auth />;
-  }
-
-  if (networkError) {
-    return <p>Network Error, could not connect to server.</p>;
-  }
-
   return (
-    <Router>
-      <Route path="/" component={Home} />
-      <Route path="/auth" component={Auth} />
-      <Route path="/*paramName" component={NotFound} />
-    </Router>
+    <Show when={!store.loading} fallback={<p>loading</p>}>
+      <Show when={!!store.user} fallback={<Auth />}>
+        <Show when={!store.networkError} fallback={<p>Network Error, could not connect to server.</p>}>
+          <Router>
+            <Route path="/" component={Home} />
+            <Route path="/auth" component={Auth} />
+            <Route path="/*paramName" component={NotFound} />
+          </Router>
+        </Show>
+      </Show>
+    </Show>
   );
 }

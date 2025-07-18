@@ -4,9 +4,7 @@ import { createContext } from "solid-js";
 
 type PBContextType = {
   pb: PocketBase;
-  user: User | null;
-  loading: boolean;
-  networkError: boolean;
+  store: { user: User | null; loading: boolean; networkError: boolean };
   checkAuth: () => Promise<void>;
 };
 

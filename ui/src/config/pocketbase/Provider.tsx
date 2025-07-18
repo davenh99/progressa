@@ -11,36 +11,41 @@ const apiUrl = import.meta.env.VITE_PUBLIC_API_URL
 
 export const PBProvider: ParentComponent = (props) => {
   const [pb] = createStore(new PocketBase(apiUrl));
-  const [user, setUser] = createStore(pb.authStore.record as unknown as User | null);
-  const [loading, setLoading] = createSignal(true);
-  const [networkError, setNetworkError] = createSignal(false);
+
+  const [pbStore, setPBStore] = createStore({
+    user: pb.authStore.record as unknown as User | null,
+    loading: true,
+    networkError: false,
+  });
 
   const checkAuth = async () => {
     if (pb.authStore.token) {
       if (pb.authStore.isValid) {
         try {
           await pb.collection("users").authRefresh();
-          setNetworkError(false);
+          setPBStore("networkError", false);
         } catch (e) {
           if (e instanceof ClientResponseError && [401, 403].includes(e.status)) {
             pb.authStore.clear();
           } else {
-            setNetworkError(true);
+            setPBStore("networkError", true);
           }
         }
       } else {
         pb.authStore.clear();
       }
+    } else {
+      setPBStore("user", null);
     }
   };
 
   createEffect(() => {
     const unsubscribe = pb.authStore.onChange(() => {
-      setUser(pb.authStore.record as unknown as User | null);
+      setPBStore("user", pb.authStore.record as unknown as User | null);
     });
 
     checkAuth().then(() => {
-      setLoading(false);
+      setPBStore("loading", false);
     });
 
     onCleanup(unsubscribe);
@@ -62,21 +67,5 @@ export const PBProvider: ParentComponent = (props) => {
     });
   });
 
-  createEffect(() => {
-    console.log(loading());
-  });
-
-  const value = {
-    pb,
-    user,
-    get loading() {
-      return loading();
-    },
-    get networkError() {
-      return networkError();
-    },
-    checkAuth,
-  };
-
-  return <PBContext.Provider value={value}>{props.children}</PBContext.Provider>;
+  return <PBContext.Provider value={{ pb, store: pbStore, checkAuth }}>{props.children}</PBContext.Provider>;
 };

@@ -1,4 +1,4 @@
-import { useContext } from "solid-js";
+import { createEffect, useContext } from "solid-js";
 import { PBContext } from "./context";
 
 const BaseSignUpData = {
@@ -34,20 +34,18 @@ export function usePB() {
     pb.authStore.clear();
   };
 
-  return {
-    pb: context.pb,
-    user: context.user,
-    loading: context.loading,
-    networkError: context.networkError,
-    checkAuth: context.checkAuth,
-    login,
-    signUp,
-    logout,
-  };
+  createEffect(() => {
+    console.log(context.store.loading);
+  });
+
+  return { ...context, login, signUp, logout };
 }
 
 export function useAuthPB() {
-  const { pb, user } = usePB();
+  const {
+    pb,
+    store: { user },
+  } = usePB();
   if (!user) {
     throw new Error("User not authenticated");
   }
