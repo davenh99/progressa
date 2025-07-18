@@ -1,4 +1,5 @@
 export interface User {
+  id: string;
   username: string;
   email: string;
   dob: string;
@@ -7,6 +8,7 @@ export interface User {
 }
 
 export interface MeasurementType {
+  id: string;
   system: boolean;
   name: string;
   public: boolean;
@@ -15,6 +17,7 @@ export interface MeasurementType {
 }
 
 export interface MeasurementValue {
+  id: string;
   measurementType: string;
   value: string;
   public: boolean;
@@ -22,27 +25,35 @@ export interface MeasurementValue {
 }
 
 export interface Session {
+  id: string;
   name: string;
+  createdBy: string;
   description: string;
   usersSaved: string[];
   public: boolean;
 }
 
 export interface Exercise {
+  id: string;
+  createdBy: string;
   name: string;
   description: string;
   bodyweight: boolean;
   measurementType: string;
+  public: boolean;
   usersSaved: string[];
 }
 
 export interface SessionExercise {
+  id: string;
+  session: string;
   exercise: string;
   setCount: number;
   supersetParent: string | null;
 }
 
 export interface UserSession {
+  id: string;
   name: string;
   user: string;
   userDay: string;
@@ -53,6 +64,7 @@ export interface UserSession {
 }
 
 export interface UserSessionExercise {
+  id: string;
   user: string;
   exercise: string;
   userSession: string;
@@ -68,7 +80,8 @@ export interface UserSessionExercise {
 }
 
 export interface tag {
+  id: string;
   name: string;
-  user: string;
+  createdBy: string;
   public: boolean;
 }
