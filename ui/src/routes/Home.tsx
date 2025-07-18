@@ -3,7 +3,7 @@ import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
 
 const Home: Component = () => {
-  const { user } = useAuthPB();
+  const { user, logout } = useAuthPB();
 
   return (
     <div>
@@ -16,6 +16,9 @@ const Home: Component = () => {
           <p>Height: {user.height}</p>
           <p>Height: {user.height}</p>
           <p>Age: {user.dob ? getAge(user.dob) : "N/A"}</p>
+          <div onClick={logout}>
+            <p>logout</p>
+          </div>
         </div>
       </div>
     </div>

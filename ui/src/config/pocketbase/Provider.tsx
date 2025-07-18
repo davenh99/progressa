@@ -7,7 +7,7 @@ import { User } from "../../../Types";
 
 const apiUrl = import.meta.env.VITE_PUBLIC_API_URL
   ? import.meta.env.VITE_PUBLIC_API_URL
-  : "https://127.0.0.1:8090";
+  : "http://127.0.0.1:8090";
 
 export const PBProvider: ParentComponent = (props) => {
   const pb = new PocketBase(apiUrl);

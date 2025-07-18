@@ -41,10 +41,11 @@ export function useAuthPB() {
   const {
     pb,
     store: { user },
+    logout,
   } = usePB();
   if (!user) {
     throw new Error("User not authenticated");
   }
 
-  return { pb, user };
+  return { pb, user, logout };
 }
