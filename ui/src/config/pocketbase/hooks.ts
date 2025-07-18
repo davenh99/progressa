@@ -21,10 +21,10 @@ export function usePB() {
   const signUp = async (email: string, password: string, passwordConfirm: string) => {
     const data = {
       ...BaseSignUpData,
-      password: password,
-      passwordConfirm: passwordConfirm,
       name: email.split("@")[0],
-      email: email,
+      email,
+      password,
+      passwordConfirm,
     };
     await pb.collection("users").create(data);
     await login(email, password);
