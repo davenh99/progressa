@@ -26,8 +26,9 @@ const AuthEmail: Component = () => {
 
       if (isCreatingAccount()) {
         await signUp(email(), password(), passwordConfirm());
+      } else {
+        await login(email(), password());
       }
-      await login(email(), password());
     } catch (err) {
       setError(err.message);
     } finally {
