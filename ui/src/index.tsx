@@ -46,7 +46,7 @@ function Content() {
   }
 
   if (networkError) {
-    return <p>Network Error, check connection.</p>;
+    return <p>Network Error, could not connect to server.</p>;
   }
 
   return (
