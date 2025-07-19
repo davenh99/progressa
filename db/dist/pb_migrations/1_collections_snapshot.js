@@ -767,7 +767,7 @@ migrate(
         },
         name: "users",
         oauth2: {
-          enabled: false,
+          enabled: true,
           mappedFields: {
             avatarURL: "avatar",
             id: "",

@@ -5,4 +5,4 @@ test:
 	@go test -v -coverprofile=coverage.out ./...
 
 serve: build
-	@./dist/workouter serve
+	@cd dist; ./workouter serve

@@ -1,8 +1,26 @@
-import { Component, createSignal, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, Show } from "solid-js";
 import AuthEmail from "../components/AuthEmail";
+import { usePB } from "../config/pocketbase";
+import { createStore } from "solid-js/store";
+import { AuthMethodsList } from "pocketbase";
+import OAuthButton from "../components/OAuthButton";
 
 const Auth: Component = () => {
   const [emailLogin, setEmailLogin] = createSignal(false);
+  const [OAuthProviders, setOAuthProviders] = createStore([]);
+  const { pb } = usePB();
+
+  const getAuthMethods = async () => {
+    const methods = await pb.collection("users").listAuthMethods();
+
+    if (methods.oauth2.enabled) {
+      setOAuthProviders(methods.oauth2.providers);
+    }
+  };
+
+  createEffect(() => {
+    getAuthMethods();
+  });
 
   return (
     <Show
@@ -19,15 +37,9 @@ const Auth: Component = () => {
       <div>
         <div>
           <h2>Sign in</h2>
-          <div>
-            <p>Continue with Google</p>
-          </div>
-          <div>
-            <p>Continue with Facebook</p>
-          </div>
-          <div>
-            <p>Continue with Instagram</p>
-          </div>
+          <For each={OAuthProviders}>
+            {(provider) => <OAuthButton name={provider.name} displayName={provider.displayName} />}
+          </For>
           <div></div>
           <div onclick={() => setEmailLogin(true)}>
             <p>Continue with Email</p>

@@ -33,7 +33,29 @@ export function usePB() {
     pb.authStore.clear();
   };
 
-  return { ...context, login, signUp, logout };
+  const OAuthSignIn = async (provider: string) => {
+    const authData = await pb.collection("users").authWithOAuth2({
+      provider,
+      createData: { ...BaseSignUpData, name: "user" },
+    });
+    // after succesful auth we can update the user with a different username from the authData
+    if (authData.meta?.name) {
+      try {
+        const formData = new FormData();
+
+        if (authData.meta?.name) {
+          formData.append("name", authData.meta.name);
+        }
+
+        await pb.collection("users").update(authData.record.id, formData);
+      } catch (e: any) {
+        alert(`${e}: ${e.originalError}`);
+        alert("could not update name");
+      }
+    }
+  };
+
+  return { ...context, login, signUp, logout, OAuthSignIn };
 }
 
 export function useAuthPB() {
