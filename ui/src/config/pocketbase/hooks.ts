@@ -1,5 +1,7 @@
 import { createEffect, useContext } from "solid-js";
 import { PBContext } from "./context";
+import { UserSession } from "../../../Types";
+import { ClientResponseError } from "pocketbase";
 
 const BaseSignUpData = {
   dob: "",
@@ -68,5 +70,18 @@ export function useAuthPB() {
     throw new Error("User not authenticated");
   }
 
-  return { pb, user, logout };
+  const getUserSessions = async () => {
+    try {
+      const userSessions = await pb.collection<UserSession>("userSessions").getFullList({
+        filter: `user = '${user.id}'`,
+        sort: "-userDay",
+      });
+
+      return userSessions;
+    } catch (e) {
+      throw new Error("get userSessions error", e);
+    }
+  };
+
+  return { pb, user, logout, getUserSessions };
 }

@@ -2,12 +2,12 @@ import { Component, createEffect, createSignal, For, Show } from "solid-js";
 import AuthEmail from "../components/AuthEmail";
 import { usePB } from "../config/pocketbase";
 import { createStore } from "solid-js/store";
-import { AuthMethodsList } from "pocketbase";
+import { AuthMethodsList, AuthProviderInfo } from "pocketbase";
 import OAuthButton from "../components/OAuthButton";
 
 const Auth: Component = () => {
   const [emailLogin, setEmailLogin] = createSignal(false);
-  const [OAuthProviders, setOAuthProviders] = createStore([]);
+  const [OAuthProviders, setOAuthProviders] = createStore<AuthProviderInfo[]>([]);
   const { pb } = usePB();
 
   const getAuthMethods = async () => {
