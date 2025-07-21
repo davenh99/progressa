@@ -42,6 +42,9 @@ export interface Exercise {
   measurementType: string;
   public: boolean;
   usersSaved: string[];
+  expand: {
+    measurementType: MeasurementType;
+  };
 }
 
 export interface SessionExercise {
@@ -77,6 +80,9 @@ export interface UserSessionExercise {
   measurementValue: string | null;
   sessionExercise: string | null;
   supersetParent: string | null;
+  expand: {
+    exercise?: Exercise;
+  };
 }
 
 export interface tag {

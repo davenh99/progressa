@@ -1,6 +1,6 @@
 import { createEffect, useContext } from "solid-js";
 import { PBContext } from "./context";
-import { UserSession } from "../../../Types";
+import { UserSession, UserSessionExercise } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
 
 const BaseSignUpData = {
@@ -83,5 +83,20 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getUserSessions };
+  const getUserSessionExercises = async (sessionID: string) => {
+    try {
+      const userSessionExercises = await pb
+        .collection<UserSessionExercise>("userSessionExercises")
+        .getFullList({
+          filter: `user = '${user.id}' && userSession = '${sessionID}'`,
+          expand: "exercise",
+        });
+
+      return userSessionExercises;
+    } catch (e) {
+      throw new Error("get userSessionExercises error", e);
+    }
+  };
+
+  return { pb, user, logout, getUserSessions, getUserSessionExercises };
 }

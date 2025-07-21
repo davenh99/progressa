@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   font-family: "Ubuntu", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -27,9 +29,9 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     color: var(--scheme-light);
     background-color: var(--scheme-dark-2);
   }
-}
+} */

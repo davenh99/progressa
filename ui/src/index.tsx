@@ -1,11 +1,13 @@
 /* @refresh reload */
-import { createEffect, lazy, Show } from "solid-js";
+import { lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 
 import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
 import Auth from "./routes/Auth";
+import Session from "./routes/Session";
+import Sessions from "./routes/Sessions";
 
 const Home = lazy(() => import("./routes/Home"));
 const NotFound = lazy(() => import("./routes/NotFound"));
@@ -40,6 +42,10 @@ function Content() {
           <Router>
             <Route path="/" component={Home} />
             <Route path="/auth" component={Auth} />
+            <Route path="/workouts">
+              <Route path="/" component={Sessions} />
+              <Route path="/:id" component={Session} />
+            </Route>
             <Route path="/*paramName" component={NotFound} />
           </Router>
         </Show>

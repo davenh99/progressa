@@ -1,5 +1,5 @@
 import { Component, createSignal, Show } from "solid-js";
-import { usePB } from "../config/pocketbase";
+import { usePB } from "../../config/pocketbase";
 
 const AuthEmail: Component = () => {
   const [email, setEmail] = createSignal("");
