@@ -8,6 +8,7 @@ import { PBProvider, usePB } from "./config/pocketbase";
 import Auth from "./routes/Auth";
 import Session from "./routes/Session";
 import Sessions from "./routes/Sessions";
+import { ThemeProvider } from "./config/theme";
 
 const Home = lazy(() => import("./routes/Home"));
 const NotFound = lazy(() => import("./routes/NotFound"));
@@ -23,7 +24,9 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <PBProvider>
-      <Content />
+      <ThemeProvider>
+        <Content />
+      </ThemeProvider>
     </PBProvider>
   ),
   root!
