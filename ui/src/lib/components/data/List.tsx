@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-const List: Component = () => {
+export const List: Component = () => {
   return (
     <div>
       <header>
@@ -9,5 +9,3 @@ const List: Component = () => {
     </div>
   );
 };
-
-export default List;

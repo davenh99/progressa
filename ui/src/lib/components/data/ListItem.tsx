@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { useTheme } from "../../../config/theme";
 
-const ListItem: Component = () => {
+export const ListItem: Component = () => {
   const { theme } = useTheme();
 
   return (
@@ -12,5 +12,3 @@ const ListItem: Component = () => {
     </div>
   );
 };
-
-export default ListItem;

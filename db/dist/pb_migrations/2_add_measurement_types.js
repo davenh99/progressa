@@ -5,6 +5,7 @@ migrate(
 
     let record = new Record(measurementTypes);
 
+    record.set("id", "m01s8yx7wfk2gxd");
     record.set("system", true);
     record.set("name", "Reps");
     record.set("numeric", true);
@@ -14,6 +15,7 @@ migrate(
 
     record = new Record(measurementTypes);
 
+    record.set("id", "8ldlggjjvy2ircl");
     record.set("system", true);
     record.set("name", "Time (s)");
     record.set("numeric", true);
@@ -22,6 +24,12 @@ migrate(
     app.save(record);
   },
   (app) => {
-    // No down migration yet
+    const createdIDs = ["m01s8yx7wfk2gxd", "8ldlggjjvy2ircl"];
+    for (const id of createdIDs) {
+      try {
+        let record = app.findRecordById("measurementTypes", id);
+        app.delete(record);
+      } catch {}
+    }
   }
 );

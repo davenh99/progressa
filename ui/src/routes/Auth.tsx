@@ -3,8 +3,8 @@ import { createStore } from "solid-js/store";
 import { AuthProviderInfo } from "pocketbase";
 
 import { usePB } from "../config/pocketbase";
-import AuthEmail from "../components/auth/Email";
-import OAuthButton from "../components/auth/OAuthButton";
+import AuthEmail from "../views/auth/Email";
+import OAuthButton from "../views/auth/OAuthButton";
 
 const Auth: Component = () => {
   const [emailLogin, setEmailLogin] = createSignal(false);

@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import UserSessionListView from "../components/UserSessionListView";
+import UserSessionListView from "../views/UserSessionListView";
 import Sessions from "./Sessions";
 
 const Home: Component = () => {

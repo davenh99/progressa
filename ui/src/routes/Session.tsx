@@ -3,8 +3,8 @@ import { useParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
 import { UserSession } from "../../Types";
-import Loading from "../components/Loading";
-import SessionExercises from "../components/SessionExercises";
+import Loading from "../views/Loading";
+import SessionExercises from "../views/SessionExercises";
 
 const Session: Component = () => {
   const [session, setSession] = createSignal<UserSession>(null);

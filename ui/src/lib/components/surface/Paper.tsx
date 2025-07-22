@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-const Paper: Component = () => {
+export const Paper: Component = () => {
   return (
     <div>
       <header>
@@ -9,5 +9,3 @@ const Paper: Component = () => {
     </div>
   );
 };
-
-export default Paper;

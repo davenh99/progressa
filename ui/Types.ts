@@ -35,13 +35,13 @@ export interface Session {
 
 export interface Exercise {
   id: string;
-  createdBy: string;
   name: string;
   description: string;
   bodyweight: boolean;
   measurementType: string;
   public: boolean;
   usersSaved: string[];
+  createdBy: string;
   expand: {
     measurementType: MeasurementType;
   };

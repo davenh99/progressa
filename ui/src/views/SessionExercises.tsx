@@ -3,8 +3,8 @@ import { createStore } from "solid-js/store";
 
 import { useAuthPB } from "../config/pocketbase";
 import { Exercise, UserSessionExercise } from "../../Types";
-import Loading from "../components/Loading";
-import ExercisesListView from "./ExercisesListView";
+import Loading from "./Loading";
+import { ExerciseList } from "./data";
 
 interface Props {
   sessionID: string;
@@ -73,7 +73,7 @@ const SessionExercises: Component<Props> = (props) => {
             <span class="label-text">Select Exercise</span>
           </div>
           <Show when={showExercises()}>
-            <ExercisesListView
+            <ExerciseList
               setSelected={(exercise: Exercise) => {
                 setNewExercise("exercise", exercise.id);
                 setNewExercise("exerciseName", exercise.name);

@@ -2,7 +2,7 @@ import { Component, createSignal, For, onMount, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { UserSession } from "../../Types";
-import Loading from "../components/Loading";
+import Loading from "../views/Loading";
 import { createStore } from "solid-js/store";
 
 const Sessions: Component = () => {
