@@ -1,34 +1,55 @@
 import { Component, createMemo, createSignal, For, onMount, Show } from "solid-js";
-import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
 import Ellipsis from "lucide-solid/icons/ellipsis";
 
+import { UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import { Exercise } from "../../../Types";
 import Loading from "../Loading";
 
-interface Props {
-  setSelected: (exercise: Exercise) => void;
-}
-
-export const ExerciseList: Component<Props> = (props) => {
-  const [exercises, setExercises] = createSignal<Exercise[]>();
+export const UserSessionList: Component = (props) => {
+  const [sessions, setSessions] = createSignal<UserSession[]>([]);
   const { pb } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<Exercise>[]>(() => [
+  const columns = createMemo<ColumnDef<UserSession>[]>(() => [
     {
       accessorKey: "name",
-      header: "Exercise",
+      header: "Session Name",
     },
     {
-      header: "",
+      accessorKey: "userDay",
+      header: "Date",
+      cell: (ctx) => new Date(ctx.getValue<string>()).toLocaleDateString(),
+    },
+    {
+      accessorKey: "notes",
+      header: "Notes",
+      cell: (ctx) => ctx.getValue() || "-",
+    },
+    {
+      accessorKey: "tags",
+      header: "Tags",
+      cell: (ctx) => (
+        <div class="flex gap-1">
+          <For each={ctx.getValue() as string[]}>
+            {(tag) => <span class="badge badge-neutral">{tag}</span>}
+          </For>
+        </div>
+      ),
+    },
+    {
       id: "more-info",
-      cell: () => <Ellipsis />,
+      header: "",
+      cell: (ctx) => (
+        <a href={`/workouts/${ctx.row.original.id}`}>
+          <Ellipsis />
+        </a>
+      ),
     },
   ]);
 
   const table = createSolidTable({
     get data() {
-      return exercises();
+      return sessions();
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
@@ -36,12 +57,12 @@ export const ExerciseList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const exercises = await pb.collection<Exercise>("exercises").getFullList({ expand: "measurementType" });
+      const sessions = await pb.collection<UserSession>("userSessions").getFullList();
 
-      console.log(exercises);
-      setExercises(exercises);
+      console.log(sessions);
+      setSessions(sessions);
     } catch (e) {
-      console.log("get exercises error: ", e);
+      console.log("get sessions error: ", e);
     }
   };
 
@@ -50,8 +71,9 @@ export const ExerciseList: Component<Props> = (props) => {
   });
 
   return (
-    <Show when={!!exercises()} fallback={<Loading />}>
+    <Show when={!!sessions()} fallback={<Loading />}>
       <div class="bg-base-100 rounded-lg shadow p-6">
+        <h3 class="text-xl font-bold mb-4">Your Workout Sessions</h3>
         <div class="overflow-x-auto">
           <table class="table w-full">
             <thead>
@@ -68,7 +90,7 @@ export const ExerciseList: Component<Props> = (props) => {
             <tbody>
               <For each={table.getRowModel().rows}>
                 {(row) => (
-                  <tr class="hover" onclick={() => props.setSelected(row.original)}>
+                  <tr class="hover">
                     <For each={row.getVisibleCells()}>
                       {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
                     </For>
@@ -78,7 +100,7 @@ export const ExerciseList: Component<Props> = (props) => {
             </tbody>
           </table>
         </div>
-        {exercises().length === 0 && <div class="text-center py-4">No Exercises found</div>}
+        {sessions().length === 0 && <div class="text-center py-4">No sessions found</div>}
       </div>
     </Show>
   );

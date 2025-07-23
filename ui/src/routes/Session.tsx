@@ -4,7 +4,7 @@ import { useParams } from "@solidjs/router";
 import { useAuthPB } from "../config/pocketbase";
 import { UserSession } from "../../Types";
 import Loading from "../views/Loading";
-import SessionExercises from "../views/SessionExercises";
+import { UserSessionExerciseList } from "../views/data";
 
 const Session: Component = () => {
   const [session, setSession] = createSignal<UserSession>(null);
@@ -26,7 +26,7 @@ const Session: Component = () => {
       <p>{session().notes}</p>
       <p>{session().userDay}</p>
 
-      <SessionExercises sessionID={params.id} />
+      <UserSessionExerciseList sessionID={params.id} />
     </Show>
   );
 };

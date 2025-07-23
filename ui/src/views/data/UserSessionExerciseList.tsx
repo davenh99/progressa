@@ -1,10 +1,10 @@
 import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useAuthPB } from "../config/pocketbase";
-import { Exercise, UserSessionExercise } from "../../Types";
-import Loading from "./Loading";
-import { ExerciseList } from "./data";
+import { useAuthPB } from "../../config/pocketbase";
+import { Exercise, UserSessionExercise } from "../../../Types";
+import Loading from "../Loading";
+import { ExerciseList } from ".";
 
 interface Props {
   sessionID: string;
@@ -19,7 +19,7 @@ const BaseUserSessionExercise = {
   addedWeight: 0,
 };
 
-const SessionExercises: Component<Props> = (props) => {
+export const UserSessionExerciseList: Component<Props> = (props) => {
   const [sessionExercises, setSessionExercises] = createSignal<UserSessionExercise[]>(null);
   const [isLoading, setIsLoading] = createSignal(false);
   const [showExercises, setShowExercises] = createSignal(false);
@@ -131,5 +131,3 @@ const SessionExercises: Component<Props> = (props) => {
     </Show>
   );
 };
-
-export default SessionExercises;
