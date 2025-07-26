@@ -10,6 +10,7 @@ import Session from "./routes/Session";
 import Sessions from "./routes/Sessions";
 import { ThemeProvider } from "./config/theme";
 import LogSession from "./routes/LogSession";
+import Profile from "./routes/Profile";
 
 const Home = lazy(() => import("./routes/Home"));
 const NotFound = lazy(() => import("./routes/NotFound"));
@@ -46,10 +47,11 @@ function Content() {
           <Router>
             <Route path="/" component={Home} />
             <Route path="/auth" component={Auth} />
+            <Route path="/profile" component={Profile} />
             <Route path="/workouts">
               <Route path="/" component={Sessions} />
               <Route path="/log" component={LogSession} />
-              <Route path="/:id" component={Session} />
+              <Route path="/log/:id" component={LogSession} />
             </Route>
             <Route path="/*paramName" component={NotFound} />
           </Router>

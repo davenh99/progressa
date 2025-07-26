@@ -1,11 +1,17 @@
 import { Component } from "solid-js";
+import Header from "../components/Header";
+import { Link } from "@kobalte/core/link";
 
 const NotFound: Component = () => {
   return (
     <div>
-      <header>
-        <p>404 haha</p>
-      </header>
+      <Header />
+      <div>
+        <p>You appear to be lost</p>
+        <Link href="/">
+          <p>take me back home</p>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -3,8 +3,8 @@ export interface User {
   name: string;
   email: string;
   dob: string;
-  height: string;
-  weight: string;
+  height: number;
+  weight: number;
 }
 
 export interface MeasurementType {
@@ -42,8 +42,8 @@ export interface Exercise {
   public: boolean;
   usersSaved: string[];
   createdBy: string;
-  expand: {
-    measurementType: MeasurementType;
+  expand?: {
+    measurementType?: MeasurementType;
   };
 }
 
@@ -55,8 +55,7 @@ export interface SessionExercise {
   supersetParent: string | null;
 }
 
-export interface UserSession {
-  id: string;
+export interface UserSessionCreateData {
   name: string;
   user: string;
   userDay: string;
@@ -64,28 +63,40 @@ export interface UserSession {
   tags: string[];
   userHeight: number;
   userWeight: number;
+  sessionExercises: string[];
 }
 
-export interface UserSessionExercise {
+export interface UserSession extends UserSessionCreateData {
   id: string;
+  expand?: {
+    tags?: Tag[];
+    sessionExercises?: UserSessionExercise[];
+  };
+}
+
+export interface UserSessionExerciseCreateData {
   user: string;
   exercise: string;
-  userSession: string;
   notes: string;
   tags: string[];
   addedWeight: number;
   qty: number;
   restAfter: number;
-  measurementNumeric: number | null;
-  measurementValue: string | null;
-  sessionExercise: string | null;
-  supersetParent: string | null;
-  expand: {
+  isWarmup: boolean;
+  measurementNumeric?: number;
+  measurementValue?: string;
+  sessionExercise?: string;
+  supersetParent?: string;
+}
+
+export interface UserSessionExercise extends UserSessionExerciseCreateData {
+  id: string;
+  expand?: {
     exercise?: Exercise;
   };
 }
 
-export interface tag {
+export interface Tag {
   id: string;
   name: string;
   createdBy: string;

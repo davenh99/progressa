@@ -59,7 +59,7 @@ export const UserSessionList: Component = (props) => {
     try {
       const sessions = await pb.collection<UserSession>("userSessions").getFullList();
 
-      console.log(sessions);
+      // console.log(sessions);
       setSessions(sessions);
     } catch (e) {
       console.log("get sessions error: ", e);

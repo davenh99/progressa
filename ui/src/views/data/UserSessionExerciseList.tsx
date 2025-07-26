@@ -63,71 +63,73 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   });
 
   return (
-    <Show when={!!sessionExercises()} fallback={<Loading />}>
-      <div onClick={() => setCreatingExercise(true)}>
-        <p>add exercise</p>
-      </div>
-      <Show when={creatingExercise()}>
-        <div>
-          <div onclick={() => setShowExercises(true)} class="div">
-            <span class="label-text">Select Exercise</span>
-          </div>
-          <Show when={showExercises()}>
-            <ExerciseList
-              setSelected={(exercise: Exercise) => {
-                setNewExercise("exercise", exercise.id);
-                setNewExercise("exerciseName", exercise.name);
-              }}
-            />
-          </Show>
-          <p>selected exercise: {newExercise.exerciseName}</p>
+    <div class="mx-auto p-4">
+      <Show when={!!sessionExercises()} fallback={<Loading />}>
+        <div onClick={() => setCreatingExercise(true)}>
+          <p>add exercise</p>
         </div>
-
-        <div>
-          <label class="label">
-            <span class="label-text">Notes</span>
-          </label>
-          <textarea
-            value={newExercise.notes}
-            onInput={(e) => setNewExercise("notes", e.target.value)}
-            class="input input-bordered w-full"
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <label class="label">
-            <span class="label-text">Amount (reps or minutes or whatever)</span>
-          </label>
-          <input
-            type="number"
-            value={newExercise.qty}
-            onInput={(e) => setNewExercise("qty", Number(e.target.value))}
-            class="textarea textarea-bordered w-full"
-          />
-        </div>
-
-        <div class="flex justify-end gap-2 pt-4">
-          <button onClick={() => setCreatingExercise(false)} class="btn" disabled={isLoading()}>
-            Cancel
-          </button>
-          <button
-            onClick={createSessionExercise}
-            class="btn btn-primary"
-            disabled={isLoading() || !newExercise.exercise.trim()}
-          >
-            {isLoading() ? "Creating..." : "Create Session"}
-          </button>
-        </div>
-      </Show>
-      <For each={sessionExercises()}>
-        {(exercise) => (
+        <Show when={creatingExercise()}>
           <div>
-            <p>exercise</p>
-            <p>{exercise.notes}</p>
+            <div onclick={() => setShowExercises(true)} class="div">
+              <span class="label-text">Select Exercise</span>
+            </div>
+            <Show when={showExercises()}>
+              <ExerciseList
+                onclick={(exercise: Exercise) => {
+                  setNewExercise("exercise", exercise.id);
+                  setNewExercise("exerciseName", exercise.name);
+                }}
+              />
+            </Show>
+            <p>selected exercise: {newExercise.exerciseName}</p>
           </div>
-        )}
-      </For>
-    </Show>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Notes</span>
+            </label>
+            <textarea
+              value={newExercise.notes}
+              onInput={(e) => setNewExercise("notes", e.target.value)}
+              class="input input-bordered w-full"
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Amount (reps or minutes or whatever)</span>
+            </label>
+            <input
+              type="number"
+              value={newExercise.qty}
+              onInput={(e) => setNewExercise("qty", Number(e.target.value))}
+              class="textarea textarea-bordered w-full"
+            />
+          </div>
+
+          <div class="flex justify-end gap-2 pt-4">
+            <button onClick={() => setCreatingExercise(false)} class="btn" disabled={isLoading()}>
+              Cancel
+            </button>
+            <button
+              onClick={createSessionExercise}
+              class="btn btn-primary"
+              disabled={isLoading() || !newExercise.exercise.trim()}
+            >
+              {isLoading() ? "Creating..." : "Create Session"}
+            </button>
+          </div>
+        </Show>
+        <For each={sessionExercises()}>
+          {(exercise) => (
+            <div>
+              <p>exercise</p>
+              <p>{exercise.notes}</p>
+            </div>
+          )}
+        </For>
+      </Show>
+    </div>
   );
 };
