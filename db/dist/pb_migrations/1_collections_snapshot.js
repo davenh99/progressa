@@ -1503,7 +1503,7 @@ migrate(
           },
         ],
         id: "pbc_415974452",
-        indexes: [],
+        indexes: ["CREATE UNIQUE INDEX `idx_LvIRQtjNTo` ON `userSessions` (\n  `user`,\n  `userDay`\n)"],
         listRule: "user=@request.auth.id",
         name: "userSessions",
         system: false,
