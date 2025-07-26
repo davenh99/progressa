@@ -1482,6 +1482,19 @@ migrate(
             type: "relation",
           },
           {
+            cascadeDelete: false,
+            collectionId: "pbc_1563017532",
+            hidden: false,
+            id: "relation675081786",
+            maxSelect: 999,
+            minSelect: 0,
+            name: "sessionExercises",
+            presentable: false,
+            required: false,
+            system: false,
+            type: "relation",
+          },
+          {
             hidden: false,
             id: "autodate2990389176",
             name: "created",
@@ -1596,7 +1609,7 @@ migrate(
         viewRule: "createdBy=@request.auth.id || public=true",
       },
       {
-        createRule: "userSession.user=@request.auth.id",
+        createRule: "",
         deleteRule: "user=@request.auth.id",
         fields: [
           {
@@ -1634,19 +1647,6 @@ migrate(
             maxSelect: 1,
             minSelect: 0,
             name: "exercise",
-            presentable: false,
-            required: false,
-            system: false,
-            type: "relation",
-          },
-          {
-            cascadeDelete: false,
-            collectionId: "pbc_415974452",
-            hidden: false,
-            id: "relation2207781110",
-            maxSelect: 1,
-            minSelect: 0,
-            name: "userSession",
             presentable: false,
             required: false,
             system: false,
