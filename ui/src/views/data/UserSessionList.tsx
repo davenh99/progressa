@@ -2,7 +2,7 @@ import { Component, createMemo, createSignal, For, onMount, Show } from "solid-j
 import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
 import Ellipsis from "lucide-solid/icons/ellipsis";
 
-import { UserSession } from "../../../Types";
+import { Tag, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import Loading from "../Loading";
 
@@ -26,12 +26,12 @@ export const UserSessionList: Component = (props) => {
       cell: (ctx) => ctx.getValue() || "-",
     },
     {
-      accessorKey: "tags",
+      accessorFn: (row) => (row.expand.tags ? row.expand.tags : []),
       header: "Tags",
       cell: (ctx) => (
         <div class="flex gap-1">
-          <For each={ctx.getValue() as string[]}>
-            {(tag) => <span class="badge badge-neutral">{tag}</span>}
+          <For each={ctx.getValue() as Tag[]}>
+            {(tag) => <span class="badge badge-neutral">{tag.name}</span>}
           </For>
         </div>
       ),
@@ -40,7 +40,7 @@ export const UserSessionList: Component = (props) => {
       id: "more-info",
       header: "",
       cell: (ctx) => (
-        <a href={`/workouts/${ctx.row.original.id}`}>
+        <a href={`/workouts/log/${ctx.row.original.id}`}>
           <Ellipsis />
         </a>
       ),
@@ -57,9 +57,9 @@ export const UserSessionList: Component = (props) => {
 
   const getData = async () => {
     try {
-      const sessions = await pb.collection<UserSession>("userSessions").getFullList();
+      const sessions = await pb.collection<UserSession>("userSessions").getFullList({ expand: "tags" });
 
-      // console.log(sessions);
+      // console.log(sessions[0]);
       setSessions(sessions);
     } catch (e) {
       console.log("get sessions error: ", e);

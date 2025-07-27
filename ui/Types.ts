@@ -63,6 +63,8 @@ export interface UserSessionCreateData {
   tags: string[];
   userHeight: number;
   userWeight: number;
+  meals: string[];
+  sleepQuality: "poor" | "fair" | "good" | "great";
   sessionExercises: string[];
 }
 
@@ -71,6 +73,7 @@ export interface UserSession extends UserSessionCreateData {
   expand?: {
     tags?: Tag[];
     sessionExercises?: UserSessionExercise[];
+    meals?: Meal[];
   };
 }
 
@@ -80,12 +83,14 @@ export interface UserSessionExerciseCreateData {
   notes: string;
   tags: string[];
   addedWeight: number;
-  qty: number;
+  // qty: number;
   restAfter: number;
   isWarmup: boolean;
+  sequence: number;
+  perceivedEffort: number; // 0 - 100
   measurementNumeric?: number;
   measurementValue?: string;
-  sessionExercise?: string;
+  // sessionExercise?: string;
   supersetParent?: string;
 }
 
@@ -101,4 +106,13 @@ export interface Tag {
   name: string;
   createdBy: string;
   public: boolean;
+}
+
+export interface Meal {
+  id: string;
+  name: string;
+  kj: number;
+  gramsProtein: number;
+  gramsCarbohydrate: number;
+  gramsFat: number;
 }
