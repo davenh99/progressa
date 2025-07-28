@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { useAuthPB } from "../config/pocketbase";
 import { Link } from "@kobalte/core/link";
 
-const Header: Component = () => {
+export const Header: Component = () => {
   const { user } = useAuthPB();
 
   return (

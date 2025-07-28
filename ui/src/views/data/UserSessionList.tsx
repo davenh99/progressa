@@ -73,7 +73,6 @@ export const UserSessionList: Component = (props) => {
   return (
     <Show when={!!sessions()} fallback={<Loading />}>
       <div class="bg-base-100 rounded-lg shadow p-6">
-        <h3 class="text-xl font-bold mb-4">Your Workout Sessions</h3>
         <div class="overflow-x-auto">
           <table class="table w-full">
             <thead>

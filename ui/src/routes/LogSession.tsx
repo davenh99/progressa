@@ -3,12 +3,12 @@ import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 import { TextField } from "@kobalte/core/text-field";
 import { ClientResponseError } from "pocketbase";
-import Check from "lucide-solid/icons/check";
 
 import { useAuthPB } from "../config/pocketbase";
 import Header from "../components/Header";
+import { Button, Tag as TagComponent, Checkbox, Slider, Input, TextArea } from "../components";
 import Container from "../components/Container";
-import {
+import type {
   Exercise,
   Tag,
   UserSession,
@@ -17,7 +17,6 @@ import {
   UserSessionExerciseCreateData,
 } from "../../Types";
 import { ExerciseList } from "../views/data";
-import { Checkbox } from "@kobalte/core/checkbox";
 
 interface SaveSessionProps {
   nextSessionExerciseID?: string;
@@ -208,64 +207,51 @@ const LogSession: Component = () => {
           fallback={
             <>
               <p>Select Date</p>
-              <label class="label">
-                <span class="label-text">Date</span>
-              </label>
-              <input
+              <Input
+                label="Date"
                 type="date"
                 value={newSession.userDay}
                 onInput={(e) => {
                   setNewSession("userDay", e.target.value);
                   getSession();
                 }}
-                class="input input-bordered w-full"
               />
               <Show when={!loading() && newSession.name}>
                 <p>Found session: {newSession.name}</p>
               </Show>
-              <button onclick={() => setDateSelected(true)}>Continue</button>
+              <Button onClick={() => setDateSelected(true)}>Continue</Button>
             </>
           }
         >
           <p>{newSession.userDay}</p>
-          <button
-            onclick={() => {
+          <Button
+            onClick={() => {
               setDateSelected(false);
               setLoading(true);
               setNewSession(BaseNewSession);
               navigate("/workouts/log");
             }}
           >
-            <p>back to select date</p>
-          </button>
-          <TextField>
-            <TextField.Label>Session Name</TextField.Label>
-            <TextField.Input
-              type="text"
-              value={newSession.name}
-              onInput={(
-                e: InputEvent & {
-                  target: HTMLInputElement;
-                }
-              ) => setNewSession("name", e.target.value)}
-            />
-          </TextField>
-          <TextField>
-            <TextField.Label>Notes</TextField.Label>
-            <TextField.TextArea
-              type="text"
-              value={newSession.notes}
-              onInput={(
-                e: InputEvent & {
-                  target: HTMLInputElement;
-                }
-              ) => setNewSession("notes", e.target.value)}
-            />
-          </TextField>
+            back to select date
+          </Button>
+
+          <Input
+            label="Session Name"
+            type="text"
+            value={newSession.name}
+            onInput={(e) => setNewSession("name", e.target.value)}
+          />
+
+          <TextArea
+            label="Notes"
+            value={newSession.notes}
+            onInput={(e) => setNewSession("notes", e.target.value)}
+          />
+
           <p>Exercises</p>
-          <button onclick={() => setShowCreateSessionExercise(true)}>Add Set</button>
+          <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
           <Show when={showCreateSessionExercise()}>
-            <button onclick={() => setShowAddExercise(true)}>Select Exercise</button>
+            <Button onClick={() => setShowAddExercise(true)}>Select Exercise</Button>
             <Show when={showAddExercise()}>
               <ExerciseList
                 onclick={(exercise: Exercise) => {
@@ -277,84 +263,58 @@ const LogSession: Component = () => {
             <div class="flex flex-row">
               <p>Selected exercise: {newSessionExercise.exercise?.name ?? "None"}</p>
 
-              <TextField>
-                <TextField.Label>Notes</TextField.Label>
-                <TextField.TextArea
-                  type="text"
-                  value={newSessionExercise.notes}
-                  onInput={(
-                    e: InputEvent & {
-                      target: HTMLInputElement;
-                    }
-                  ) => setNewSessionExercise("notes", e.target.value)}
-                />
-              </TextField>
+              <TextArea
+                label="Notes"
+                value={newSessionExercise.notes}
+                onInput={(e) => setNewSessionExercise("notes", e.target.value)}
+              />
 
-              <TextField>
-                <TextField.Label>Added weight</TextField.Label>
-                <TextField.Input
-                  type="number"
-                  value={newSessionExercise.addedWeight}
-                  onInput={(
-                    e: InputEvent & {
-                      target: HTMLInputElement;
-                    }
-                  ) => setNewSessionExercise("addedWeight", Number(e.target.value))}
-                />
-              </TextField>
+              <Input
+                label="Added weight"
+                type="number"
+                value={newSessionExercise.addedWeight}
+                onInput={(e) => setNewSessionExercise("addedWeight", Number(e.target.value))}
+              />
 
               <Checkbox
                 checked={newSessionExercise.isWarmup}
                 onChange={(v: boolean) => setNewSessionExercise("isWarmup", v)}
-              >
-                <Checkbox.Input />
-                <Checkbox.Control class="h-5 w-5 bg-ash-gray-500 rounded-sm">
-                  <Checkbox.Indicator>
-                    <Check />
-                  </Checkbox.Indicator>
-                </Checkbox.Control>
-                <Checkbox.Label>Is it a warmup?</Checkbox.Label>
-              </Checkbox>
+              />
 
-              <TextField>
-                <TextField.Label>Rest afterwards</TextField.Label>
-                <TextField.Input
-                  type="number"
-                  value={newSessionExercise.restAfter}
-                  onInput={(
-                    e: InputEvent & {
-                      target: HTMLInputElement;
-                    }
-                  ) => setNewSessionExercise("restAfter", Number(e.target.value))}
-                />
-              </TextField>
+              <Input
+                label="Rest afterwards"
+                type="number"
+                value={newSessionExercise.restAfter}
+                onInput={(e) => setNewSessionExercise("restAfter", Number(e.target.value))}
+              />
+
+              <Slider
+                label="Perceived Effort"
+                onChange={(v) => setNewSessionExercise("perceivedEffort", v)}
+                value={newSessionExercise.perceivedEffort}
+              />
+
               <Show
                 when={
                   newSessionExercise.exercise && newSessionExercise.exercise.expand?.measurementType?.numeric
                 }
               >
-                <TextField>
-                  <TextField.Label>Amount (reps, mins, whatever)</TextField.Label>
-                  <TextField.Input
-                    type="number"
-                    value={newSessionExercise.measurement}
-                    onInput={(
-                      e: InputEvent & {
-                        target: HTMLInputElement;
-                      }
-                    ) => setNewSessionExercise("measurement", Number(e.target.value))}
-                  />
-                </TextField>
+                <Input
+                  label="Amount (reps, mins, whatever)"
+                  type="number"
+                  value={newSessionExercise.measurement}
+                  onInput={(e) => setNewSessionExercise("measurement", Number(e.target.value))}
+                />
               </Show>
             </div>
-            <button
-              onclick={() => {
+            <Button
+              onClick={() => {
                 setShowCreateSessionExercise(false);
                 addSessionExercise();
               }}
             >
               Confirm add
-            </button>
+            </Button>
           </Show>
           <For each={newSession.sessionExercises}>
             {(e) => (
@@ -367,29 +327,22 @@ const LogSession: Component = () => {
             )}
           </For>
 
-          <TextField>
-            <TextField.Label>Tags</TextField.Label>
-            <TextField.Input type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-          </TextField>
+          <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
+
           <For each={newSession.tags}>
             {(t) => (
-              <span class="badge">
-                {t.name}
-                <button
-                  onClick={() =>
-                    setNewSession(
-                      "tags",
-                      newSession.tags.filter((tag) => tag.name !== t.name)
-                    )
-                  }
-                  class="ml-1"
-                >
-                  ×
-                </button>
-              </span>
+              <TagComponent
+                name={t.name}
+                onClick={() =>
+                  setNewSession(
+                    "tags",
+                    newSession.tags.filter((tag) => tag.name !== t.name)
+                  )
+                }
+              />
             )}
           </For>
-          <button onclick={() => saveSession({})}>Save</button>
+          <Button onClick={() => saveSession({})}>Save</Button>
         </Show>
       </Container>
     </>
