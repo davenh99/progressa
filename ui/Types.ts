@@ -78,7 +78,7 @@ export interface UserSession extends UserSessionCreateData {
   id: string;
   expand?: {
     tags?: Tag[];
-    sessionExercises_via_userSession?: UserSessionExercise[];
+    userSessionExercises_via_userSession?: UserSessionExercise[];
     meals_via_userSession?: Meal[];
   };
 }
@@ -104,6 +104,7 @@ export interface UserSessionExercise extends UserSessionExerciseCreateData {
   id: string;
   expand?: {
     exercise?: Exercise;
+    variation: ExerciseVariation;
   };
 }
 

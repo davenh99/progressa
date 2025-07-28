@@ -7,7 +7,7 @@ import { Exercise } from "../../../Types";
 import Loading from "../Loading";
 
 interface Props {
-  onclick: (exercise: Exercise) => void;
+  onClick: (exercise: Exercise) => void;
 }
 
 export const ExerciseList: Component<Props> = (props) => {
@@ -36,7 +36,9 @@ export const ExerciseList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const exercises = await pb.collection<Exercise>("exercises").getFullList({ expand: "measurementType" });
+      const exercises = await pb
+        .collection<Exercise>("exercises")
+        .getFullList({ expand: "measurementType, exerciseVariations_via_exercise" });
 
       // console.log(exercises);
       setExercises(exercises);
@@ -68,7 +70,7 @@ export const ExerciseList: Component<Props> = (props) => {
             <tbody>
               <For each={table.getRowModel().rows}>
                 {(row) => (
-                  <tr class="hover" onclick={() => props.onclick(row.original)}>
+                  <tr class="hover" onClick={() => props.onClick(row.original)}>
                     <For each={row.getVisibleCells()}>
                       {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
                     </For>

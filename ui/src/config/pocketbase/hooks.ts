@@ -83,20 +83,5 @@ export function useAuthPB() {
     }
   };
 
-  const getUserSessionExercises = async (sessionID: string) => {
-    try {
-      const userSessionExercises = await pb
-        .collection<UserSessionExercise>("userSessionExercises")
-        .getFullList({
-          filter: `user = '${user.id}' && userSession = '${sessionID}'`,
-          expand: "exercise",
-        });
-
-      return userSessionExercises;
-    } catch (e) {
-      throw new Error("get userSessionExercises error", e);
-    }
-  };
-
-  return { pb, user, logout, getUserSessions, getUserSessionExercises };
+  return { pb, user, logout, getUserSessions };
 }

@@ -1,29 +1,20 @@
-import { Component, createSignal, For, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
-import { TextField } from "@kobalte/core/text-field";
 import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
 import Header from "../components/Header";
-import { Button, Tag as TagComponent, Checkbox, Slider, Input, TextArea } from "../components";
+import { Button, Tag as TagComponent, Input, TextArea } from "../components";
 import Container from "../components/Container";
-import type {
-  Exercise,
-  Tag,
-  UserSession,
-  UserSessionCreateData,
-  UserSessionExercise,
-  UserSessionExerciseCreateData,
-} from "../../Types";
-import { ExerciseList } from "../views/data";
+import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } from "../../Types";
+import { UserSessionExerciseList } from "../views/data";
 
 interface SaveSessionProps {
-  nextSessionExerciseID?: string;
   nextTagID?: string;
 }
 
-const BaseNewSession = {
+const Basesession = {
   name: "",
   userDay: new Date().toLocaleDateString("en-CA"),
   notes: "",
@@ -31,25 +22,10 @@ const BaseNewSession = {
   sessionExercises: [] as UserSessionExercise[],
 };
 
-const BaseNewExercise = {
-  exercise: null as Exercise,
-  notes: "",
-  tags: [] as Tag[],
-  addedWeight: 0,
-  restAfter: 0,
-  isWarmup: false,
-  perceivedEffort: 50,
-  measurement: null as string | number,
-  supersetParent: null as string,
-};
-
 const LogSession: Component = () => {
   const [dateSelected, setDateSelected] = createSignal(false);
-  const [newSessionExercise, setNewSessionExercise] = createStore(BaseNewExercise);
-  const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
-  const [showAddExercise, setShowAddExercise] = createSignal(false);
   const [loading, setLoading] = createSignal(true);
-  const [newSession, setNewSession] = createStore(BaseNewSession);
+  const [session, setSession] = createStore(Basesession);
   const { pb, user } = useAuthPB();
   const navigate = useNavigate();
   const params = useParams();
@@ -60,21 +36,23 @@ const LogSession: Component = () => {
 
       if (params.id) {
         session = await pb.collection<UserSession>("userSessions").getOne(params.id, {
-          expand: "tags, sessionExercises, sessionExercises.exercise",
+          expand:
+            "tags, userSessionExercises_via_userSession.exercise, userSessionExercises_via_userSession.variation",
         });
       } else {
         session = await pb
           .collection<UserSession>("userSessions")
-          .getFirstListItem(`userDay = '${newSession.userDay}'`, {
-            expand: "tags, sessionExercises, sessionExercises.exercise",
+          .getFirstListItem(`userDay = '${session.userDay}'`, {
+            expand:
+              "tags, userSessionExercises_via_userSession.exercise, userSessionExercises_via_userSession.variation",
           });
       }
 
-      setNewSession("name", session.name);
-      setNewSession("userDay", session.userDay);
-      setNewSession("notes", session.notes);
-      setNewSession("tags", session.expand?.tags ?? []);
-      setNewSession("sessionExercises", session.expand?.sessionExercises ?? []);
+      setSession("name", session.name);
+      setSession("userDay", session.userDay);
+      setSession("notes", session.notes);
+      setSession("tags", session.expand?.tags ?? []);
+      setSession("sessionExercises", session.expand?.userSessionExercises_via_userSession ?? []);
     } catch (e) {
       if (e instanceof ClientResponseError && e.status == 404) {
       } else {
@@ -92,7 +70,7 @@ const LogSession: Component = () => {
       e.preventDefault();
       const newTag = e.target.value.trim();
 
-      if (!newSession.tags.map((t) => t.name).includes(newTag)) {
+      if (!session.tags.map((t) => t.name).includes(newTag)) {
         try {
           const foundTag = await pb
             .collection<Tag>("tags")
@@ -100,7 +78,7 @@ const LogSession: Component = () => {
 
           await saveSession({ nextTagID: foundTag.id });
 
-          setNewSession("tags", [...newSession.tags, foundTag]);
+          setSession("tags", [...session.tags, foundTag]);
         } catch (e) {
           if (e instanceof ClientResponseError && e.status == 404) {
             const createdTag = await pb
@@ -109,7 +87,7 @@ const LogSession: Component = () => {
 
             await saveSession({ nextTagID: createdTag.id });
 
-            setNewSession("tags", [...newSession.tags, createdTag]);
+            setSession("tags", [...session.tags, createdTag]);
           } else {
             console.log(e);
           }
@@ -120,18 +98,25 @@ const LogSession: Component = () => {
     }
   };
 
-  // TODO we could make this only send the relevant data
-  const saveSession = async ({ nextSessionExerciseID, nextTagID }: SaveSessionProps) => {
-    let updateData = {
-      name: newSession.name,
-      notes: newSession.notes,
-      sessionExercises: newSession.sessionExercises.map((e) => e.id),
-      tags: newSession.tags.map((t) => t.id),
-    };
-
-    if (nextSessionExerciseID) {
-      updateData.sessionExercises = [...updateData.sessionExercises, nextSessionExerciseID];
+  const deleteTag = async (t: Tag) => {
+    try {
+      await pb.collection<UserSession>("userSessions").update(params.id, { "tags-": [t.id] });
+      setSession(
+        "tags",
+        session.tags.filter((tag) => tag.name !== t.name)
+      );
+    } catch (e) {
+      console.log(e);
     }
+  };
+
+  // TODO we could make this only send the relevant data
+  const saveSession = async ({ nextTagID }: SaveSessionProps) => {
+    let updateData = {
+      name: session.name,
+      notes: session.notes,
+      tags: session.tags.map((t) => t.id),
+    };
 
     if (nextTagID) {
       updateData.tags = [...updateData.tags, nextTagID];
@@ -144,46 +129,14 @@ const LogSession: Component = () => {
         const createData: UserSessionCreateData = {
           ...updateData,
           user: user.id,
-          userDay: newSession.userDay,
+          userDay: session.userDay,
           userHeight: user.height,
           userWeight: user.weight,
-          meals: [],
           sleepQuality: "fair",
         };
 
-        const session = await pb.collection<UserSession>("userSessions").create(createData);
-        navigate(`/workouts/log/${session.id}`, { replace: true });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const addSessionExercise = async () => {
-    const data: UserSessionExerciseCreateData = {
-      user: user.id,
-      notes: newSessionExercise.notes,
-      addedWeight: newSessionExercise.addedWeight,
-      exercise: newSessionExercise.exercise.id,
-      isWarmup: newSessionExercise.isWarmup,
-      perceivedEffort: newSessionExercise.perceivedEffort,
-      restAfter: newSessionExercise.restAfter,
-      tags: [],
-      sequence: Math.max(...newSession.sessionExercises.map((e) => e.sequence)) + 1,
-    };
-
-    try {
-      // TODO validate data and display error before getting here
-      const sessionExercise = await pb
-        .collection<UserSessionExercise>("userSessionExercises")
-        .create(data, { expand: "exercise" });
-
-      if (sessionExercise) {
-        await saveSession({ nextSessionExerciseID: sessionExercise.id });
-
-        setNewSession("sessionExercises", [...newSession.sessionExercises, sessionExercise]);
-      } else {
-        alert("error savign data, perhaps incomplete :)");
+        const newSession = await pb.collection<UserSession>("userSessions").create(createData);
+        navigate(`/workouts/log/${newSession.id}`, { replace: true });
       }
     } catch (e) {
       console.log(e);
@@ -210,25 +163,25 @@ const LogSession: Component = () => {
               <Input
                 label="Date"
                 type="date"
-                value={newSession.userDay}
+                value={session.userDay}
                 onInput={(e) => {
-                  setNewSession("userDay", e.target.value);
+                  setSession("userDay", e.target.value);
                   getSession();
                 }}
               />
-              <Show when={!loading() && newSession.name}>
-                <p>Found session: {newSession.name}</p>
+              <Show when={!loading() && session.name}>
+                <p>Found session: {session.name}</p>
               </Show>
               <Button onClick={() => setDateSelected(true)}>Continue</Button>
             </>
           }
         >
-          <p>{newSession.userDay}</p>
+          <p>{session.userDay}</p>
           <Button
             onClick={() => {
               setDateSelected(false);
               setLoading(true);
-              setNewSession(BaseNewSession);
+              setSession(Basesession);
               navigate("/workouts/log");
             }}
           >
@@ -238,110 +191,22 @@ const LogSession: Component = () => {
           <Input
             label="Session Name"
             type="text"
-            value={newSession.name}
-            onInput={(e) => setNewSession("name", e.target.value)}
+            value={session.name}
+            onInput={(e) => setSession("name", e.target.value)}
           />
 
           <TextArea
             label="Notes"
-            value={newSession.notes}
-            onInput={(e) => setNewSession("notes", e.target.value)}
+            value={session.notes}
+            onInput={(e) => setSession("notes", e.target.value)}
           />
 
           <p>Exercises</p>
-          <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
-          <Show when={showCreateSessionExercise()}>
-            <Button onClick={() => setShowAddExercise(true)}>Select Exercise</Button>
-            <Show when={showAddExercise()}>
-              <ExerciseList
-                onclick={(exercise: Exercise) => {
-                  setShowAddExercise(false);
-                  setNewSessionExercise("exercise", exercise);
-                }}
-              />
-            </Show>
-            <div class="flex flex-row">
-              <p>Selected exercise: {newSessionExercise.exercise?.name ?? "None"}</p>
-
-              <TextArea
-                label="Notes"
-                value={newSessionExercise.notes}
-                onInput={(e) => setNewSessionExercise("notes", e.target.value)}
-              />
-
-              <Input
-                label="Added weight"
-                type="number"
-                value={newSessionExercise.addedWeight}
-                onInput={(e) => setNewSessionExercise("addedWeight", Number(e.target.value))}
-              />
-
-              <Checkbox
-                checked={newSessionExercise.isWarmup}
-                onChange={(v: boolean) => setNewSessionExercise("isWarmup", v)}
-              />
-
-              <Input
-                label="Rest afterwards"
-                type="number"
-                value={newSessionExercise.restAfter}
-                onInput={(e) => setNewSessionExercise("restAfter", Number(e.target.value))}
-              />
-
-              <Slider
-                label="Perceived Effort"
-                onChange={(v) => setNewSessionExercise("perceivedEffort", v)}
-                value={newSessionExercise.perceivedEffort}
-              />
-
-              <Show
-                when={
-                  newSessionExercise.exercise && newSessionExercise.exercise.expand?.measurementType?.numeric
-                }
-              >
-                <Input
-                  label="Amount (reps, mins, whatever)"
-                  type="number"
-                  value={newSessionExercise.measurement}
-                  onInput={(e) => setNewSessionExercise("measurement", Number(e.target.value))}
-                />
-              </Show>
-            </div>
-            <Button
-              onClick={() => {
-                setShowCreateSessionExercise(false);
-                addSessionExercise();
-              }}
-            >
-              Confirm add
-            </Button>
-          </Show>
-          <For each={newSession.sessionExercises}>
-            {(e) => (
-              <div class="flex flex-row">
-                <p>Exercise: {e.expand.exercise?.name}</p>
-                <p>Warmup?: {e.isWarmup ? "yes" : "no"}</p>
-                <p>Added Weight: {e.addedWeight}</p>
-                <p>Notes: {e.notes}</p>
-              </div>
-            )}
-          </For>
+          <UserSessionExerciseList sessionExercises={session.sessionExercises} sessionID={params.id} />
 
           <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
 
-          <For each={newSession.tags}>
-            {(t) => (
-              <TagComponent
-                name={t.name}
-                onClick={() =>
-                  setNewSession(
-                    "tags",
-                    newSession.tags.filter((tag) => tag.name !== t.name)
-                  )
-                }
-              />
-            )}
-          </For>
+          <For each={session.tags}>{(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}</For>
           <Button onClick={() => saveSession({})}>Save</Button>
         </Show>
       </Container>
