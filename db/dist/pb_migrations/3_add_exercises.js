@@ -15,7 +15,6 @@ migrate(
       "description",
       "A one-hand lift on a 20mm edge, an excellent choice for building finger strength. Select from grip type."
     );
-    record.set("variations", ["g5zbeg25i7vx1ee", "femr1kq8bsud5il", "olh8p1v1li69xwd"]);
 
     app.save(record);
 
@@ -28,7 +27,6 @@ migrate(
     record.set("public", true);
     record.set("bodyweight", true);
     record.set("description", "Select from grip type.");
-    record.set("variations", ["xlofh42c7nss995", "ul74mgnwah1s0r1", "acbog8cxg2umwhn"]);
 
     app.save(record);
   },

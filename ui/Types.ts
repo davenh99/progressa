@@ -44,7 +44,15 @@ export interface Exercise {
   createdBy: string;
   expand?: {
     measurementType?: MeasurementType;
+    exerciseVariations_via_exercise?: ExerciseVariation[];
   };
+}
+
+export interface ExerciseVariation {
+  id: string;
+  exercise: string;
+  name: string;
+  description: string;
 }
 
 export interface SessionExercise {
@@ -63,34 +71,32 @@ export interface UserSessionCreateData {
   tags: string[];
   userHeight: number;
   userWeight: number;
-  meals: string[];
   sleepQuality: "poor" | "fair" | "good" | "great";
-  sessionExercises: string[];
 }
 
 export interface UserSession extends UserSessionCreateData {
   id: string;
   expand?: {
     tags?: Tag[];
-    sessionExercises?: UserSessionExercise[];
-    meals?: Meal[];
+    sessionExercises_via_userSession?: UserSessionExercise[];
+    meals_via_userSession?: Meal[];
   };
 }
 
 export interface UserSessionExerciseCreateData {
   user: string;
   exercise: string;
+  userSession: string;
   notes: string;
   tags: string[];
   addedWeight: number;
-  // qty: number;
   restAfter: number;
   isWarmup: boolean;
   sequence: number;
+  variation: string;
   perceivedEffort: number; // 0 - 100
   measurementNumeric?: number;
   measurementValue?: string;
-  // sessionExercise?: string;
   supersetParent?: string;
 }
 
@@ -110,6 +116,7 @@ export interface Tag {
 
 export interface Meal {
   id: string;
+  userSession: string;
   name: string;
   kj: number;
   gramsProtein: number;
