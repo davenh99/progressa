@@ -81,21 +81,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       ),
     },
     {
-      accessorKey: "notes",
-      header: "Notes",
-      cell: (ctx) => (
-        <DataInput
-          type="text"
-          initial={ctx.getValue() as string}
-          saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "notes")}
-        />
-      ),
-    },
-    {
-      accessorKey: "tags",
-      header: "Tags",
-    },
-    {
       header: "",
       id: "more-info",
       cell: () => <Ellipsis />,
