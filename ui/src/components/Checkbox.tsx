@@ -6,7 +6,6 @@ interface Props {
   checked: boolean;
   onChange: (v: boolean) => void;
   label?: string;
-  saveFunc?: () => void;
 }
 
 export const Checkbox: ParentComponent<Props> = (props) => {

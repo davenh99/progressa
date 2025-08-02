@@ -9,7 +9,7 @@ import {
   UserSessionExerciseCreateData,
 } from "../../../Types";
 import { ExerciseList } from ".";
-import { Button, DataCheckbox, DataInput, DataSlider } from "../../components";
+import { Button, DataCheckbox, DataInput, DataSlider, DataSelect } from "../../components";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import Ellipsis from "lucide-solid/icons/ellipsis";
 import { ExerciseVariationList } from "./ExerciseVariationList";
@@ -46,6 +46,31 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           initial={ctx.getValue() as boolean}
           saveFunc={(v: boolean) => saveRow(ctx.row.original.id, v, "isWarmup")}
         />
+      ),
+    },
+    {
+      accessorFn: (row) =>
+        row.expand?.exercise?.expand?.measurementType?.numeric ? "measurementNumeric" : "measurementValue",
+      header: "Measurement",
+      cell: (ctx) => (
+        <Show
+          when={ctx.row.original.expand?.exercise?.expand?.measurementType?.numeric}
+          fallback={
+            <DataSelect
+              values={
+                ctx.row.original.expand?.exercise?.expand?.measurementType?.expand
+                  ?.measurementValues_via_measurementType
+              }
+              saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "measurementValue")}
+            />
+          }
+        >
+          <DataInput
+            type="number"
+            initial={ctx.getValue() as number}
+            saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "measurementNumeric")}
+          />
+        </Show>
       ),
     },
     {
@@ -116,7 +141,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     } else {
       try {
         // TODO below in inefficient, can probably just grab the new record from the return value and add it
-        await pb.collection<UserSessionExercise>("userSessionExercises").create(data, { expand: "exercise" });
+        await pb
+          .collection<UserSessionExercise>("userSessionExercises")
+          .create(data, { expand: "exercise.measurementType.measurementValues_via_measurementType" });
         await props.getSession();
       } catch (e) {
         console.log(e);

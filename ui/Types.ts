@@ -14,6 +14,9 @@ export interface MeasurementType {
   public: boolean;
   createdBy: string;
   numeric: boolean;
+  expand?: {
+    measurementValues_via_measurementType: MeasurementValue[];
+  };
 }
 
 export interface MeasurementValue {
@@ -104,7 +107,7 @@ export interface UserSessionExercise extends UserSessionExerciseCreateData {
   supersetParent?: string;
   expand?: {
     exercise?: Exercise;
-    variation: ExerciseVariation;
+    variation?: ExerciseVariation;
   };
 }
 

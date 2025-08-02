@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
@@ -37,14 +37,14 @@ const LogSession: Component = () => {
       if (params.id) {
         session = await pb.collection<UserSession>("userSessions").getOne(params.id, {
           expand:
-            "tags, userSessionExercises_via_userSession.exercise, userSessionExercises_via_userSession.variation",
+            "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.variation",
         });
       } else {
         session = await pb
           .collection<UserSession>("userSessions")
           .getFirstListItem(`userDay = '${session.userDay}'`, {
             expand:
-              "tags, userSessionExercises_via_userSession.exercise, userSessionExercises_via_userSession.variation",
+              "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.variation",
           });
       }
 

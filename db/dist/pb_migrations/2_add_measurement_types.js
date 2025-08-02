@@ -3,28 +3,26 @@ migrate(
   (app) => {
     let measurementTypes = app.findCollectionByNameOrId("measurementTypes");
 
-    let record = new Record(measurementTypes);
+    const newMeasurementTypes = [
+      { id: "m01s8yx7wfk2gxd", s: true, n: "Reps", num: true, p: true },
+      { id: "8ldlggjjvy2ircl", s: true, n: "s (Time)", num: true, p: true },
+      { id: "8ldlgghjvy4ircl", s: true, n: "Boulder grade (hueco)", num: false, p: true },
+    ];
 
-    record.set("id", "m01s8yx7wfk2gxd");
-    record.set("system", true);
-    record.set("name", "Reps");
-    record.set("numeric", true);
-    record.set("public", true);
+    for (const m of newMeasurementTypes) {
+      let record = new Record(measurementTypes);
 
-    app.save(record);
+      record.set("id", m.id);
+      record.set("system", m.s);
+      record.set("name", m.n);
+      record.set("numeric", m.num);
+      record.set("public", m.p);
 
-    record = new Record(measurementTypes);
-
-    record.set("id", "8ldlggjjvy2ircl");
-    record.set("system", true);
-    record.set("name", "Time (s)");
-    record.set("numeric", true);
-    record.set("public", true);
-
-    app.save(record);
+      app.save(record);
+    }
   },
   (app) => {
-    const createdIDs = ["m01s8yx7wfk2gxd", "8ldlggjjvy2ircl"];
+    const createdIDs = ["m01s8yx7wfk2gxd", "8ldlggjjvy2ircl", "8ldlgghjvy4ircl"];
     for (const id of createdIDs) {
       try {
         let record = app.findRecordById("measurementTypes", id);
