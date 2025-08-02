@@ -5,66 +5,95 @@ import { useAuthPB } from "../../config/pocketbase";
 import {
   Exercise,
   ExerciseVariation,
-  Tag,
   UserSessionExercise,
   UserSessionExerciseCreateData,
 } from "../../../Types";
 import { ExerciseList } from ".";
-import { Button, Checkbox, Input, Slider, TextArea } from "../../components";
+import { Button, DataCheckbox, DataInput, DataSlider } from "../../components";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import Ellipsis from "lucide-solid/icons/ellipsis";
 import { ExerciseVariationList } from "./ExerciseVariationList";
+import { ClientResponseError } from "pocketbase";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
+  getSession: () => Promise<void>;
 }
 
 const BaseNewExercise = {
   exercise: null as Exercise,
-  notes: "",
-  tags: [] as Tag[],
-  addedWeight: 0,
-  restAfter: 0,
-  isWarmup: false,
-  perceivedEffort: 50,
-  variation: "",
-  measurement: null as string | number,
-  supersetParent: null as string,
+  variation: null as ExerciseVariation,
 };
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
   const [newExercise, setNewExercise] = createStore(BaseNewExercise);
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
-  const [showAddExercise, setShowAddExercise] = createSignal(false);
   const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
   const [variations, setVariations] = createSignal<ExerciseVariation[]>([]);
   const { pb, user } = useAuthPB();
 
   const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
     {
-      accessorKey: "notes",
-      header: "Notes",
-    },
-    {
       accessorFn: (row) => `${row.expand?.exercise?.name} (${row.expand?.variation?.name})`,
       header: "Exercise",
     },
     {
-      accessorKey: "tags",
-      header: "Tags",
+      accessorKey: "isWarmup",
+      header: "Warmup?",
+      cell: (ctx) => (
+        <DataCheckbox
+          initial={ctx.getValue() as boolean}
+          saveFunc={(v: boolean) => saveRow(ctx.row.original.id, v, "isWarmup")}
+        />
+      ),
     },
     {
       accessorKey: "addedWeight",
       header: "Weight Added (kg)",
+      cell: (ctx) => (
+        <DataInput
+          type="number"
+          initial={ctx.getValue() as number}
+          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "addedWeight")}
+        />
+      ),
+    },
+    {
+      accessorKey: "perceivedEffort",
+      header: "Perceived Effort",
+      cell: (ctx) => (
+        <DataSlider
+          initial={50}
+          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "perceivedEffort")}
+        />
+      ),
     },
     {
       accessorKey: "restAfter",
       header: "Rest After (s)",
+      cell: (ctx) => (
+        <DataInput
+          type="number"
+          initial={ctx.getValue() as number}
+          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "restAfter")}
+        />
+      ),
     },
     {
-      accessorKey: "isWarmup",
-      header: "Warmup?",
+      accessorKey: "notes",
+      header: "Notes",
+      cell: (ctx) => (
+        <DataInput
+          type="text"
+          initial={ctx.getValue() as string}
+          saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "notes")}
+        />
+      ),
+    },
+    {
+      accessorKey: "tags",
+      header: "Tags",
     },
     {
       header: "",
@@ -73,26 +102,42 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
   ]);
 
+  const saveRow = async (id: string, newVal: any, key: any) => {
+    const data = {};
+    data[`${key}`] = newVal;
+
+    try {
+      await pb.collection("userSessionExercises").update(id, data);
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 0) {
+      } else {
+        console.log(e);
+      }
+    }
+  };
+
   const addSessionExercise = async () => {
     const data: UserSessionExerciseCreateData = {
       user: user.id,
       userSession: props.sessionID,
-      variation: newExercise.variation,
-      notes: newExercise.notes,
-      addedWeight: newExercise.addedWeight,
+      variation: newExercise.variation.id,
       exercise: newExercise.exercise.id,
-      isWarmup: newExercise.isWarmup,
-      perceivedEffort: newExercise.perceivedEffort,
-      restAfter: newExercise.restAfter,
-      tags: [],
+      perceivedEffort: 50,
       sequence: Math.max(...props.sessionExercises.map((e) => e.sequence)) + 1,
     };
 
-    try {
-      // TODO validate data and display error before getting here?
-      await pb.collection<UserSessionExercise>("userSessionExercises").create(data, { expand: "exercise" });
-    } catch (e) {
-      console.log(e);
+    if (variations.length > 0 && !newExercise.variation) {
+      alert("must select a variation for this exercise");
+    } else {
+      try {
+        // TODO below in inefficient, can probably just grab the new record from the return value and add it
+        await pb.collection<UserSessionExercise>("userSessionExercises").create(data, { expand: "exercise" });
+        await props.getSession();
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setShowCreateSessionExercise(false);
+      }
     }
   };
 
@@ -106,82 +151,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   return (
     <>
-      <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
-      <Show when={showCreateSessionExercise()}>
-        <Button onClick={() => setShowAddExercise(true)}>Select Exercise</Button>
-        <Show when={showAddExercise()}>
-          <ExerciseList
-            onClick={(exercise: Exercise) => {
-              if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
-                setShowAddExerciseVariation(true);
-                setVariations(exercise.expand.exerciseVariations_via_exercise);
-              } else {
-                setShowAddExercise(false);
-              }
-              setNewExercise("exercise", exercise);
-            }}
-          />
-          <Show when={showAddExerciseVariation()}>
-            <ExerciseVariationList
-              variations={variations}
-              onClick={(v) => {
-                setShowAddExercise(false);
-                setShowAddExerciseVariation(false);
-                setNewExercise("variation", v.id);
-              }}
-            />
-          </Show>
-        </Show>
-        <div class="flex flex-row">
-          <p>Selected exercise: {newExercise.exercise?.name ?? "None"}</p>
-
-          <TextArea
-            label="Notes"
-            value={newExercise.notes}
-            onInput={(e) => setNewExercise("notes", e.target.value)}
-          />
-
-          <Input
-            label="Added weight"
-            type="number"
-            value={newExercise.addedWeight}
-            onInput={(e) => setNewExercise("addedWeight", Number(e.target.value))}
-          />
-
-          <Checkbox checked={newExercise.isWarmup} onChange={(v: boolean) => setNewExercise("isWarmup", v)} />
-
-          <Input
-            label="Rest afterwards"
-            type="number"
-            value={newExercise.restAfter}
-            onInput={(e) => setNewExercise("restAfter", Number(e.target.value))}
-          />
-
-          <Slider
-            label="Perceived Effort"
-            onChange={(v) => setNewExercise("perceivedEffort", v)}
-            value={newExercise.perceivedEffort}
-          />
-
-          <Show when={newExercise.exercise && newExercise.exercise.expand?.measurementType?.numeric}>
-            <Input
-              label="Amount (reps, mins, whatever)"
-              type="number"
-              value={newExercise.measurement}
-              onInput={(e) => setNewExercise("measurement", Number(e.target.value))}
-            />
-          </Show>
-        </div>
-        <Button
-          onClick={() => {
-            setShowCreateSessionExercise(false);
-            addSessionExercise();
-          }}
-        >
-          Confirm add
-        </Button>
-      </Show>
-
       <table class="table w-full">
         <thead>
           <For each={table.getHeaderGroups()}>
@@ -206,6 +175,33 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           </For>
         </tbody>
       </table>
+      <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
+      <Show when={showCreateSessionExercise()}>
+        <p>Select Exercise</p>
+        <ExerciseList
+          onClick={(exercise: Exercise) => {
+            if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
+              setShowAddExerciseVariation(true);
+              setVariations(exercise.expand.exerciseVariations_via_exercise);
+            }
+            setNewExercise("exercise", exercise);
+          }}
+        />
+        <Show when={showAddExerciseVariation()}>
+          <ExerciseVariationList
+            variations={variations}
+            onClick={(v) => {
+              setShowAddExerciseVariation(false);
+              setNewExercise("variation", v);
+            }}
+          />
+        </Show>
+        <p>
+          Selected: {newExercise.exercise?.name ?? "None"}{" "}
+          {newExercise.variation?.name ? `(${newExercise.variation?.name})` : ""}
+        </p>
+        <Button onClick={addSessionExercise}>Add</Button>
+      </Show>
     </>
   );
 };

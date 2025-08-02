@@ -1,10 +1,12 @@
-import { ParentComponent } from "solid-js";
+import { createSignal, ParentComponent, Show } from "solid-js";
 import { Checkbox as KobalteCheckbox } from "@kobalte/core/checkbox";
 import Check from "lucide-solid/icons/check";
 
 interface Props {
   checked: boolean;
   onChange: (v: boolean) => void;
+  label?: string;
+  saveFunc?: () => void;
 }
 
 export const Checkbox: ParentComponent<Props> = (props) => {
@@ -16,9 +18,22 @@ export const Checkbox: ParentComponent<Props> = (props) => {
           <Check />
         </KobalteCheckbox.Indicator>
       </KobalteCheckbox.Control>
-      <KobalteCheckbox.Label>Is it a warmup?</KobalteCheckbox.Label>
+      <Show when={props.label}>
+        <KobalteCheckbox.Label>{props.label}</KobalteCheckbox.Label>
+      </Show>
     </KobalteCheckbox>
   );
+};
+
+interface DataProps {
+  initial: boolean;
+  saveFunc: (v: boolean) => Promise<void>;
+}
+
+export const DataCheckbox: ParentComponent<DataProps> = (props) => {
+  const [val, setVal] = createSignal(props.initial);
+
+  return <Checkbox checked={val()} onChange={(v: boolean) => props.saveFunc(v).then(() => setVal(v))} />;
 };
 
 export default Checkbox;

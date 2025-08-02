@@ -202,7 +202,11 @@ const LogSession: Component = () => {
           />
 
           <p>Exercises</p>
-          <UserSessionExerciseList sessionExercises={session.sessionExercises} sessionID={params.id} />
+          <UserSessionExerciseList
+            sessionExercises={session.sessionExercises}
+            sessionID={params.id}
+            getSession={getSession}
+          />
 
           <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
 

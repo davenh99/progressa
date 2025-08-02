@@ -1,4 +1,4 @@
-import { ParentComponent } from "solid-js";
+import { createSignal, ParentComponent } from "solid-js";
 import { Slider as KobalteSlider } from "@kobalte/core/slider";
 
 interface Props {
@@ -27,6 +27,27 @@ export const Slider: ParentComponent<Props> = (props) => {
         </KobalteSlider.Thumb>
       </KobalteSlider.Track>
     </KobalteSlider>
+  );
+};
+
+interface DataProps {
+  initial: number;
+  saveFunc: (v: number) => Promise<void>;
+  label?: string;
+}
+
+export const DataSlider: ParentComponent<DataProps> = (props) => {
+  const [val, setVal] = createSignal(props.initial);
+
+  return (
+    <Slider
+      label={props.label}
+      value={val()}
+      onChange={(v: number) => {
+        props.saveFunc(v);
+        setVal(v);
+      }}
+    />
   );
 };
 

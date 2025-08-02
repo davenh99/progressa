@@ -87,21 +87,21 @@ export interface UserSessionExerciseCreateData {
   user: string;
   exercise: string;
   userSession: string;
+  variation: string;
+  sequence: number;
+  perceivedEffort: number; // 0 - 100
+}
+
+export interface UserSessionExercise extends UserSessionExerciseCreateData {
+  id: string;
   notes: string;
   tags: string[];
   addedWeight: number;
   restAfter: number;
   isWarmup: boolean;
-  sequence: number;
-  variation: string;
-  perceivedEffort: number; // 0 - 100
   measurementNumeric?: number;
   measurementValue?: string;
   supersetParent?: string;
-}
-
-export interface UserSessionExercise extends UserSessionExerciseCreateData {
-  id: string;
   expand?: {
     exercise?: Exercise;
     variation: ExerciseVariation;
