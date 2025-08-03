@@ -43,8 +43,8 @@ export const DataInput: ParentComponent<DataProps> = (props) => {
       value={val()}
       onBlur={() => props.saveFunc(val())}
       onInput={(e: InputEvent & { target: HTMLInputElement }) => {
+        setVal(e.target.value);
         if (props.type == "number") {
-          setVal(e.target.value);
           props.saveFunc(e.target.value);
         }
       }}
