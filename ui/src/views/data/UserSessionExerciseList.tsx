@@ -1,10 +1,13 @@
 import { Component, createMemo, createSignal, For, Show } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 
 import { useAuthPB } from "../../config/pocketbase";
 import {
   Exercise,
   ExerciseVariation,
+  UserSession,
+  UserSessionCreateData,
   UserSessionExercise,
   UserSessionExerciseCreateData,
 } from "../../../Types";
@@ -13,11 +16,11 @@ import { Button, DataCheckbox, DataInput, DataSlider, DataSelect } from "../../c
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import Ellipsis from "lucide-solid/icons/ellipsis";
 import { ExerciseVariationList } from "./ExerciseVariationList";
-import { ClientResponseError } from "pocketbase";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
+  sessionDay: string;
   getSession: () => Promise<void>;
 }
 
@@ -31,7 +34,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
   const [variations, setVariations] = createSignal<ExerciseVariation[]>([]);
-  const { pb, user } = useAuthPB();
+  const navigate = useNavigate();
+  const { pb, user, updateRecord } = useAuthPB();
 
   const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
     {
@@ -112,17 +116,11 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
   ]);
 
-  const saveRow = async (id: string, newVal: any, key: any) => {
-    const data = {};
-    data[`${key}`] = newVal;
-
+  const saveRow = async (recordID: string, newVal: any, column: any) => {
     try {
-      await pb.collection("userSessionExercises").update(id, data);
+      await updateRecord("userSessionExercises", recordID, newVal, column);
     } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 0) {
-      } else {
-        console.log(e);
-      }
+      console.log(e);
     }
   };
 
@@ -130,7 +128,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     const data: UserSessionExerciseCreateData = {
       user: user.id,
       userSession: props.sessionID,
-      variation: newExercise.variation.id,
+      variation: newExercise.variation?.id || undefined,
       exercise: newExercise.exercise.id,
       perceivedEffort: 50,
       sequence: Math.max(...props.sessionExercises.map((e) => e.sequence)) + 1,
@@ -140,10 +138,31 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       alert("must select a variation for this exercise");
     } else {
       try {
-        // TODO below in inefficient, can probably just grab the new record from the return value and add it
+        if (!props.sessionID) {
+          // TODO can probs remove the double up here and in log session
+          const createData: UserSessionCreateData = {
+            name: "",
+            notes: "",
+            tags: [],
+            user: user.id,
+            userDay: props.sessionDay,
+            userHeight: user.height,
+            userWeight: user.weight,
+            sleepQuality: "fair",
+          };
+
+          const newSession = await pb.collection<UserSession>("userSessions").create(createData);
+          data.userSession = newSession.id;
+        }
+        // TODO below in inefficient, can probably just grab the new record from the return value and add it?
         await pb
           .collection<UserSessionExercise>("userSessionExercises")
           .create(data, { expand: "exercise.measurementType.measurementValues_via_measurementType" });
+
+        if (!props.sessionID) {
+          navigate(`/workouts/log/${data.userSession}`, { replace: true });
+        }
+
         await props.getSession();
       } catch (e) {
         console.log(e);

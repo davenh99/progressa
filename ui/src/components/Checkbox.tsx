@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent, Show } from "solid-js";
+import { createEffect, createSignal, ParentComponent, Show } from "solid-js";
 import { Checkbox as KobalteCheckbox } from "@kobalte/core/checkbox";
 import Check from "lucide-solid/icons/check";
 
@@ -31,6 +31,10 @@ interface DataProps {
 
 export const DataCheckbox: ParentComponent<DataProps> = (props) => {
   const [val, setVal] = createSignal(props.initial);
+
+  createEffect(() => {
+    setVal(props.initial);
+  });
 
   return <Checkbox checked={val()} onChange={(v: boolean) => props.saveFunc(v).then(() => setVal(v))} />;
 };

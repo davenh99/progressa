@@ -23,7 +23,7 @@ migrate(
         d: "Select from grip type.",
       },
       {
-        id: "a5wjd65ufgrjt8f",
+        id: "a5wjd65ifgrjt8f",
         s: true,
         n: "Boulder (hueco)",
         mType: "8ldlgghjvy4ircl",

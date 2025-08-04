@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent, Show } from "solid-js";
+import { createEffect, createSignal, ParentComponent, Show } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 
 interface Props {
@@ -32,11 +32,15 @@ export const Input: ParentComponent<Props> = (props) => {
 
 interface DataProps extends Props {
   initial: number | string;
-  saveFunc: (v: number | string) => Promise<void>;
+  saveFunc: (v: number | string) => Promise<any>;
 }
 
 export const DataInput: ParentComponent<DataProps> = (props) => {
   const [val, setVal] = createSignal(props.initial);
+
+  createEffect(() => {
+    setVal(props.initial);
+  });
 
   return (
     <Input

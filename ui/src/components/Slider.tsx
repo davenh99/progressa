@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent } from "solid-js";
+import { createEffect, createSignal, ParentComponent } from "solid-js";
 import { Slider as KobalteSlider } from "@kobalte/core/slider";
 
 interface Props {
@@ -38,6 +38,10 @@ interface DataProps {
 
 export const DataSlider: ParentComponent<DataProps> = (props) => {
   const [val, setVal] = createSignal(props.initial);
+
+  createEffect(() => {
+    setVal(props.initial);
+  });
 
   return (
     <Slider

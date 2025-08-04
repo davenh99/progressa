@@ -83,5 +83,22 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getUserSessions };
+  const updateRecord = async <T>(collectionName: string, recordID: string, newVal: any, column: any) => {
+    const data = {};
+    data[`${column}`] = newVal;
+
+    try {
+      const record = await pb
+        .collection<T>(collectionName)
+        .update(recordID, data, { requestKey: `${collectionName}.${recordID}.${column}` });
+      return record as T;
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 0) {
+      } else {
+        throw e;
+      }
+    }
+  };
+
+  return { pb, user, logout, getUserSessions, updateRecord };
 }
