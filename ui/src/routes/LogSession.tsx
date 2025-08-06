@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
 
@@ -100,11 +100,14 @@ const LogSession: Component = () => {
       "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.variation";
     try {
       if (params.id) {
-        setLoading(true); // TODO need to come up with better way to avoid the double call to backend...
+        // TODO need to come up with better way to avoid the double call to backend
+        // atm, if a matching date is found, we nav to it's id then get it again...
+        setLoading(true);
         const s = await pb
           .collection<UserSession>("userSessions")
           .getOne(params.id, { expand: expandFields });
 
+        // TODO should tidy up below to avoid the duplication
         setSession("name", s.name);
         setSession("userDay", s.userDay);
         setSession("notes", s.notes);
@@ -127,6 +130,7 @@ const LogSession: Component = () => {
       }
     } catch (e) {
       if (e instanceof ClientResponseError && e.status === 404) {
+        setSession(reconcile(Basesession));
       } else {
         console.log(e);
       }
@@ -147,7 +151,10 @@ const LogSession: Component = () => {
           label="Date"
           type="date"
           value={session.userDay}
-          onInput={(e) => setSession("userDay", e.target.value)}
+          onInput={(e) => {
+            navigate("/workouts/log/", { replace: true });
+            setSession("userDay", e.target.value);
+          }}
         />
 
         <Show when={!loading()} fallback={<Loading />}>
