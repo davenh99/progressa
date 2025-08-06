@@ -97,7 +97,7 @@ const LogSession: Component = () => {
 
   const getSession = async () => {
     const expandFields =
-      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.variation";
+      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue";
     try {
       if (params.id) {
         // TODO need to come up with better way to avoid the double call to backend

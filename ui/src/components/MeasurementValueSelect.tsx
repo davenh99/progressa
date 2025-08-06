@@ -47,11 +47,12 @@ export const Select: ParentComponent<Props> = (props) => {
 
 interface DataProps {
   values: MeasurementValue[];
+  initial: MeasurementValue;
   saveFunc: (id: string) => Promise<void>;
 }
 
 export const DataSelect: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal<MeasurementValue>();
+  const [val, setVal] = createSignal<MeasurementValue>(props.initial);
 
   return (
     <Select

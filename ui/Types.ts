@@ -108,6 +108,7 @@ export interface UserSessionExercise extends UserSessionExerciseCreateData {
   expand?: {
     exercise?: Exercise;
     variation?: ExerciseVariation;
+    measurementValue?: MeasurementValue;
   };
 }
 

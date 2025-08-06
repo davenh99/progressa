@@ -66,6 +66,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                   ctx.row.original.expand?.exercise?.expand?.measurementType?.expand
                     ?.measurementValues_via_measurementType ?? []
                 }
+                initial={ctx.row.original.expand?.measurementValue}
                 saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "measurementValue")}
               />
             }
