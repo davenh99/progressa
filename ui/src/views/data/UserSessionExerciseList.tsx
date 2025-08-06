@@ -56,26 +56,28 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorFn: (row) =>
         row.expand?.exercise?.expand?.measurementType?.numeric ? "measurementNumeric" : "measurementValue",
       header: "Measurement",
-      cell: (ctx) => (
-        <Show
-          when={ctx.row.original.expand?.exercise?.expand?.measurementType?.numeric}
-          fallback={
-            <DataSelect
-              values={
-                ctx.row.original.expand?.exercise?.expand?.measurementType?.expand
-                  ?.measurementValues_via_measurementType
-              }
-              saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "measurementValue")}
+      cell: (ctx) => {
+        return (
+          <Show
+            when={ctx.row.original.expand?.exercise?.expand?.measurementType?.numeric}
+            fallback={
+              <DataSelect
+                values={
+                  ctx.row.original.expand?.exercise?.expand?.measurementType?.expand
+                    ?.measurementValues_via_measurementType ?? []
+                }
+                saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "measurementValue")}
+              />
+            }
+          >
+            <DataInput
+              type="number"
+              initial={ctx.getValue() as number}
+              saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "measurementNumeric")}
             />
-          }
-        >
-          <DataInput
-            type="number"
-            initial={ctx.getValue() as number}
-            saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "measurementNumeric")}
-          />
-        </Show>
-      ),
+          </Show>
+        );
+      },
     },
     {
       accessorKey: "addedWeight",

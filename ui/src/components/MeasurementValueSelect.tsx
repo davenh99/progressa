@@ -14,13 +14,16 @@ interface Props {
 export const Select: ParentComponent<Props> = (props) => {
   return (
     <KobalteSelect
+      multiple={false}
       value={props.value()}
-      onChange={(v: MeasurementValue) => props.onChange(v)}
+      optionValue="id"
+      optionTextValue="value"
+      onChange={props.onChange}
       options={props.values}
       placeholder={props.placeholder}
       itemComponent={(props) => (
         <KobalteSelect.Item item={props.item}>
-          <KobalteSelect.ItemLabel>{props.item.rawValue.value}</KobalteSelect.ItemLabel>
+          <KobalteSelect.ItemLabel>{props.item.textValue}</KobalteSelect.ItemLabel>
           <KobalteSelect.ItemIndicator>
             <Check />
           </KobalteSelect.ItemIndicator>
@@ -28,9 +31,7 @@ export const Select: ParentComponent<Props> = (props) => {
       )}
     >
       <KobalteSelect.Trigger>
-        <KobalteSelect.Value>
-          {(state) => (state.selectedOption() as MeasurementValue).value}
-        </KobalteSelect.Value>
+        <KobalteSelect.Value<MeasurementValue>>{(state) => state.selectedOption().value}</KobalteSelect.Value>
         <KobalteSelect.Icon>
           <UpDown />
         </KobalteSelect.Icon>
@@ -56,7 +57,7 @@ export const DataSelect: ParentComponent<DataProps> = (props) => {
     <Select
       value={val}
       values={props.values}
-      onChange={(v: MeasurementValue) => props.saveFunc(v.id).then(() => setVal(v))}
+      onChange={(v: MeasurementValue) => props.saveFunc(v?.id || "").then(() => setVal(v))}
     />
   );
 };

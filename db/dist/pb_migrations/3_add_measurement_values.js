@@ -27,7 +27,7 @@ migrate(
     for (const m of newMeasurementValues) {
       let record = new Record(measurementValues);
 
-      record.set("measurementType", m.id);
+      record.set("measurementType", m.t);
       record.set("value", m.v);
       record.set("public", m.p);
 
