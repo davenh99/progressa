@@ -1,4 +1,5 @@
-import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, Show } from "solid-js";
+import { Tabs } from "@kobalte/core/tabs";
 import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
@@ -97,7 +98,7 @@ const LogSession: Component = () => {
 
   const getSession = async () => {
     const expandFields =
-      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue";
+      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation";
     try {
       if (params.id) {
         // TODO need to come up with better way to avoid the double call to backend
@@ -171,17 +172,29 @@ const LogSession: Component = () => {
             saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
           />
 
-          <p>Exercises</p>
-          <UserSessionExerciseList
-            sessionExercises={session.sessionExercises}
-            sessionID={params.id}
-            sessionDay={session.userDay}
-            getSession={getSession}
-          />
-
           <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-
           <For each={session.tags}>{(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}</For>
+
+          <Tabs>
+            <Tabs.List>
+              <Tabs.Trigger value="exercises">
+                <p>Exercises</p>
+              </Tabs.Trigger>
+              <Tabs.Trigger value="meals-sleep">Meals + Sleep</Tabs.Trigger>
+              <Tabs.Indicator />
+            </Tabs.List>
+            <Tabs.Content value="exercises">
+              <UserSessionExerciseList
+                sessionExercises={session.sessionExercises}
+                sessionID={params.id}
+                sessionDay={session.userDay}
+                getSession={getSession}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="meals-sleep">
+              <p>meal an sleep</p>
+            </Tabs.Content>
+          </Tabs>
         </Show>
       </Container>
     </>

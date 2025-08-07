@@ -1,6 +1,11 @@
 import { Component, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
+import Copy from "lucide-solid/icons/copy";
+import Down from "lucide-solid/icons/chevron-down";
+import Up from "lucide-solid/icons/chevron-up";
+import Grip from "lucide-solid/icons/grip";
+import Trash from "lucide-solid/icons/trash-2";
 
 import { useAuthPB } from "../../config/pocketbase";
 import {
@@ -12,10 +17,10 @@ import {
   UserSessionExerciseCreateData,
 } from "../../../Types";
 import { ExerciseList } from ".";
-import { Button, DataCheckbox, DataInput, DataSlider, DataSelect } from "../../components";
+import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } from "../../components";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
-import Ellipsis from "lucide-solid/icons/ellipsis";
 import { ExerciseVariationList } from "./ExerciseVariationList";
+import { Cell, Row, Table, TableBody, TableHeader, TableHeaderCell } from "./Table";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -29,7 +34,15 @@ const BaseNewExercise = {
   variation: null as ExerciseVariation,
 };
 
+interface SessionExerciseRow {
+  sessionExercise: UserSessionExercise;
+  expanded: boolean;
+}
+
 export const UserSessionExerciseList: Component<Props> = (props) => {
+  const [exerciseRows, setExerciseRows] = createStore({
+    rows: props.sessionExercises.map((sessionExercise) => ({ sessionExercise, expanded: false })),
+  });
   const [newExercise, setNewExercise] = createStore(BaseNewExercise);
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
@@ -37,9 +50,21 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
-      accessorFn: (row) => `${row.expand?.exercise?.name} (${row.expand?.variation?.name})`,
+      header: "",
+      id: "handle",
+      cell: () => (
+        <IconButton onClick={() => {}}>
+          <Grip />
+        </IconButton>
+      ),
+    },
+    {
+      accessorFn: (row) =>
+        row.sessionExercise.expand?.variation?.name
+          ? `${row.sessionExercise.expand?.exercise?.name} (${row.sessionExercise.expand?.variation?.name})`
+          : row.sessionExercise.expand?.exercise?.name,
       header: "Exercise",
     },
     {
@@ -48,33 +73,35 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => (
         <DataCheckbox
           initial={ctx.getValue() as boolean}
-          saveFunc={(v: boolean) => saveRow(ctx.row.original.id, v, "isWarmup")}
+          saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, v, "isWarmup")}
         />
       ),
     },
     {
       accessorFn: (row) =>
-        row.expand?.exercise?.expand?.measurementType?.numeric ? "measurementNumeric" : "measurementValue",
+        row.sessionExercise.expand?.exercise?.expand?.measurementType?.numeric
+          ? "measurementNumeric"
+          : "measurementValue",
       header: "Measurement",
       cell: (ctx) => {
         return (
           <Show
-            when={ctx.row.original.expand?.exercise?.expand?.measurementType?.numeric}
+            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.measurementType?.numeric}
             fallback={
               <DataSelect
                 values={
-                  ctx.row.original.expand?.exercise?.expand?.measurementType?.expand
+                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.measurementType?.expand
                     ?.measurementValues_via_measurementType ?? []
                 }
-                initial={ctx.row.original.expand?.measurementValue}
-                saveFunc={(v: string) => saveRow(ctx.row.original.id, v, "measurementValue")}
+                initial={ctx.row.original.sessionExercise.expand?.measurementValue}
+                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, v, "measurementValue")}
               />
             }
           >
             <DataInput
               type="number"
               initial={ctx.getValue() as number}
-              saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "measurementNumeric")}
+              saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "measurementNumeric")}
             />
           </Show>
         );
@@ -87,7 +114,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         <DataInput
           type="number"
           initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "addedWeight")}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "addedWeight")}
         />
       ),
     },
@@ -97,7 +124,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => (
         <DataSlider
           initial={50}
-          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "perceivedEffort")}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "perceivedEffort")}
         />
       ),
     },
@@ -108,14 +135,62 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         <DataInput
           type="number"
           initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.id, v, "restAfter")}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "restAfter")}
         />
       ),
     },
     {
       header: "",
-      id: "more-info",
-      cell: () => <Ellipsis />,
+      id: "add-dropset",
+      cell: () => <Button onClick={() => {}}>+ dropset</Button>,
+    },
+    {
+      header: "",
+      id: "duplicate",
+      cell: () => (
+        <IconButton onClick={() => {}}>
+          <Copy />
+        </IconButton>
+      ),
+    },
+    {
+      header: "",
+      id: "delete",
+      cell: () => (
+        <IconButton onClick={() => {}}>
+          <Trash />
+        </IconButton>
+      ),
+    },
+    {
+      header: "",
+      id: "expand",
+      cell: (ctx) => (
+        <Show
+          when={ctx.row.original.expanded}
+          fallback={
+            <IconButton
+              onClick={() =>
+                setExerciseRows("rows", (rows) =>
+                  rows.map((row, ind) =>
+                    ind === ctx.row.index ? { ...row, expanded: true } : { ...row, expanded: false }
+                  )
+                )
+              }
+            >
+              <Down />
+            </IconButton>
+          }
+        >
+          <IconButton
+            onClick={() =>
+              setExerciseRows("rows", (rows) => rows.map((row) => ({ ...row, expanded: false })))
+            }
+          >
+            <Up />
+          </IconButton>
+        </Show>
+      ),
     },
   ]);
 
@@ -177,7 +252,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const table = createSolidTable({
     get data() {
-      return props.sessionExercises;
+      return exerciseRows.rows;
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
@@ -185,30 +260,34 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   return (
     <>
-      <table class="table w-full">
-        <thead>
+      <Table>
+        <TableHeader>
           <For each={table.getHeaderGroups()}>
             {(headerGroup) => (
-              <tr>
+              <Row>
                 <For each={headerGroup.headers}>
-                  {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
+                  {(header) => (
+                    <TableHeaderCell>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHeaderCell>
+                  )}
                 </For>
-              </tr>
+              </Row>
             )}
           </For>
-        </thead>
-        <tbody>
+        </TableHeader>
+        <TableBody>
           <For each={table.getRowModel().rows}>
             {(row) => (
-              <tr class="hover">
+              <Row>
                 <For each={row.getVisibleCells()}>
-                  {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
+                  {(cell) => <Cell>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Cell>}
                 </For>
-              </tr>
+              </Row>
             )}
           </For>
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
       <Show when={showCreateSessionExercise()}>
         <p>Select Exercise</p>

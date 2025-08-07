@@ -52,6 +52,7 @@ export const DataInput: ParentComponent<DataProps> = (props) => {
           props.saveFunc(e.target.value);
         }
       }}
+      label={props.label}
       type={props.type}
     />
   );
