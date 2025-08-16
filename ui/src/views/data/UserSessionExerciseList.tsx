@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
@@ -50,6 +50,10 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
+  createEffect(() => {
+    console.log(exerciseRows.rows);
+  });
+
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
       header: "",
@@ -68,7 +72,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "Exercise",
     },
     {
-      accessorKey: "isWarmup",
+      accessorKey: "sessionExercise.isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
         <DataCheckbox
@@ -80,8 +84,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     {
       accessorFn: (row) =>
         row.sessionExercise.expand?.exercise?.expand?.measurementType?.numeric
-          ? "measurementNumeric"
-          : "measurementValue",
+          ? "sessionExercise.measurementNumeric"
+          : "sessionExercise.measurementValue",
       header: "Measurement",
       cell: (ctx) => {
         return (
@@ -108,7 +112,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       },
     },
     {
-      accessorKey: "addedWeight",
+      accessorKey: "sessionExercise.addedWeight",
       header: "Weight Added (kg)",
       cell: (ctx) => (
         <DataInput
@@ -119,17 +123,17 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       ),
     },
     {
-      accessorKey: "perceivedEffort",
+      accessorKey: "sessionExercise.perceivedEffort",
       header: "Perceived Effort",
       cell: (ctx) => (
         <DataSlider
-          initial={50}
+          initial={ctx.getValue() as number}
           saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "perceivedEffort")}
         />
       ),
     },
     {
-      accessorKey: "restAfter",
+      accessorKey: "sessionExercise.restAfter",
       header: "Rest After (s)",
       cell: (ctx) => (
         <DataInput
