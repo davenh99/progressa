@@ -1,10 +1,9 @@
-import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
-import Grip from "lucide-solid/icons/grip";
 import Trash from "lucide-solid/icons/trash-2";
 
 import { useAuthPB } from "../../config/pocketbase";
@@ -20,7 +19,7 @@ import { ExerciseList } from ".";
 import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } from "../../components";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { ExerciseVariationList } from "./ExerciseVariationList";
-import { Cell, Row, Table, TableBody, TableHeader, TableHeaderCell } from "./Table";
+import { DraggableRow, Row, Table, TableBody, TableHeader, TableHeaderCell } from "./Table";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -34,15 +33,26 @@ const BaseNewExercise = {
   variation: null as ExerciseVariation,
 };
 
-interface SessionExerciseRow {
+export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
   expanded: boolean;
+  groupID: number;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
-  const [exerciseRows, setExerciseRows] = createStore({
-    rows: props.sessionExercises.map((sessionExercise) => ({ sessionExercise, expanded: false })),
+  const [exerciseRows, setExerciseRows] = createStore<{ rows: SessionExerciseRow[] }>({
+    rows: props.sessionExercises
+      .toSorted((a, b) => a.sequence - b.sequence)
+      .map((sessionExercise) => ({
+        sessionExercise,
+        expanded: false,
+        groupID: sessionExercise.sequence,
+        dragState: "idle",
+      })),
   });
+  const exerciseRowIds = createMemo<string[]>(() =>
+    exerciseRows.rows.map(({ sessionExercise }) => sessionExercise.id)
+  );
   const [newExercise, setNewExercise] = createStore(BaseNewExercise);
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
@@ -50,19 +60,15 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
-  createEffect(() => {
-    console.log(exerciseRows.rows);
-  });
-
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
       header: "",
       id: "handle",
-      cell: () => (
-        <IconButton onClick={() => {}}>
-          <Grip />
-        </IconButton>
-      ),
+      // cell: () => (
+      //   // <IconButton onClick={() => {}}>
+      //   <Grip />
+      //   //{/* </IconButton> */}
+      // ),
     },
     {
       accessorFn: (row) =>
@@ -260,6 +266,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.sessionExercise.id, // required because row indexes will change
   });
 
   return (
@@ -281,15 +288,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           </For>
         </TableHeader>
         <TableBody>
-          <For each={table.getRowModel().rows}>
-            {(row) => (
-              <Row>
-                <For each={row.getVisibleCells()}>
-                  {(cell) => <Cell>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Cell>}
-                </For>
-              </Row>
-            )}
-          </For>
+          <For each={table.getRowModel().rows}>{(row) => <DraggableRow row={row} />}</For>
         </TableBody>
       </Table>
       <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
