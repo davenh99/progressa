@@ -1,4 +1,13 @@
-import { Component, For, ParentComponent, createEffect, createSignal, type JSX } from "solid-js";
+import {
+  Accessor,
+  Component,
+  For,
+  ParentComponent,
+  Show,
+  createEffect,
+  createSignal,
+  type JSX,
+} from "solid-js";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -14,29 +23,33 @@ import Grip from "lucide-solid/icons/grip-vertical";
 import { SessionExerciseRow } from "./";
 
 export const Table: ParentComponent = (props) => {
-  return <table class="table w-full border-separate border-spacing-y-1">{props.children}</table>;
+  return <div class="w-full">{props.children}</div>;
 };
 
 export const TableBody: ParentComponent = (props) => {
-  return <tbody>{props.children}</tbody>;
+  return <div class="space-y-1">{props.children}</div>;
 };
 
 export const TableHeader: ParentComponent = (props) => {
-  return <thead>{props.children}</thead>;
+  return <div>{props.children}</div>;
 };
 
 export const Row: ParentComponent = (props) => {
-  return <tr>{props.children}</tr>;
+  return <div class="flex">{props.children}</div>;
 };
 
 interface DraggableRowProps {
   row: RowType<SessionExerciseRow>;
+  exerciseRowIds: Accessor<string[]>;
 }
 
+type DraggingState = "idle" | "dragging" | "dragging-over";
+
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
-  let ref: HTMLTableRowElement | undefined = undefined;
-  let dragHandleRef: HTMLTableCellElement | undefined = undefined;
-  const [dragging, setDragging] = createSignal<boolean>(false);
+  let ref: HTMLDivElement | undefined = undefined;
+  let dragHandleRef: HTMLDivElement | undefined = undefined;
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
+  const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
   createEffect(() => {
     const element = ref;
@@ -48,44 +61,90 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       element,
       dragHandle,
       onDragStart() {
-        setDragging(true);
+        setDragging("dragging");
       },
       onDrop() {
-        setDragging(false);
+        setDragging("idle");
+      },
+    });
+
+    dropTargetForElements({
+      element,
+      canDrop({ source }) {
+        // not allowing dropping on yourself
+        if (source.element === element) {
+          return false;
+        }
+        // only allowing tasks to be dropped on me
+        return props.exerciseRowIds().some((r) => r === props.row.original.sessionExercise.id);
+      },
+      getIsSticky() {
+        return true;
+      },
+      getData({ input }) {
+        return attachClosestEdge(
+          { [Symbol("exerciseRow")]: true, taskId: props.row.original.groupID },
+          {
+            element,
+            input,
+            allowedEdges: ["top", "bottom"],
+          }
+        );
+      },
+      onDragEnter({ self }) {
+        const _closestEdge = extractClosestEdge(self.data);
+        setDragging("dragging-over");
+        setClosestEdge(_closestEdge);
+      },
+      onDrag({ self }) {
+        const _closestEdge = extractClosestEdge(self.data);
+        // Only need to update state if nothing has changed.
+        // Prevents re-rendering.
+        if (dragging() !== "dragging-over" || _closestEdge !== closestEdge()) {
+          setDragging("dragging-over");
+          setClosestEdge(_closestEdge);
+        }
+      },
+      onDragLeave() {
+        setDragging("idle");
+      },
+      onDrop() {
+        setDragging("idle");
       },
     });
   });
 
   return (
-    <tr ref={ref} class={`${dragging() ? "opacity-40" : ""}`}>
-      <For each={props.row.getVisibleCells()}>
-        {(cell) => (
-          <Cell>
-            {cell.column.id === "handle" ? (
-              <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
-                <Grip />
-              </div>
-            ) : (
-              flexRender(cell.column.columnDef.cell, cell.getContext())
-            )}
-          </Cell>
-        )}
-      </For>
-    </tr>
+    <>
+      <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
+        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
+      </Show>
+      <div ref={ref} class={`flex border rounded-md ${dragging() === "dragging" ? "opacity-40" : ""}`}>
+        <For each={props.row.getVisibleCells()}>
+          {(cell) => (
+            <Cell>
+              {cell.column.id === "handle" ? (
+                <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
+                  <Grip />
+                </div>
+              ) : (
+                flexRender(cell.column.columnDef.cell, cell.getContext())
+              )}
+            </Cell>
+          )}
+        </For>
+      </div>
+      <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
+        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
+      </Show>
+    </>
   );
 };
 
 export const Cell: ParentComponent = (props) => {
-  return (
-    <td
-      class={`p-1 border-t-1 border-b-1 first-of-type:border-l-1 first-of-type:rounded-bl-md first-of-type:rounded-tl-md
-        last-of-type:border-r-1 last-of-type:rounded-br-md last-of-type:rounded-tr-md`}
-    >
-      {props.children}
-    </td>
-  );
+  return <div class={`p-1 flex-1`}>{props.children}</div>;
 };
 
 export const TableHeaderCell: ParentComponent = (props) => {
-  return <td class="text-left p-3">{props.children}</td>;
+  return <div class="text-left p-3 flex-1">{props.children}</div>;
 };

@@ -212,6 +212,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
+  const addRowAtIndex = (index: number, createData?: UserSessionExerciseCreateData) => {};
+
   const addSessionExercise = async () => {
     const data: UserSessionExerciseCreateData = {
       user: user.id,
@@ -288,7 +290,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           </For>
         </TableHeader>
         <TableBody>
-          <For each={table.getRowModel().rows}>{(row) => <DraggableRow row={row} />}</For>
+          <For each={table.getRowModel().rows}>
+            {(row) => <DraggableRow row={row} exerciseRowIds={exerciseRowIds} />}
+          </For>
         </TableBody>
       </Table>
       <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
