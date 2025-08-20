@@ -74,6 +74,7 @@ export interface UserSessionCreateData {
   tags: string[];
   userHeight: number;
   userWeight: number;
+  itemsOrder: string[];
   sleepQuality: "poor" | "fair" | "good" | "great";
 }
 
@@ -91,7 +92,6 @@ export interface UserSessionExerciseCreateData {
   exercise: string;
   userSession: string;
   variation: string;
-  sequence: number;
   perceivedEffort: number; // 0 - 100
 }
 
