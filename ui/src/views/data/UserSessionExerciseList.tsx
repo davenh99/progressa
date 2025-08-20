@@ -227,14 +227,118 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
-  const reorderRows = async (draggedItemsOldInd: number, draggedItemsNewInd: number) => {
+  const reorderRows = async (draggedItemsOldInd: number, draggedItemsNewInd: number, count: number) => {
     // shuffle array
+    const newRows = [...exerciseRows.rows];
+    const draggedItems = newRows.splice(draggedItemsOldInd, count);
+
+    const adjustedNewIndex =
+      draggedItemsNewInd > draggedItemsOldInd ? draggedItemsNewInd - count : draggedItemsNewInd;
+    newRows.splice(adjustedNewIndex, 0, ...draggedItems);
+
+    setExerciseRows("rows", newRows);
+
     // send the updated list to 'itemsOrder'
+    await updateRecord(
+      "userSessions",
+      props.sessionID,
+      newRows.map((r) => r.sessionExercise.id),
+      "itemsOrder"
+    );
   };
 
-  const addRowsAtIndex = (index: number, duplicateInds: number[]) => {
-    // add to array
-    // send the updated list to 'itemsOrder'
+  const addRowsAtIndex = async (
+    index: number,
+    duplicateInds?: number[],
+    createData?: UserSessionExerciseCreateData
+  ) => {
+    // create session if doesn't exist
+    if (!props.sessionID) {
+      const createSessionData: UserSessionCreateData = {
+        name: "",
+        notes: "",
+        tags: [],
+        user: user.id,
+        userDay: props.sessionDay,
+        userHeight: user.height,
+        userWeight: user.weight,
+        itemsOrder: [],
+        sleepQuality: "fair",
+      };
+
+      const newSession = await pb.collection<UserSession>("userSessions").create(createSessionData);
+      if (createData) {
+        createData.userSession = newSession.id;
+      }
+
+      // maybe move below to end if problematic
+      navigate(`/workouts/log/${newSession.id}`, { replace: true });
+    }
+
+    // create item/s
+    if (createData) {
+      // add to array
+      const record = await pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
+        expand: "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation",
+      });
+
+      const newRows = [...exerciseRows.rows];
+      newRows.splice(index, 0, {
+        sessionExercise: record,
+        expanded: false,
+        groupID: record.supersetParent ?? record.id,
+      });
+      setExerciseRows("rows", newRows);
+
+      // send the updated list to 'itemsOrder'
+      await updateRecord(
+        "userSessions",
+        props.sessionID,
+        newRows.map((r) => r.sessionExercise.id),
+        "itemsOrder"
+      );
+    } else if (duplicateInds) {
+      // add to array (sorting just in case)
+      const createPromises = duplicateInds
+        .sort((a, b) => a - b)
+        .map((ind) => {
+          const createData = {
+            user: user.id,
+            exercise: exerciseRows.rows[ind].sessionExercise.exercise,
+            perceivedEffort: exerciseRows.rows[ind].sessionExercise.perceivedEffort,
+            userSession: exerciseRows.rows[ind].sessionExercise.userSession,
+            variation: exerciseRows.rows[ind].sessionExercise.variation,
+            addedWeight: exerciseRows.rows[ind].sessionExercise.addedWeight,
+            restAfter: exerciseRows.rows[ind].sessionExercise.restAfter,
+            isWarmup: exerciseRows.rows[ind].sessionExercise.isWarmup,
+            measurementNumeric: exerciseRows.rows[ind].sessionExercise.measurementNumeric,
+            measurementValue: exerciseRows.rows[ind].sessionExercise.measurementValue,
+          };
+
+          return pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
+            expand:
+              "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation",
+          });
+        });
+      const newRecords = await Promise.all(createPromises);
+
+      const newRows = [...exerciseRows.rows];
+      const newRowsToInsert = newRecords.map((record) => ({
+        sessionExercise: record,
+        expanded: false,
+        groupID: record.supersetParent ?? record.id,
+      }));
+      newRows.splice(index, 0, ...newRowsToInsert);
+      setExerciseRows("rows", newRows);
+
+      // send the updated list to 'itemsOrder'
+      await updateRecord(
+        "userSessions",
+        props.sessionID,
+        newRows.map((r) => r.sessionExercise.id),
+        "itemsOrder"
+      );
+    }
   };
 
   const addSessionExercise = async () => {
@@ -249,39 +353,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     if (variations.length > 0 && !newExercise.variation) {
       alert("must select a variation for this exercise");
     } else {
-      try {
-        if (!props.sessionID) {
-          // TODO can probs remove the double up here and in log session
-          const createData: UserSessionCreateData = {
-            name: "",
-            notes: "",
-            tags: [],
-            user: user.id,
-            userDay: props.sessionDay,
-            userHeight: user.height,
-            userWeight: user.weight,
-            itemsOrder: [],
-            sleepQuality: "fair",
-          };
-
-          const newSession = await pb.collection<UserSession>("userSessions").create(createData);
-          data.userSession = newSession.id;
-        }
-        // TODO below in inefficient, can probably just grab the new record from the return value and add it?
-        await pb
-          .collection<UserSessionExercise>("userSessionExercises")
-          .create(data, { expand: "exercise.measurementType.measurementValues_via_measurementType" });
-
-        if (!props.sessionID) {
-          navigate(`/workouts/log/${data.userSession}`, { replace: true });
-        }
-
-        await props.getSession();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setShowCreateSessionExercise(false);
-      }
+      addRowsAtIndex(exerciseRows.rows.length, null, data);
+      setShowCreateSessionExercise(false);
     }
   };
 
