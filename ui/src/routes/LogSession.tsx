@@ -11,6 +11,7 @@ import Container from "../components/Container";
 import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } from "../../Types";
 import { UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
+import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
 
 const Basesession = {
   name: "",
@@ -39,6 +40,7 @@ const LogSession: Component = () => {
         userDay: session.userDay,
         userHeight: user.height,
         userWeight: user.weight,
+        itemsOrder: [],
         sleepQuality: undefined,
       };
 
@@ -113,7 +115,10 @@ const LogSession: Component = () => {
         setSession("userDay", s.userDay);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
-        setSession("sessionExercises", s.expand?.userSessionExercises_via_userSession ?? []);
+        setSession(
+          "sessionExercises",
+          sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
+        );
       } else {
         const s = await pb
           .collection<UserSession>("userSessions")
@@ -125,7 +130,10 @@ const LogSession: Component = () => {
         setSession("userDay", s.userDay);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
-        setSession("sessionExercises", s.expand?.userSessionExercises_via_userSession ?? []);
+        setSession(
+          "sessionExercises",
+          sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
+        );
 
         navigate(`/workouts/log/${s.id}`, { replace: true });
       }

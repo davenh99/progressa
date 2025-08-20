@@ -36,19 +36,17 @@ const BaseNewExercise = {
 export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
   expanded: boolean;
-  groupID: number;
+  groupID: string;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
   const [exerciseRows, setExerciseRows] = createStore<{ rows: SessionExerciseRow[] }>({
-    rows: props.sessionExercises
-      .toSorted((a, b) => a.sequence - b.sequence)
-      .map((sessionExercise) => ({
-        sessionExercise,
-        expanded: false,
-        groupID: sessionExercise.sequence,
-        dragState: "idle",
-      })),
+    rows: props.sessionExercises.map((sessionExercise) => ({
+      sessionExercise,
+      expanded: false,
+      groupID: sessionExercise.supersetParent ?? sessionExercise.id,
+      dragState: "idle",
+    })),
   });
   const exerciseRowIds = createMemo<string[]>(() =>
     exerciseRows.rows.map(({ sessionExercise }) => sessionExercise.id)
@@ -212,7 +210,32 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
-  const addRowAtIndex = (index: number, createData?: UserSessionExerciseCreateData) => {};
+  const deleteRow = async (index: number) => {
+    const newRows = exerciseRows.rows.filter((_, ind) => ind !== index);
+    setExerciseRows("rows", newRows);
+
+    try {
+      await pb.collection("userSessionExercises").delete(exerciseRows.rows[index].sessionExercise.id);
+      await updateRecord(
+        "userSessions",
+        props.sessionID,
+        newRows.map((r) => r.sessionExercise.id),
+        "itemsOrder"
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const reorderRows = async (draggedItemsOldInd: number, draggedItemsNewInd: number) => {
+    // shuffle array
+    // send the updated list to 'itemsOrder'
+  };
+
+  const addRowsAtIndex = (index: number, duplicateInds: number[]) => {
+    // add to array
+    // send the updated list to 'itemsOrder'
+  };
 
   const addSessionExercise = async () => {
     const data: UserSessionExerciseCreateData = {
@@ -221,7 +244,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       variation: newExercise.variation?.id || undefined,
       exercise: newExercise.exercise.id,
       perceivedEffort: 50,
-      sequence: Math.max(...props.sessionExercises.map((e) => e.sequence)) + 1,
     };
 
     if (variations.length > 0 && !newExercise.variation) {
@@ -238,6 +260,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             userDay: props.sessionDay,
             userHeight: user.height,
             userWeight: user.weight,
+            itemsOrder: [],
             sleepQuality: "fair",
           };
 

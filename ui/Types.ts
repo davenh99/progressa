@@ -74,7 +74,7 @@ export interface UserSessionCreateData {
   tags: string[];
   userHeight: number;
   userWeight: number;
-  itemsOrder: string[];
+  itemsOrder: string[] | null;
   sleepQuality: "poor" | "fair" | "good" | "great";
 }
 
