@@ -5,6 +5,7 @@ import {
   ParentComponent,
   Show,
   createEffect,
+  createMemo,
   createSignal,
   type JSX,
 } from "solid-js";
@@ -51,7 +52,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
+  const isDraggable = createMemo(() => !props.row.original._isChild);
+
   createEffect(() => {
+    if (!isDraggable()) return;
+
     const element = ref;
     const dragHandle = dragHandleRef;
     invariant(element);
@@ -123,7 +128,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         <For each={props.row.getVisibleCells()}>
           {(cell) => (
             <Cell>
-              {cell.column.id === "handle" ? (
+              {cell.column.id === "handle" && isDraggable() ? (
                 <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
                   <Grip />
                 </div>

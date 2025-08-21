@@ -20,6 +20,7 @@ import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } f
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { ExerciseVariationList } from "./ExerciseVariationList";
 import { DraggableRow, Row, Table, TableBody, TableHeader, TableHeaderCell } from "./Table";
+import { getDropsetAddData, getIDsToDuplicate } from "../../methods/userSessionExerciseMethods";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -63,11 +64,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     {
       header: "",
       id: "handle",
-      // cell: () => (
-      //   // <IconButton onClick={() => {}}>
-      //   <Grip />
-      //   //{/* </IconButton> */}
-      // ),
     },
     {
       accessorFn: (row) =>
@@ -151,13 +147,19 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     {
       header: "",
       id: "add-dropset",
-      cell: () => <Button onClick={() => {}}>+ dropset</Button>,
+      cell: (ctx) => (
+        <Button onClick={() => addRowsAtIndex(ctx.row.index, null, getDropsetAddData(ctx.row.original))}>
+          + dropset
+        </Button>
+      ),
     },
     {
       header: "",
       id: "duplicate",
-      cell: () => (
-        <IconButton onClick={() => {}}>
+      cell: (ctx) => (
+        <IconButton
+          onClick={() => addRowsAtIndex(ctx.row.index, getIDsToDuplicate(ctx.row.index, exerciseRows.rows))}
+        >
           <Copy />
         </IconButton>
       ),
@@ -165,8 +167,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     {
       header: "",
       id: "delete",
-      cell: () => (
-        <IconButton onClick={() => {}}>
+      cell: (ctx) => (
+        <IconButton onClick={() => deleteRow(ctx.row.index)}>
           <Trash />
         </IconButton>
       ),
