@@ -36,7 +36,8 @@ const BaseNewExercise = {
 export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
   expanded: boolean;
-  groupID: string;
+  _parentID?: string | null;
+  _isChild?: boolean;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
@@ -44,8 +45,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     rows: props.sessionExercises.map((sessionExercise) => ({
       sessionExercise,
       expanded: false,
-      groupID: sessionExercise.supersetParent ?? sessionExercise.id,
-      dragState: "idle",
+      _parentID: sessionExercise.supersetParent ?? null,
+      _isChild: !!sessionExercise.supersetParent,
     })),
   });
   const exerciseRowIds = createMemo<string[]>(() =>
@@ -286,7 +287,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       newRows.splice(index, 0, {
         sessionExercise: record,
         expanded: false,
-        groupID: record.supersetParent ?? record.id,
+        _parentID: record.supersetParent ?? null,
+        _isChild: !!record.supersetParent,
       });
       setExerciseRows("rows", newRows);
 
@@ -326,7 +328,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       const newRowsToInsert = newRecords.map((record) => ({
         sessionExercise: record,
         expanded: false,
-        groupID: record.supersetParent ?? record.id,
+        _parentID: record.supersetParent ?? null,
+        _isChild: !!record.supersetParent,
       }));
       newRows.splice(index, 0, ...newRowsToInsert);
       setExerciseRows("rows", newRows);

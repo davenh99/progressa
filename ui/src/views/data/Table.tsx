@@ -83,7 +83,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       },
       getData({ input }) {
         return attachClosestEdge(
-          { [Symbol("exerciseRow")]: true, taskId: props.row.original.groupID },
+          { id: props.row.original.sessionExercise.id },
           {
             element,
             input,
