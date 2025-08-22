@@ -37,7 +37,6 @@ const BaseNewExercise = {
 export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
   expanded: boolean;
-  _parentID?: string | null;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
@@ -45,7 +44,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     rows: props.sessionExercises.map((sessionExercise) => ({
       sessionExercise,
       expanded: false,
-      _parentID: sessionExercise.supersetParent ?? null,
     })),
   });
   const exerciseRowIds = createMemo<string[]>(() =>
@@ -175,29 +173,31 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "",
       id: "expand",
       cell: (ctx) => (
-        <Show
-          when={ctx.row.original.expanded}
-          fallback={
-            <IconButton
-              onClick={() =>
-                setExerciseRows("rows", (rows) =>
-                  rows.map((row, ind) =>
-                    ind === ctx.row.index ? { ...row, expanded: true } : { ...row, expanded: false }
+        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+          <Show
+            when={ctx.row.original.expanded}
+            fallback={
+              <IconButton
+                onClick={() =>
+                  setExerciseRows("rows", (rows) =>
+                    rows.map((row, ind) =>
+                      ind === ctx.row.index ? { ...row, expanded: true } : { ...row, expanded: false }
+                    )
                   )
-                )
-              }
-            >
-              <Down />
-            </IconButton>
-          }
-        >
-          <IconButton
-            onClick={() =>
-              setExerciseRows("rows", (rows) => rows.map((row) => ({ ...row, expanded: false })))
+                }
+              >
+                <Down />
+              </IconButton>
             }
           >
-            <Up />
-          </IconButton>
+            <IconButton
+              onClick={() =>
+                setExerciseRows("rows", (rows) => rows.map((row) => ({ ...row, expanded: false })))
+              }
+            >
+              <Up />
+            </IconButton>
+          </Show>
         </Show>
       ),
     },
@@ -287,7 +287,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       newRows.splice(index, 0, {
         sessionExercise: record,
         expanded: false,
-        _parentID: record.supersetParent ?? null,
       });
       setExerciseRows("rows", newRows);
 
