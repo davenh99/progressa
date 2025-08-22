@@ -41,6 +41,7 @@ export const Row: ParentComponent = (props) => {
 
 interface DraggableRowProps {
   row: RowType<SessionExerciseRow>;
+  rows: SessionExerciseRow[];
   exerciseRowIds: Accessor<string[]>;
 }
 
@@ -52,7 +53,17 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
-  const isDraggable = createMemo(() => !props.row.original._isChild);
+  const isDraggable = createMemo(() => !props.row.original.sessionExercise.supersetParent);
+  const firstOfGroup = createMemo(
+    () =>
+      props.row.index === 0 ||
+      props.row.original.sessionExercise.exercise !== props.rows[props.row.index - 1].sessionExercise.exercise
+  );
+  const lastOfGroup = createMemo(
+    () =>
+      props.row.index === props.rows.length - 1 ||
+      props.row.original.sessionExercise.exercise !== props.rows[props.row.index + 1].sessionExercise.exercise
+  );
 
   createEffect(() => {
     if (!isDraggable()) return;
@@ -124,20 +135,38 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
         <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
       </Show>
-      <div ref={ref} class={`flex border rounded-md ${dragging() === "dragging" ? "opacity-40" : ""}`}>
-        <For each={props.row.getVisibleCells()}>
-          {(cell) => (
-            <Cell>
-              {cell.column.id === "handle" && isDraggable() ? (
-                <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
-                  <Grip />
-                </div>
-              ) : (
-                flexRender(cell.column.columnDef.cell, cell.getContext())
-              )}
-            </Cell>
-          )}
-        </For>
+      <div
+        class={`${firstOfGroup() ? "mt-2 border-t-1 rounded-tl-lg rounded-tr-lg" : ""} ${
+          lastOfGroup() ? "pb-1 border-b-1 rounded-bl-lg rounded-br-lg" : ""
+        } border-l-1 border-r-1 `}
+      >
+        <Show when={firstOfGroup()}>
+          <p>
+            {props.row.original.sessionExercise.expand?.variation?.name
+              ? `${props.row.original.sessionExercise.expand?.exercise?.name} (${props.row.original.sessionExercise.expand?.variation?.name})`
+              : props.row.original.sessionExercise.expand?.exercise?.name}
+          </p>
+        </Show>
+        <div
+          ref={ref}
+          class={`flex ${props.row.original.sessionExercise.supersetParent ? "" : "border rounded-md"} ${
+            dragging() === "dragging" ? "opacity-40" : ""
+          }`}
+        >
+          <For each={props.row.getVisibleCells()}>
+            {(cell) => (
+              <Cell>
+                {cell.column.id === "handle" && isDraggable() ? (
+                  <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
+                    <Grip />
+                  </div>
+                ) : (
+                  flexRender(cell.column.columnDef.cell, cell.getContext())
+                )}
+              </Cell>
+            )}
+          </For>
+        </div>
       </div>
       <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
         <div class={`h-1 bg-blue-400 rounded-full relative`}></div>

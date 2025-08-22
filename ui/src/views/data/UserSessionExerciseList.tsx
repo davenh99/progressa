@@ -58,13 +58,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
-      accessorFn: (row) =>
-        row.sessionExercise.expand?.variation?.name
-          ? `${row.sessionExercise.expand?.exercise?.name} (${row.sessionExercise.expand?.variation?.name})`
-          : row.sessionExercise.expand?.exercise?.name,
-      header: "Exercise",
-    },
-    {
       header: "",
       id: "handle",
     },
@@ -404,7 +397,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         </TableHeader>
         <TableBody>
           <For each={table.getRowModel().rows}>
-            {(row) => <DraggableRow row={row} exerciseRowIds={exerciseRowIds} />}
+            {(row) => <DraggableRow row={row} exerciseRowIds={exerciseRowIds} rows={exerciseRows.rows} />}
           </For>
         </TableBody>
       </Table>
