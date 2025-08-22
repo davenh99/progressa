@@ -6,7 +6,7 @@ export const getIDsToDuplicate = (index: number, data: SessionExerciseRow[]) => 
   const sessionExerciseId = data[index].sessionExercise.id;
 
   for (const [i, d] of data.entries()) {
-    if (d._isChild && d._parentID === sessionExerciseId) {
+    if (d._parentID && d._parentID === sessionExerciseId) {
       inds.push(i);
     }
   }

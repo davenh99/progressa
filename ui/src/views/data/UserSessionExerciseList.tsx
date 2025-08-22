@@ -38,7 +38,6 @@ export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
   expanded: boolean;
   _parentID?: string | null;
-  _isChild?: boolean;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
@@ -47,7 +46,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       sessionExercise,
       expanded: false,
       _parentID: sessionExercise.supersetParent ?? null,
-      _isChild: !!sessionExercise.supersetParent,
     })),
   });
   const exerciseRowIds = createMemo<string[]>(() =>
@@ -290,7 +288,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         sessionExercise: record,
         expanded: false,
         _parentID: record.supersetParent ?? null,
-        _isChild: !!record.supersetParent,
       });
       setExerciseRows("rows", newRows);
 
