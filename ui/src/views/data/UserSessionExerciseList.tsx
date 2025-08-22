@@ -105,7 +105,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           >
             <DataInput
               type="number"
-              initial={ctx.getValue() as number}
+              initial={ctx.row.original.sessionExercise.measurementNumeric}
               saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "measurementNumeric")}
             />
           </Show>
