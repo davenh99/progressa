@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -15,7 +15,6 @@ import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
 
 const Basesession = {
   name: "",
-  userDay: new Date().toLocaleDateString("en-CA"),
   notes: "",
   tags: [] as Tag[],
   sessionExercises: [] as UserSessionExercise[],
@@ -24,6 +23,7 @@ const Basesession = {
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(true);
   const [session, setSession] = createStore(Basesession);
+  const [date, setDate] = createSignal<string>(new Date().toLocaleDateString("en-CA"));
   const { pb, user, updateRecord } = useAuthPB();
   const navigate = useNavigate();
   const params = useParams();
@@ -37,7 +37,7 @@ const LogSession: Component = () => {
         notes: "",
         tags: [],
         user: user.id,
-        userDay: session.userDay,
+        userDay: date(),
         userHeight: user.height,
         userWeight: user.weight,
         itemsOrder: [],
@@ -111,8 +111,8 @@ const LogSession: Component = () => {
           .getOne(params.id, { expand: expandFields });
 
         // TODO should tidy up below to avoid the duplication
+        setDate(s.userDay);
         setSession("name", s.name);
-        setSession("userDay", s.userDay);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
         setSession(
@@ -120,14 +120,12 @@ const LogSession: Component = () => {
           sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
         );
       } else {
-        const s = await pb
-          .collection<UserSession>("userSessions")
-          .getFirstListItem(`userDay = '${session.userDay}'`, {
-            expand: expandFields,
-          });
+        const s = await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date()}'`, {
+          expand: expandFields,
+        });
 
+        setDate(s.userDay);
         setSession("name", s.name);
-        setSession("userDay", s.userDay);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
         setSession(
@@ -148,7 +146,15 @@ const LogSession: Component = () => {
     }
   };
 
-  createEffect(() => {
+  // createEffect(() => {
+  //   console.log(session.sessionExercises.length);
+  // });
+
+  // createEffect(() => {
+  //   console.log(date());
+  // });
+
+  onMount(() => {
     getSession();
   });
 
@@ -159,10 +165,10 @@ const LogSession: Component = () => {
         <Input
           label="Date"
           type="date"
-          value={session.userDay}
+          value={date()}
           onInput={(e) => {
+            setDate(e.target.value);
             navigate("/workouts/log/", { replace: true });
-            setSession("userDay", e.target.value);
           }}
         />
 
@@ -195,7 +201,7 @@ const LogSession: Component = () => {
               <UserSessionExerciseList
                 sessionExercises={session.sessionExercises}
                 sessionID={params.id}
-                sessionDay={session.userDay}
+                sessionDay={date()}
                 getSession={getSession}
               />
             </Tabs.Content>

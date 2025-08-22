@@ -29,6 +29,7 @@ export const getDropsetAddData = (row: SessionExerciseRow) => {
     isWarmup: row.sessionExercise.isWarmup,
     measurementNumeric: row.sessionExercise.measurementNumeric,
     measurementValue: row.sessionExercise.measurementValue,
+    supersetParent: row.sessionExercise.id,
   };
   return data;
 };

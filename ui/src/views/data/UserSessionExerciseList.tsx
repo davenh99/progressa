@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
@@ -58,10 +58,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
-      header: "",
-      id: "handle",
-    },
-    {
       accessorFn: (row) =>
         row.sessionExercise.expand?.variation?.name
           ? `${row.sessionExercise.expand?.exercise?.name} (${row.sessionExercise.expand?.variation?.name})`
@@ -69,13 +65,19 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "Exercise",
     },
     {
+      header: "",
+      id: "handle",
+    },
+    {
       accessorKey: "sessionExercise.isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
-        <DataCheckbox
-          initial={ctx.getValue() as boolean}
-          saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, v, "isWarmup")}
-        />
+        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+          <DataCheckbox
+            initial={ctx.getValue() as boolean}
+            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, v, "isWarmup")}
+          />
+        </Show>
       ),
     },
     {
@@ -133,20 +135,24 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorKey: "sessionExercise.restAfter",
       header: "Rest After (s)",
       cell: (ctx) => (
-        <DataInput
-          type="number"
-          initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "restAfter")}
-        />
+        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+          <DataInput
+            type="number"
+            initial={ctx.getValue() as number}
+            saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "restAfter")}
+          />
+        </Show>
       ),
     },
     {
       header: "",
       id: "add-dropset",
       cell: (ctx) => (
-        <Button onClick={() => addRowsAtIndex(ctx.row.index, null, getDropsetAddData(ctx.row.original))}>
-          + dropset
-        </Button>
+        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+          <Button onClick={() => addRowsAtIndex(ctx.row.index, null, getDropsetAddData(ctx.row.original))}>
+            + dropset
+          </Button>
+        </Show>
       ),
     },
     {
@@ -284,7 +290,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       });
 
       const newRows = [...exerciseRows.rows];
-      newRows.splice(index, 0, {
+      newRows.splice(index + 1, 0, {
         sessionExercise: record,
         expanded: false,
       });
@@ -329,7 +335,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         _parentID: record.supersetParent ?? null,
         _isChild: !!record.supersetParent,
       }));
-      newRows.splice(index, 0, ...newRowsToInsert);
+      newRows.splice(index + 1, 0, ...newRowsToInsert);
       setExerciseRows("rows", newRows);
 
       // send the updated list to 'itemsOrder'
@@ -366,6 +372,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.sessionExercise.id, // required because row indexes will change
+  });
+
+  // in case the base data changes, refresh
+  createEffect(() => {
+    setExerciseRows({
+      rows: props.sessionExercises.map((sessionExercise) => ({
+        sessionExercise,
+        expanded: false,
+      })),
+    });
   });
 
   return (
