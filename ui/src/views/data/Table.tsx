@@ -53,7 +53,8 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
-  const isDraggable = createMemo(() => !props.row.original.sessionExercise.supersetParent);
+  const isDropSet = createMemo(() => !!props.row.original.sessionExercise.supersetParent);
+
   const firstOfGroup = createMemo(
     () =>
       props.row.index === 0 ||
@@ -64,9 +65,15 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       props.row.index === props.rows.length - 1 ||
       props.row.original.sessionExercise.exercise !== props.rows[props.row.index + 1].sessionExercise.exercise
   );
+  const firstOfSuperset = createMemo(() => !isDropSet());
+  const lastOfSuperSet = createMemo(
+    () =>
+      props.row.index === props.rows.length - 1 ||
+      !props.rows[props.row.index + 1].sessionExercise.supersetParent
+  );
 
   createEffect(() => {
-    if (!isDraggable()) return;
+    if (!firstOfSuperset()) return;
 
     const element = ref;
     const dragHandle = dragHandleRef;
@@ -149,12 +156,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         </Show>
         <div
           ref={ref}
-          class={`flex ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 rounded-md`}
+          class={`flex ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 ${
+            firstOfSuperset() ? "rounded-t-md" : ""
+          } ${lastOfSuperSet() ? "rounded-b-md" : ""}`}
         >
           <For each={props.row.getVisibleCells()}>
             {(cell) => (
               <Cell>
-                {cell.column.id === "handle" && isDraggable() ? (
+                {cell.column.id === "handle" && firstOfSuperset() ? (
                   <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
                     <Grip />
                   </div>
