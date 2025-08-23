@@ -132,13 +132,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
 
   return (
     <>
-      <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
-        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-      </Show>
       <div
-        class={`${firstOfGroup() ? "mt-2 border-t-1 rounded-tl-lg rounded-tr-lg" : ""} ${
-          lastOfGroup() ? "pb-1 border-b-1 rounded-bl-lg rounded-br-lg" : ""
-        } border-l-1 border-r-1 px-2 py-0.5`}
+        class={`${firstOfGroup() ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
+          lastOfGroup() ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
+        } bg-charcoal-900 px-2 ${props.row.original.sessionExercise.supersetParent ? "" : "pt-1"}`}
       >
         <Show when={firstOfGroup()}>
           <p>
@@ -147,11 +144,12 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               : props.row.original.sessionExercise.expand?.exercise?.name}
           </p>
         </Show>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
+          <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
+        </Show>
         <div
           ref={ref}
-          class={`flex ${props.row.original.sessionExercise.supersetParent ? "" : "border rounded-md"} ${
-            dragging() === "dragging" ? "opacity-40" : ""
-          }`}
+          class={`flex ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 rounded-md`}
         >
           <For each={props.row.getVisibleCells()}>
             {(cell) => (
@@ -167,10 +165,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             )}
           </For>
         </div>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
+          <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
+        </Show>
       </div>
-      <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
-        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-      </Show>
     </>
   );
 };
