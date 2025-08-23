@@ -65,7 +65,10 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorKey: "sessionExercise.isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
-        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+        <Show
+          when={!ctx.row.original.sessionExercise.supersetParent}
+          fallback={<p class="italic">dropset</p>}
+        >
           <DataCheckbox
             initial={ctx.getValue() as boolean}
             saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, v, "isWarmup")}

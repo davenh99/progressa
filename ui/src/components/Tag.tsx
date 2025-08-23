@@ -9,12 +9,12 @@ interface Props {
 
 export const Tag: ParentComponent<Props> = (props) => {
   return (
-    <span class="badge">
+    <div class="badge border-1 rounded-full p-2 flex flex-row">
       {props.name}
       <KobalteButton onClick={props.onClick} class="ml-1">
         <CloseIcon />
       </KobalteButton>
-    </span>
+    </div>
   );
 };
 

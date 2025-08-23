@@ -28,7 +28,7 @@ export const Table: ParentComponent = (props) => {
 };
 
 export const TableBody: ParentComponent = (props) => {
-  return <div class="space-y-1">{props.children}</div>;
+  return <div>{props.children}</div>;
 };
 
 export const TableHeader: ParentComponent = (props) => {
@@ -138,7 +138,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       <div
         class={`${firstOfGroup() ? "mt-2 border-t-1 rounded-tl-lg rounded-tr-lg" : ""} ${
           lastOfGroup() ? "pb-1 border-b-1 rounded-bl-lg rounded-br-lg" : ""
-        } border-l-1 border-r-1 `}
+        } border-l-1 border-r-1 px-2 py-0.5`}
       >
         <Show when={firstOfGroup()}>
           <p>

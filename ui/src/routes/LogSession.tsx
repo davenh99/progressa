@@ -187,26 +187,36 @@ const LogSession: Component = () => {
           />
 
           <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-          <For each={session.tags}>{(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}</For>
+          <div class="">
+            <For each={session.tags}>
+              {(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}
+            </For>
+          </div>
 
           <Tabs>
-            <Tabs.List>
-              <Tabs.Trigger value="exercises">
-                <p>Exercises</p>
+            <Tabs.List class="border-b-1">
+              <Tabs.Trigger value="exercises" class="p-2 hover:bg-ash-gray-600">
+                Exercises
               </Tabs.Trigger>
-              <Tabs.Trigger value="meals-sleep">Meals + Sleep</Tabs.Trigger>
+              <Tabs.Trigger value="meals-sleep" class="p-2 hover:bg-ash-gray-600">
+                Meals + Sleep
+              </Tabs.Trigger>
               <Tabs.Indicator />
             </Tabs.List>
             <Tabs.Content value="exercises">
-              <UserSessionExerciseList
-                sessionExercises={session.sessionExercises}
-                sessionID={params.id}
-                sessionDay={date()}
-                getSession={getSession}
-              />
+              <div class="m-10">
+                <UserSessionExerciseList
+                  sessionExercises={session.sessionExercises}
+                  sessionID={params.id}
+                  sessionDay={date()}
+                  getSession={getSession}
+                />
+              </div>
             </Tabs.Content>
             <Tabs.Content value="meals-sleep">
-              <p>meal an sleep</p>
+              <div class="m-10">
+                <p>meal an sleep. coming soon...</p>
+              </div>
             </Tabs.Content>
           </Tabs>
         </Show>
