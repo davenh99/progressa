@@ -73,23 +73,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   );
 
   createEffect(() => {
-    if (!firstOfSuperset()) return;
+    if (!firstOfSuperset() && !lastOfSuperSet()) return;
 
     const element = ref;
-    const dragHandle = dragHandleRef;
     invariant(element);
-    invariant(dragHandle);
-
-    draggable({
-      element,
-      dragHandle,
-      onDragStart() {
-        setDragging("dragging");
-      },
-      onDrop() {
-        setDragging("idle");
-      },
-    });
 
     dropTargetForElements({
       element,
@@ -105,12 +92,16 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return true;
       },
       getData({ input }) {
+        const allowedEdges = [];
+        if (firstOfSuperset()) allowedEdges.push("top");
+        if (lastOfSuperSet()) allowedEdges.push("bottom");
+
         return attachClosestEdge(
           { id: props.row.original.sessionExercise.id },
           {
             element,
             input,
-            allowedEdges: ["top", "bottom"],
+            allowedEdges: allowedEdges,
           }
         );
       },
@@ -137,6 +128,26 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     });
   });
 
+  createEffect(() => {
+    if (!firstOfSuperset()) return;
+
+    const element = ref;
+    const dragHandle = dragHandleRef;
+    invariant(element);
+    invariant(dragHandle);
+
+    draggable({
+      element,
+      dragHandle,
+      onDragStart() {
+        setDragging("dragging");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+  });
+
   return (
     <>
       <div
@@ -151,7 +162,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               : props.row.original.sessionExercise.expand?.exercise?.name}
           </p>
         </Show>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "top" && firstOfSuperset()}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
         </Show>
         <div
@@ -174,7 +185,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             )}
           </For>
         </div>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && lastOfSuperSet()}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
         </Show>
       </div>
