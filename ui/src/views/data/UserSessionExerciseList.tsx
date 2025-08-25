@@ -5,6 +5,9 @@ import Copy from "lucide-solid/icons/copy";
 import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 import Trash from "lucide-solid/icons/trash-2";
+import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 import { useAuthPB } from "../../config/pocketbase";
 import {
@@ -17,9 +20,15 @@ import {
 } from "../../../Types";
 import { ExerciseList } from ".";
 import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } from "../../components";
-import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { ExerciseVariationList } from "./ExerciseVariationList";
-import { DraggableRow, Row, Table, TableBody, TableHeader, TableHeaderCell } from "./Table";
+import {
+  DraggableRow,
+  Row,
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderCell,
+} from "./UserSessionExerciseTable";
 import { getDropsetAddData, getIDsToDuplicate } from "../../methods/userSessionExerciseMethods";
 
 interface Props {
@@ -368,6 +377,38 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.sessionExercise.id, // required because row indexes will change
+  });
+
+  createEffect(() => {
+    return monitorForElements({
+      canMonitor({ source }) {
+        return source.data.isUserSessionExerciseRow as boolean;
+      },
+      onDrop({ location, source }) {
+        const target = location.current.dropTargets[0];
+        if (!target) {
+          return;
+        }
+
+        const sourceData = source.data;
+        const targetData = target.data;
+
+        if (!sourceData.isUserSessionExerciseRow || !targetData.isUserSessionExerciseRow) {
+          return;
+        }
+
+        if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
+          return;
+        }
+
+        const closestEdgeOfTarget = extractClosestEdge(targetData);
+
+        const newInd =
+          closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+
+        reorderRows(sourceData.ind as number, newInd, 1);
+      },
+    });
   });
 
   // in case the base data changes, refresh

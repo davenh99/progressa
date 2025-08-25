@@ -7,7 +7,6 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  type JSX,
 } from "solid-js";
 import {
   attachClosestEdge,
@@ -15,13 +14,11 @@ import {
   type Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview";
-import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import Grip from "lucide-solid/icons/grip-vertical";
 
-import { SessionExerciseRow } from "./";
+import { SessionExerciseRow } from ".";
 
 export const Table: ParentComponent = (props) => {
   return <div class="w-full">{props.children}</div>;
@@ -86,7 +83,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           return false;
         }
         // only allowing tasks to be dropped on me
-        return props.exerciseRowIds().some((r) => r === props.row.original.sessionExercise.id);
+        return source.data.isUserSessionExerciseRow as boolean;
       },
       getIsSticky() {
         return true;
@@ -97,12 +94,8 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         if (lastOfSuperSet()) allowedEdges.push("bottom");
 
         return attachClosestEdge(
-          { id: props.row.original.sessionExercise.id },
-          {
-            element,
-            input,
-            allowedEdges: allowedEdges,
-          }
+          { id: props.row.original.sessionExercise.id, ind: props.row.index, isUserSessionExerciseRow: true },
+          { element, input, allowedEdges }
         );
       },
       onDragEnter({ self }) {
@@ -139,6 +132,13 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     draggable({
       element,
       dragHandle,
+      getInitialData() {
+        return {
+          id: props.row.original.sessionExercise.id,
+          ind: props.row.index,
+          isUserSessionExerciseRow: true,
+        };
+      },
       onDragStart() {
         setDragging("dragging");
       },
@@ -153,7 +153,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       <div
         class={`${firstOfGroup() ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           lastOfGroup() ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${props.row.original.sessionExercise.supersetParent ? "" : "pt-1"}`}
+        } bg-charcoal-900 px-2 ${isDropSet() ? "" : "pt-1"}`}
       >
         <Show when={firstOfGroup()}>
           <p>
