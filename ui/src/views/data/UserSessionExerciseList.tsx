@@ -1,6 +1,6 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
@@ -55,9 +55,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       expanded: false,
     })),
   });
-  const exerciseRowIds = createMemo<string[]>(() =>
-    exerciseRows.rows.map(({ sessionExercise }) => sessionExercise.id)
-  );
   const [newExercise, setNewExercise] = createStore(BaseNewExercise);
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
@@ -218,7 +215,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     try {
       await updateRecord("userSessionExercises", recordID, newVal, column);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -239,7 +236,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
-  const reorderRows = async (draggedItemsOldInd: number, draggedItemsNewInd: number, count: number) => {
+  const reorderRows = (draggedItemsOldInd: number, draggedItemsNewInd: number, count: number) => {
     // shuffle array
     const newRows = [...exerciseRows.rows];
     const draggedItems = newRows.splice(draggedItemsOldInd, count);
@@ -251,12 +248,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     setExerciseRows("rows", newRows);
 
     // send the updated list to 'itemsOrder'
-    await updateRecord(
+    updateRecord(
       "userSessions",
       props.sessionID,
       newRows.map((r) => r.sessionExercise.id),
       "itemsOrder"
-    );
+    ).catch(console.error);
   };
 
   const addRowsAtIndex = async (
@@ -302,12 +299,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       setExerciseRows("rows", newRows);
 
       // send the updated list to 'itemsOrder'
-      await updateRecord(
+      updateRecord(
         "userSessions",
         props.sessionID,
         newRows.map((r) => r.sessionExercise.id),
         "itemsOrder"
-      );
+      ).catch(console.error);
     } else if (duplicateInds) {
       // add to array (sorting just in case)
       const createPromises = duplicateInds
@@ -334,22 +331,17 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       const newRecords = await Promise.all(createPromises);
 
       const newRows = [...exerciseRows.rows];
-      const newRowsToInsert = newRecords.map((record) => ({
-        sessionExercise: record,
-        expanded: false,
-        _parentID: record.supersetParent ?? null,
-        _isChild: !!record.supersetParent,
-      }));
+      const newRowsToInsert = newRecords.map((record) => ({ sessionExercise: record, expanded: false }));
       newRows.splice(index + 1, 0, ...newRowsToInsert);
       setExerciseRows("rows", newRows);
 
       // send the updated list to 'itemsOrder'
-      await updateRecord(
+      updateRecord(
         "userSessions",
         props.sessionID,
         newRows.map((r) => r.sessionExercise.id),
         "itemsOrder"
-      );
+      ).catch(console.error);
     }
   };
 
@@ -441,7 +433,27 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         </TableHeader>
         <TableBody>
           <For each={table.getRowModel().rows}>
-            {(row) => <DraggableRow row={row} exerciseRowIds={exerciseRowIds} rows={exerciseRows.rows} />}
+            {(row) => (
+              <DraggableRow
+                row={row}
+                isDropSet={!!row.original.sessionExercise.supersetParent}
+                firstOfGroup={
+                  row.index === 0 ||
+                  row.original.sessionExercise.exercise !==
+                    exerciseRows.rows[row.index - 1].sessionExercise.exercise
+                }
+                lastOfGroup={
+                  row.index === exerciseRows.rows.length - 1 ||
+                  row.original.sessionExercise.exercise !==
+                    exerciseRows.rows[row.index + 1].sessionExercise.exercise
+                }
+                firstOfSuperset={!row.original.sessionExercise.supersetParent}
+                lastOfSuperset={
+                  row.index === exerciseRows.rows.length - 1 ||
+                  !exerciseRows.rows[row.index + 1].sessionExercise.supersetParent
+                }
+              />
+            )}
           </For>
         </TableBody>
       </Table>

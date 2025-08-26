@@ -1,13 +1,4 @@
-import {
-  Accessor,
-  Component,
-  For,
-  ParentComponent,
-  Show,
-  createEffect,
-  createMemo,
-  createSignal,
-} from "solid-js";
+import { Component, For, ParentComponent, Show, createEffect, createSignal } from "solid-js";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -38,8 +29,11 @@ export const Row: ParentComponent = (props) => {
 
 interface DraggableRowProps {
   row: RowType<SessionExerciseRow>;
-  rows: SessionExerciseRow[];
-  exerciseRowIds: Accessor<string[]>;
+  isDropSet: boolean;
+  firstOfGroup: boolean;
+  lastOfGroup: boolean;
+  firstOfSuperset: boolean;
+  lastOfSuperset: boolean;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -50,27 +44,8 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
-  const isDropSet = createMemo(() => !!props.row.original.sessionExercise.supersetParent);
-
-  const firstOfGroup = createMemo(
-    () =>
-      props.row.index === 0 ||
-      props.row.original.sessionExercise.exercise !== props.rows[props.row.index - 1].sessionExercise.exercise
-  );
-  const lastOfGroup = createMemo(
-    () =>
-      props.row.index === props.rows.length - 1 ||
-      props.row.original.sessionExercise.exercise !== props.rows[props.row.index + 1].sessionExercise.exercise
-  );
-  const firstOfSuperset = createMemo(() => !isDropSet());
-  const lastOfSuperSet = createMemo(
-    () =>
-      props.row.index === props.rows.length - 1 ||
-      !props.rows[props.row.index + 1].sessionExercise.supersetParent
-  );
-
   createEffect(() => {
-    if (!firstOfSuperset() && !lastOfSuperSet()) return;
+    if (!props.firstOfSuperset && !props.lastOfSuperset) return;
 
     const element = ref;
     invariant(element);
@@ -90,8 +65,8 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       },
       getData({ input }) {
         const allowedEdges = [];
-        if (firstOfSuperset()) allowedEdges.push("top");
-        if (lastOfSuperSet()) allowedEdges.push("bottom");
+        if (props.firstOfSuperset) allowedEdges.push("top");
+        if (props.lastOfSuperset) allowedEdges.push("bottom");
 
         return attachClosestEdge(
           { id: props.row.original.sessionExercise.id, ind: props.row.index, isUserSessionExerciseRow: true },
@@ -122,7 +97,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   });
 
   createEffect(() => {
-    if (!firstOfSuperset()) return;
+    if (!props.firstOfSuperset) return;
 
     const element = ref;
     const dragHandle = dragHandleRef;
@@ -151,30 +126,30 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   return (
     <>
       <div
-        class={`${firstOfGroup() ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
-          lastOfGroup() ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${isDropSet() ? "" : "pt-1"}`}
+        class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
+          props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
+        } bg-charcoal-900 px-2 ${props.isDropSet ? "" : "pt-1"}`}
       >
-        <Show when={firstOfGroup()}>
+        <Show when={props.firstOfGroup}>
           <p>
             {props.row.original.sessionExercise.expand?.variation?.name
               ? `${props.row.original.sessionExercise.expand?.exercise?.name} (${props.row.original.sessionExercise.expand?.variation?.name})`
               : props.row.original.sessionExercise.expand?.exercise?.name}
           </p>
         </Show>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "top" && firstOfSuperset()}>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfSuperset}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
         </Show>
         <div
           ref={ref}
           class={`flex ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 ${
-            firstOfSuperset() ? "rounded-t-md" : ""
-          } ${lastOfSuperSet() ? "rounded-b-md" : ""}`}
+            props.firstOfSuperset ? "rounded-t-md" : ""
+          } ${props.lastOfSuperset ? "rounded-b-md" : ""}`}
         >
           <For each={props.row.getVisibleCells()}>
             {(cell) => (
               <Cell>
-                {cell.column.id === "handle" && firstOfSuperset() ? (
+                {cell.column.id === "handle" && props.firstOfSuperset ? (
                   <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
                     <Grip />
                   </div>
@@ -185,7 +160,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             )}
           </For>
         </div>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && lastOfSuperSet()}>
+        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
         </Show>
       </div>
