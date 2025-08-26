@@ -1,11 +1,12 @@
-import { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
 import Header from "../components/Header";
+import { DataInput } from "../components";
 
 const Profile: Component = () => {
-  const { user, logout } = useAuthPB();
+  const { user, logout, updateRecord } = useAuthPB();
 
   return (
     <>
@@ -18,9 +19,33 @@ const Profile: Component = () => {
             <h5 class="text-lg font-medium mt-4">Stats</h5>
             <div class="grid grid-cols-2 gap-2 mt-2">
               <p>Email: {user.email}</p>
-              <p>Height: {user.height}</p>
-              <p>Weight: {user.weight}</p>
-              <p>Age: {user.dob ? getAge(user.dob) : "N/A"}</p>
+              <div class="flex flex-row">
+                <DataInput
+                  label="Height"
+                  initial={user.height}
+                  type="number"
+                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "height")}
+                />
+              </div>
+              <div class="flex flex-row">
+                <DataInput
+                  label="Weight"
+                  initial={user.weight}
+                  type="number"
+                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "weight")}
+                />
+              </div>
+              <div class="flex flex-row">
+                <DataInput
+                  label="DOB"
+                  type="date"
+                  initial={user.dob}
+                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "dob")}
+                />
+                <Show when={!!user.dob}>
+                  <p>(Age {getAge(user.dob)})</p>
+                </Show>
+              </div>
             </div>
             <button onClick={logout} class="btn btn-error mt-4">
               Logout
