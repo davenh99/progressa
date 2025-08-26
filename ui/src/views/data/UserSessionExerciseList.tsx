@@ -30,6 +30,7 @@ import {
   TableHeaderCell,
 } from "./UserSessionExerciseTable";
 import { getDropsetAddData, getIDsToDuplicate } from "../../methods/userSessionExerciseMethods";
+import { Portal } from "solid-js/web";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -459,30 +460,39 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       </Table>
       <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
       <Show when={showCreateSessionExercise()}>
-        <p>Select Exercise</p>
-        <ExerciseList
-          onClick={(exercise: Exercise) => {
-            if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
-              setShowAddExerciseVariation(true);
-              setVariations(exercise.expand.exerciseVariations_via_exercise);
-            }
-            setNewExercise("exercise", exercise);
-          }}
-        />
-        <Show when={showAddExerciseVariation()}>
-          <ExerciseVariationList
-            variations={variations}
-            onClick={(v) => {
-              setShowAddExerciseVariation(false);
-              setNewExercise("variation", v);
-            }}
-          />
-        </Show>
-        <p>
-          Selected: {newExercise.exercise?.name ?? "None"}{" "}
-          {newExercise.variation?.name ? `(${newExercise.variation?.name})` : ""}
-        </p>
-        <Button onClick={addSessionExercise}>Add</Button>
+        <Portal>
+          <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-1"
+            onClick={() => setShowCreateSessionExercise(false)}
+          >
+            <div class="bg-white rounded-xl shadow-lg p-6 w-[400px]" onClick={(e) => e.stopPropagation()}>
+              <p>Select Exercise</p>
+              <ExerciseList
+                onClick={(exercise: Exercise) => {
+                  if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
+                    setShowAddExerciseVariation(true);
+                    setVariations(exercise.expand.exerciseVariations_via_exercise);
+                  }
+                  setNewExercise("exercise", exercise);
+                }}
+              />
+              <Show when={showAddExerciseVariation()}>
+                <ExerciseVariationList
+                  variations={variations}
+                  onClick={(v) => {
+                    setShowAddExerciseVariation(false);
+                    setNewExercise("variation", v);
+                  }}
+                />
+              </Show>
+              <p>
+                Selected: {newExercise.exercise?.name ?? "None"}{" "}
+                {newExercise.variation?.name ? `(${newExercise.variation?.name})` : ""}
+              </p>
+              <Button onClick={addSessionExercise}>Add</Button>
+            </div>
+          </div>
+        </Portal>
       </Show>
     </>
   );
