@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -16,6 +16,7 @@ import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
 const Basesession = {
   name: "",
   notes: "",
+  userWeight: undefined as number,
   tags: [] as Tag[],
   sessionExercises: [] as UserSessionExercise[],
 };
@@ -113,6 +114,7 @@ const LogSession: Component = () => {
         // TODO should tidy up below to avoid the duplication
         setDate(s.userDay);
         setSession("name", s.name);
+        setSession("userWeight", s.userWeight);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
         setSession(
@@ -126,6 +128,7 @@ const LogSession: Component = () => {
 
         setDate(s.userDay);
         setSession("name", s.name);
+        setSession("userWeight", s.userWeight);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
         setSession(
@@ -154,6 +157,14 @@ const LogSession: Component = () => {
   //   console.log(date());
   // });
 
+  const updateWeight = async (v: number) => {
+    // also update the profile weight if it's the current day
+    if (date() === new Date().toLocaleDateString("en-CA")) {
+      updateRecord("users", user.id, v, "weight");
+    }
+    return sessionUpdate(params.id, "userWeight", v);
+  };
+
   onMount(() => {
     getSession();
   });
@@ -173,24 +184,33 @@ const LogSession: Component = () => {
         />
 
         <Show when={!loading()} fallback={<Loading />}>
-          <DataInput
-            label="Session Name"
-            initial={session.name}
-            type="text"
-            saveFunc={(v: string) => sessionUpdate(params.id, "name", v)}
-          />
+          <div class="space-y-2">
+            <DataInput
+              label="Session Name"
+              initial={session.name}
+              type="text"
+              saveFunc={(v: string) => sessionUpdate(params.id, "name", v)}
+            />
 
-          <DataTextArea
-            label="Notes"
-            initial={session.notes}
-            saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
-          />
+            <DataInput
+              label="your weight this day:"
+              type="number"
+              initial={session.userWeight ?? user.weight}
+              saveFunc={updateWeight}
+            />
 
-          <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-          <div class="">
-            <For each={session.tags}>
-              {(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}
-            </For>
+            <DataTextArea
+              label="Notes"
+              initial={session.notes}
+              saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
+            />
+
+            <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
+            <div class="">
+              <For each={session.tags}>
+                {(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}
+              </For>
+            </div>
           </div>
 
           <Tabs>
