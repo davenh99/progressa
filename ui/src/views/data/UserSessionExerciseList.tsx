@@ -310,6 +310,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         "itemsOrder"
       ).catch(console.error);
     } else if (duplicateInds) {
+      pb.autoCancellation(false);
+
       const createData = {
         user: user.id,
         exercise: exerciseRows.rows[duplicateInds[0]].sessionExercise.exercise,
@@ -352,10 +354,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         });
       });
       newRecords.push(...(await Promise.all(createPromises)));
+      pb.autoCancellation(true);
 
       const newRows = [...exerciseRows.rows];
       const newRowsToInsert = newRecords.map((record) => ({ sessionExercise: record, expanded: false }));
-      newRows.splice(index + 1, 0, ...newRowsToInsert);
+
+      newRows.splice(index + duplicateInds.length, 0, ...newRowsToInsert);
       setExerciseRows("rows", newRows);
 
       // send the updated list to 'itemsOrder'
