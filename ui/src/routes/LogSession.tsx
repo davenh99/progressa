@@ -102,10 +102,10 @@ const LogSession: Component = () => {
   const getSession = async () => {
     const expandFields =
       "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation";
-    try {
-      if (params.id) {
-        // TODO need to come up with better way to avoid the double call to backend
-        // atm, if a matching date is found, we nav to it's id then get it again...
+    if (params.id) {
+      // TODO need to come up with better way to avoid the double call to backend
+      // atm, if a matching date is found, we nav to it's id then get it again...
+      try {
         setLoading(true);
         const s = await pb
           .collection<UserSession>("userSessions")
@@ -121,7 +121,15 @@ const LogSession: Component = () => {
           "sessionExercises",
           sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
         );
-      } else {
+      } catch (e) {
+        if (e instanceof ClientResponseError && e.status === 404) {
+          navigate(`/workouts/log`, { replace: true });
+        } else {
+          console.log(e);
+        }
+      }
+    } else {
+      try {
         const s = await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date()}'`, {
           expand: expandFields,
         });
@@ -137,16 +145,16 @@ const LogSession: Component = () => {
         );
 
         navigate(`/workouts/log/${s.id}`, { replace: true });
+      } catch (e) {
+        if (e instanceof ClientResponseError && e.status === 404) {
+          setSession(reconcile(Basesession));
+        } else {
+          console.log(e);
+        }
+      } finally {
       }
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-        setSession(reconcile(Basesession));
-      } else {
-        console.log(e);
-      }
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   // createEffect(() => {
