@@ -1,7 +1,7 @@
 import { SessionExerciseRow } from "../views/data";
 
 // helper for getting existing dropsets when duplicating
-export const getIDsToDuplicate = (index: number, data: SessionExerciseRow[]) => {
+export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
   const inds = [index];
   const sessionExerciseId = data[index].sessionExercise.id;
 

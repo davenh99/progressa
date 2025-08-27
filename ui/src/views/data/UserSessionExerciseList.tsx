@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableHeaderCell,
 } from "./UserSessionExerciseTable";
-import { getDropsetAddData, getIDsToDuplicate } from "../../methods/userSessionExerciseMethods";
+import { getDropsetAddData, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import { Portal } from "solid-js/web";
 
 interface Props {
@@ -163,7 +163,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       id: "duplicate",
       cell: (ctx) => (
         <IconButton
-          onClick={() => addRowsAtIndex(ctx.row.index, getIDsToDuplicate(ctx.row.index, exerciseRows.rows))}
+          onClick={() => addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, exerciseRows.rows))}
         >
           <Copy />
         </IconButton>
@@ -173,7 +173,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "",
       id: "delete",
       cell: (ctx) => (
-        <IconButton onClick={() => deleteRow(ctx.row.index)}>
+        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, exerciseRows.rows))}>
           <Trash />
         </IconButton>
       ),
@@ -220,12 +220,15 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
-  const deleteRow = async (index: number) => {
-    const newRows = exerciseRows.rows.filter((_, ind) => ind !== index);
+  const deleteRows = async (indices: number[]) => {
+    const newRows = exerciseRows.rows.filter((_, ind) => !indices.includes(ind));
     setExerciseRows("rows", newRows);
 
     try {
-      await pb.collection("userSessionExercises").delete(exerciseRows.rows[index].sessionExercise.id);
+      const delPromises = indices.map((index) =>
+        pb.collection("userSessionExercises").delete(exerciseRows.rows[index].sessionExercise.id)
+      );
+      await Promise.all(delPromises);
       await updateRecord(
         "userSessions",
         props.sessionID,
@@ -307,29 +310,48 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         "itemsOrder"
       ).catch(console.error);
     } else if (duplicateInds) {
-      // add to array (sorting just in case)
-      const createPromises = duplicateInds
-        .sort((a, b) => a - b)
-        .map((ind) => {
-          const createData = {
-            user: user.id,
-            exercise: exerciseRows.rows[ind].sessionExercise.exercise,
-            perceivedEffort: exerciseRows.rows[ind].sessionExercise.perceivedEffort,
-            userSession: exerciseRows.rows[ind].sessionExercise.userSession,
-            variation: exerciseRows.rows[ind].sessionExercise.variation,
-            addedWeight: exerciseRows.rows[ind].sessionExercise.addedWeight,
-            restAfter: exerciseRows.rows[ind].sessionExercise.restAfter,
-            isWarmup: exerciseRows.rows[ind].sessionExercise.isWarmup,
-            measurementNumeric: exerciseRows.rows[ind].sessionExercise.measurementNumeric,
-            measurementValue: exerciseRows.rows[ind].sessionExercise.measurementValue,
-          };
-
-          return pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
-            expand:
-              "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation",
-          });
+      const createData = {
+        user: user.id,
+        exercise: exerciseRows.rows[duplicateInds[0]].sessionExercise.exercise,
+        perceivedEffort: exerciseRows.rows[duplicateInds[0]].sessionExercise.perceivedEffort,
+        userSession: exerciseRows.rows[duplicateInds[0]].sessionExercise.userSession,
+        variation: exerciseRows.rows[duplicateInds[0]].sessionExercise.variation,
+        addedWeight: exerciseRows.rows[duplicateInds[0]].sessionExercise.addedWeight,
+        restAfter: exerciseRows.rows[duplicateInds[0]].sessionExercise.restAfter,
+        isWarmup: exerciseRows.rows[duplicateInds[0]].sessionExercise.isWarmup,
+        measurementNumeric: exerciseRows.rows[duplicateInds[0]].sessionExercise.measurementNumeric,
+        measurementValue: exerciseRows.rows[duplicateInds[0]].sessionExercise.measurementValue,
+      };
+      const parentRecord = await pb
+        .collection<UserSessionExercise>("userSessionExercises")
+        .create(createData, {
+          expand:
+            "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation",
         });
-      const newRecords = await Promise.all(createPromises);
+      const newRecords = [parentRecord];
+
+      // add to array
+      const createPromises = duplicateInds.slice(1).map((ind) => {
+        const createData = {
+          user: user.id,
+          exercise: exerciseRows.rows[ind].sessionExercise.exercise,
+          perceivedEffort: exerciseRows.rows[ind].sessionExercise.perceivedEffort,
+          userSession: exerciseRows.rows[ind].sessionExercise.userSession,
+          variation: exerciseRows.rows[ind].sessionExercise.variation,
+          addedWeight: exerciseRows.rows[ind].sessionExercise.addedWeight,
+          restAfter: exerciseRows.rows[ind].sessionExercise.restAfter,
+          isWarmup: exerciseRows.rows[ind].sessionExercise.isWarmup,
+          measurementNumeric: exerciseRows.rows[ind].sessionExercise.measurementNumeric,
+          measurementValue: exerciseRows.rows[ind].sessionExercise.measurementValue,
+          supersetParent: parentRecord.id,
+        };
+
+        return pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
+          expand:
+            "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation",
+        });
+      });
+      newRecords.push(...(await Promise.all(createPromises)));
 
       const newRows = [...exerciseRows.rows];
       const newRowsToInsert = newRecords.map((record) => ({ sessionExercise: record, expanded: false }));
@@ -399,7 +421,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         const newInd =
           closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
 
-        reorderRows(sourceData.ind as number, newInd, 1);
+        const inds = getSupersetInds(sourceData.ind as number, exerciseRows.rows);
+
+        reorderRows(sourceData.ind as number, newInd, inds.length);
       },
     });
   });
