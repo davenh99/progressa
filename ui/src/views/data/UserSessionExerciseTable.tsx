@@ -5,6 +5,8 @@ import {
   type Edge,
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview";
+import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import Grip from "lucide-solid/icons/grip-vertical";
@@ -34,12 +36,14 @@ interface DraggableRowProps {
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
+  getGroupInds: () => number[];
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
+  let groupRef: HTMLDivElement | undefined = undefined;
   let dragHandleRef: HTMLDivElement | undefined = undefined;
   let dragHandleMasterRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
@@ -56,6 +60,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       canDrop({ source }) {
         // not allowing dropping on yourself
         if (source.element === element) {
+          return false;
+        }
+        // don't allow dropping group on it's own rows
+        if (source.data.isGroup && (source.data.groupInds as number[]).includes(props.row.index)) {
           return false;
         }
         // only allowing tasks to be dropped on me
@@ -115,6 +123,23 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           isUserSessionExerciseRow: true,
         };
       },
+      onGenerateDragPreview({ nativeSetDragImage }) {
+        setCustomNativeDragPreview({
+          getOffset: pointerOutsideOfPreview({
+            x: "16px",
+            y: "8px",
+          }),
+          render({ container }) {
+            const preview = document.createElement("div");
+            preview.textContent = `${props.row.original.sessionExercise.expand?.exercise?.name} (${
+              props.firstOfSuperset && !props.lastOfSuperset ? "superset" : "1x set"
+            })`;
+            preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
+            container.appendChild(preview);
+          },
+          nativeSetDragImage,
+        });
+      },
       onDragStart() {
         setDragging("dragging");
       },
@@ -124,45 +149,64 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     });
   });
 
-  // createEffect(() => {
-  //   if (!props.firstOfGroup) return;
+  createEffect(() => {
+    if (!props.firstOfGroup) return;
 
-  //   const element = ref;
-  //   const dragHandle = dragHandleMasterRef;
-  //   invariant(element);
-  //   invariant(dragHandle);
+    const element = groupRef;
+    const dragHandle = dragHandleMasterRef;
+    invariant(element);
+    invariant(dragHandle);
 
-  //   draggable({
-  //     element,
-  //     dragHandle,
-  //     getInitialData() {
-  //       return {
-  //         id: props.row.original.sessionExercise.id,
-  //         ind: props.row.index,
-  //         isUserSessionExerciseRow: true,
-  //         isGroup: true,
-  //       };
-  //     },
-  //     onDragStart() {
-  //       setDragging("dragging");
-  //     },
-  //     onDrop() {
-  //       setDragging("idle");
-  //     },
-  //   });
-  // });
+    const groupInds = props.getGroupInds();
+
+    draggable({
+      element,
+      dragHandle,
+      getInitialData() {
+        return {
+          id: props.row.original.sessionExercise.id,
+          ind: props.row.index,
+          isUserSessionExerciseRow: true,
+          isGroup: true,
+          groupInds,
+        };
+      },
+      onGenerateDragPreview({ nativeSetDragImage }) {
+        setCustomNativeDragPreview({
+          getOffset: pointerOutsideOfPreview({
+            x: "16px",
+            y: "8px",
+          }),
+          render({ container }) {
+            const preview = document.createElement("div");
+            preview.textContent = `${props.row.original.sessionExercise.expand?.exercise?.name} (${groupInds.length}x sets)`;
+            preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
+            container.appendChild(preview);
+          },
+          nativeSetDragImage,
+        });
+      },
+      onDragStart() {
+        setDragging("dragging");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+  });
 
   return (
     <>
       <div
+        ref={groupRef}
         class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
         } bg-charcoal-900 px-2 ${props.isDropSet ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
-          {/* <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
+          <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
             <Grip />
-          </div> */}
+          </div>
           <p>
             {props.row.original.sessionExercise.expand?.variation?.name
               ? `${props.row.original.sessionExercise.expand?.exercise?.name} (${props.row.original.sessionExercise.expand?.variation?.name})`

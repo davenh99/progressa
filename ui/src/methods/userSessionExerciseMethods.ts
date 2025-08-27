@@ -14,10 +14,10 @@ export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
 };
 
 export const getGroupInds = (index: number, data: SessionExerciseRow[]) => {
-  const inds = [index];
+  const inds = [];
   const exerciseId = data[index].sessionExercise.exercise;
 
-  for (const [i, d] of data.slice(index + 1).entries()) {
+  for (const [i, d] of data.slice(index).entries()) {
     if (d.sessionExercise.exercise === exerciseId) {
       inds.push(i + index);
     } else {

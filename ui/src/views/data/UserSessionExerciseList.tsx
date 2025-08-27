@@ -486,6 +486,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                   row.index === exerciseRows.rows.length - 1 ||
                   !exerciseRows.rows[row.index + 1].sessionExercise.supersetParent
                 }
+                getGroupInds={() => getGroupInds(row.index, exerciseRows.rows)}
               />
             )}
           </For>
