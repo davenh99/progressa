@@ -486,7 +486,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       <Show when={showCreateSessionExercise()}>
         <Portal>
           <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-1"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black opacity-35"
             onClick={() => setShowCreateSessionExercise(false)}
           >
             <div class="bg-white rounded-xl shadow-lg p-6 w-[400px]" onClick={(e) => e.stopPropagation()}>
