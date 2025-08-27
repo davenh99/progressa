@@ -41,6 +41,7 @@ type DraggingState = "idle" | "dragging" | "dragging-over";
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
   let dragHandleRef: HTMLDivElement | undefined = undefined;
+  let dragHandleMasterRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
@@ -123,6 +124,34 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     });
   });
 
+  // createEffect(() => {
+  //   if (!props.firstOfGroup) return;
+
+  //   const element = ref;
+  //   const dragHandle = dragHandleMasterRef;
+  //   invariant(element);
+  //   invariant(dragHandle);
+
+  //   draggable({
+  //     element,
+  //     dragHandle,
+  //     getInitialData() {
+  //       return {
+  //         id: props.row.original.sessionExercise.id,
+  //         ind: props.row.index,
+  //         isUserSessionExerciseRow: true,
+  //         isGroup: true,
+  //       };
+  //     },
+  //     onDragStart() {
+  //       setDragging("dragging");
+  //     },
+  //     onDrop() {
+  //       setDragging("idle");
+  //     },
+  //   });
+  // });
+
   return (
     <>
       <div
@@ -131,6 +160,9 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         } bg-charcoal-900 px-2 ${props.isDropSet ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
+          {/* <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
+            <Grip />
+          </div> */}
           <p>
             {props.row.original.sessionExercise.expand?.variation?.name
               ? `${props.row.original.sessionExercise.expand?.exercise?.name} (${props.row.original.sessionExercise.expand?.variation?.name})`

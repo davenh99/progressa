@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableHeaderCell,
 } from "./UserSessionExerciseTable";
-import { getDropsetAddData, getSupersetInds } from "../../methods/userSessionExerciseMethods";
+import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import { Portal } from "solid-js/web";
 
 interface Props {
@@ -425,7 +425,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         const newInd =
           closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
 
-        const inds = getSupersetInds(sourceData.ind as number, exerciseRows.rows);
+        let inds = [];
+        if (sourceData.isGroup as boolean) {
+          inds = getGroupInds(sourceData.ind as number, exerciseRows.rows);
+        } else {
+          inds = getSupersetInds(sourceData.ind as number, exerciseRows.rows);
+        }
 
         reorderRows(sourceData.ind as number, newInd, inds.length);
       },

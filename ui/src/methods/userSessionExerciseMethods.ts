@@ -1,6 +1,5 @@
 import { SessionExerciseRow } from "../views/data";
 
-// helper for getting existing dropsets when duplicating
 export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
   const inds = [index];
   const sessionExerciseId = data[index].sessionExercise.id;
@@ -8,6 +7,21 @@ export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
   for (const [i, d] of data.entries()) {
     if (d.sessionExercise.supersetParent && d.sessionExercise.supersetParent === sessionExerciseId) {
       inds.push(i);
+    }
+  }
+
+  return inds;
+};
+
+export const getGroupInds = (index: number, data: SessionExerciseRow[]) => {
+  const inds = [index];
+  const exerciseId = data[index].sessionExercise.exercise;
+
+  for (const [i, d] of data.slice(index + 1).entries()) {
+    if (d.sessionExercise.exercise === exerciseId) {
+      inds.push(i + index);
+    } else {
+      break;
     }
   }
 
