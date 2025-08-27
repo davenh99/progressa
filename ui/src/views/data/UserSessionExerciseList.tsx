@@ -222,12 +222,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const deleteRows = async (indices: number[]) => {
     const newRows = exerciseRows.rows.filter((_, ind) => !indices.includes(ind));
-    setExerciseRows("rows", newRows);
 
     try {
       const delPromises = indices.map((index) =>
         pb.collection("userSessionExercises").delete(exerciseRows.rows[index].sessionExercise.id)
       );
+      setExerciseRows("rows", newRows);
       await Promise.all(delPromises);
       await updateRecord(
         "userSessions",
