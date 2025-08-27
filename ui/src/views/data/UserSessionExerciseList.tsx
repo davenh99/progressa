@@ -378,7 +378,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       userSession: props.sessionID,
       variation: newExercise.variation?.id || undefined,
       exercise: newExercise.exercise.id,
-      perceivedEffort: 50,
+      perceivedEffort: 70,
     };
 
     if (variations.length > 0 && !newExercise.variation) {
