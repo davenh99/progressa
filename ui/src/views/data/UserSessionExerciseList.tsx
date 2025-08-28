@@ -474,12 +474,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 firstOfGroup={
                   row.index === 0 ||
                   row.original.sessionExercise.exercise !==
-                    exerciseRows.rows[row.index - 1].sessionExercise.exercise
+                    exerciseRows.rows[row.index - 1].sessionExercise.exercise ||
+                  row.original.sessionExercise.variation !==
+                    exerciseRows.rows[row.index - 1].sessionExercise.variation
                 }
                 lastOfGroup={
                   row.index === exerciseRows.rows.length - 1 ||
                   row.original.sessionExercise.exercise !==
-                    exerciseRows.rows[row.index + 1].sessionExercise.exercise
+                    exerciseRows.rows[row.index + 1].sessionExercise.exercise ||
+                  row.original.sessionExercise.variation !==
+                    exerciseRows.rows[row.index + 1].sessionExercise.variation
                 }
                 firstOfSuperset={!row.original.sessionExercise.supersetParent}
                 lastOfSuperset={
