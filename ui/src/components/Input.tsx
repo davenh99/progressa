@@ -13,7 +13,7 @@ interface Props {
 
 export const Input: ParentComponent<Props> = (props) => {
   return (
-    <TextField>
+    <TextField class="flex flex-row space-x-1">
       <Show when={props.label}>
         <TextField.Label>{props.label}</TextField.Label>
       </Show>

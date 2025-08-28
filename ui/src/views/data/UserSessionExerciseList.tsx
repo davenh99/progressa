@@ -135,19 +135,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       ),
     },
     {
-      accessorKey: "sessionExercise.restAfter",
-      header: "Rest After (s)",
-      cell: (ctx) => (
-        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
-          <DataInput
-            type="number"
-            initial={ctx.getValue() as number}
-            saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "restAfter")}
-          />
-        </Show>
-      ),
-    },
-    {
       header: "",
       id: "add-dropset",
       cell: (ctx) => (
@@ -470,6 +457,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             {(row) => (
               <DraggableRow
                 row={row}
+                saveRow={saveRow}
                 isDropSet={!!row.original.sessionExercise.supersetParent}
                 firstOfGroup={
                   row.index === 0 ||

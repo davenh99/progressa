@@ -12,6 +12,7 @@ import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import Grip from "lucide-solid/icons/grip-vertical";
 
 import { SessionExerciseRow } from ".";
+import { DataInput } from "../../components";
 
 export const Table: ParentComponent = (props) => {
   return <div class="w-full">{props.children}</div>;
@@ -37,6 +38,7 @@ interface DraggableRowProps {
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
+  saveRow: (recordID: string, newVal: any, column: any) => Promise<void>;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -218,23 +220,36 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         </Show>
         <div
           ref={ref}
-          class={`flex ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 ${
+          class={`flex flex-col p-1 ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 ${
             props.firstOfSuperset ? "rounded-t-md" : ""
           } ${props.lastOfSuperset ? "rounded-b-md" : ""}`}
         >
-          <For each={props.row.getVisibleCells()}>
-            {(cell) => (
-              <Cell>
-                {cell.column.id === "handle" && props.firstOfSuperset ? (
-                  <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
-                    <Grip />
-                  </div>
-                ) : (
-                  flexRender(cell.column.columnDef.cell, cell.getContext())
-                )}
-              </Cell>
-            )}
-          </For>
+          <div class="flex w-full">
+            <For each={props.row.getVisibleCells()}>
+              {(cell) => (
+                <Cell>
+                  {cell.column.id === "handle" && props.firstOfSuperset ? (
+                    <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
+                      <Grip />
+                    </div>
+                  ) : (
+                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                  )}
+                </Cell>
+              )}
+            </For>
+          </div>
+          <Show when={props.lastOfSuperset}>
+            <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 w-30 flex flex-row">
+              <DataInput
+                type="number"
+                label="Rest: "
+                initial={props.row.original.sessionExercise.restAfter}
+                saveFunc={(v: number) => props.saveRow(props.row.original.sessionExercise.id, v, "restAfter")}
+              />
+              <p>s</p>
+            </div>
+          </Show>
         </div>
         <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
