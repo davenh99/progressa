@@ -7,6 +7,9 @@ migrate(
       { id: "m01s8yx7wfk2gxd", s: true, n: "Reps", num: true, p: true },
       { id: "8ldlggjjvy2ircl", s: true, n: "s (Time)", num: true, p: true },
       { id: "8ldlgghjvy4ircl", s: true, n: "Boulder grade (hueco)", num: false, p: true },
+      { id: "8ldlgghjvy5yrcl", s: true, n: "Boulder grade (font)", num: false, p: true },
+      { id: "8ldlgghjvt7yrcl", s: true, n: "Route grade (ewbanks)", num: false, p: true },
+      { id: "8ldlyyhjvt7yrbl", s: true, n: "Route grade (french)", num: false, p: true },
     ];
 
     for (const m of newMeasurementTypes) {
@@ -22,7 +25,7 @@ migrate(
     }
   },
   (app) => {
-    const createdIDs = ["m01s8yx7wfk2gxd", "8ldlggjjvy2ircl", "8ldlgghjvy4ircl"];
+    const createdIDs = ["m01s8yx7wfk2gxd", "8ldlggjjvy2ircl", "8ldlgghjvy4ircl", "8ldlgghjvy5yrcl", "8ldlgghjvt7yrcl", "8ldlyyhjvt7yrbl"];
     for (const id of createdIDs) {
       try {
         let record = app.findRecordById("measurementTypes", id);
