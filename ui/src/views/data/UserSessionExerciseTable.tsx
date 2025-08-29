@@ -46,6 +46,7 @@ interface DraggableRowProps {
   expandAtInd: (index: number) => void;
   collapse: () => void;
   setTagsByID: (recordID: string, tags: Tag[]) => void;
+  setNotesByID: (recordID: string, notes: string) => void;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -281,9 +282,15 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               <DataTextArea
                 label="Notes"
                 initial={props.row.original.sessionExercise.notes}
-                saveFunc={(v: string) =>
-                  updateRecord("userSessionExercises", props.row.original.sessionExercise.id, "notes", v)
-                }
+                saveFunc={(v: string) => {
+                  props.setNotesByID(props.row.original.sessionExercise.id, v);
+                  return updateRecord(
+                    "userSessionExercises",
+                    props.row.original.sessionExercise.id,
+                    "notes",
+                    v
+                  );
+                }}
               />
 
               <TagArea

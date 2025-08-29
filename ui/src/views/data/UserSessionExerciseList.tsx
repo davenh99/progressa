@@ -82,6 +82,23 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     );
   };
 
+  const setNotesByID = (recordID: string, notes: string) => {
+    setExerciseRows(
+      "rows",
+      exerciseRows.rows.map((row) =>
+        row.sessionExercise.id === recordID
+          ? {
+              ...row,
+              sessionExercise: {
+                ...row.sessionExercise,
+                notes,
+              },
+            }
+          : row
+      )
+    );
+  };
+
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
     {
       header: "",
@@ -480,6 +497,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 expandAtInd={expandAtInd}
                 collapse={collapse}
                 setTagsByID={setTagsByID}
+                setNotesByID={setNotesByID}
               />
             )}
           </For>
