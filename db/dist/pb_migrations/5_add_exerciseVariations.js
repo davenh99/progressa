@@ -260,6 +260,9 @@ migrate(
       { e: "b5wjd65ifgrjt9p", n: "Curtsy lunge", d: "Step back and across, targets glutes and outer thigh" },
       { e: "b5wjd65ifgrjt9p", n: "Weighted lunge", d: "Hold dumbbells or barbell for added resistance" },
       { e: "b5wjd65ifgrjt9p", n: "Bulgarian split lunge", d: "Rear foot elevated on bench, increases range of motion" },
+      // Climbing
+      { e: "b5wjd65ifgrjt9q", n: "Bouldering", d: "" },
+      { e: "b5wjd65ifgrjt9q", n: "Route climbing", d: "Could be sport, top rope, trad" },
     ];
 
     for (const v of variations) {
