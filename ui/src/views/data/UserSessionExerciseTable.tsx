@@ -10,9 +10,13 @@ import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/el
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import Grip from "lucide-solid/icons/grip-vertical";
+import Down from "lucide-solid/icons/chevron-down";
+import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
-import { DataInput } from "../../components";
+import { Tag as TagComponent, DataInput, DataTextArea, IconButton, Input } from "../../components";
+import { Tag } from "../../../Types";
+import { useAuthPB } from "../../config/pocketbase";
 
 export const Table: ParentComponent = (props) => {
   return <div class="w-full">{props.children}</div>;
@@ -39,6 +43,16 @@ interface DraggableRowProps {
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
   saveRow: (recordID: string, newVal: any, column: any) => Promise<void>;
+  expandAtInd: (index: number) => void;
+  collapse: () => void;
+  handleRowTagInput: (
+    rowIndex: number,
+    e: KeyboardEvent & {
+      currentTarget: HTMLInputElement;
+      target: HTMLInputElement;
+    }
+  ) => Promise<void>;
+  deleteRowTag: (rowIndex: number, t: Tag) => Promise<void>;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -50,6 +64,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let dragHandleMasterRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
+  const { updateRecord } = useAuthPB();
 
   createEffect(() => {
     if (!props.firstOfSuperset && !props.lastOfSuperset) return;
@@ -240,15 +255,58 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             </For>
           </div>
           <Show when={props.lastOfSuperset}>
-            <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 w-30 flex flex-row">
-              <DataInput
-                type="number"
-                label="Rest: "
-                initial={props.row.original.sessionExercise.restAfter}
-                saveFunc={(v: number) => props.saveRow(props.row.original.sessionExercise.id, v, "restAfter")}
-              />
-              <p>s</p>
+            <div class="flex flex-row justify-between">
+              <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 w-30 flex flex-row">
+                <DataInput
+                  type="number"
+                  label="Rest: "
+                  initial={props.row.original.sessionExercise.restAfter}
+                  saveFunc={(v: number) =>
+                    props.saveRow(props.row.original.sessionExercise.id, v, "restAfter")
+                  }
+                />
+                <p>s</p>
+              </div>
+              <div>
+                <Show when={props.lastOfSuperset}>
+                  <Show
+                    when={props.row.original.expanded}
+                    fallback={
+                      <IconButton onClick={() => props.expandAtInd(props.row.index)}>
+                        <Down />
+                      </IconButton>
+                    }
+                  >
+                    <IconButton onClick={props.collapse}>
+                      <Up />
+                    </IconButton>
+                  </Show>
+                </Show>
+              </div>
             </div>
+            <Show when={props.row.original.expanded}>
+              <DataTextArea
+                label="Notes"
+                initial={props.row.original.sessionExercise.notes}
+                saveFunc={(v: string) =>
+                  updateRecord("userSessionExercises", props.row.original.sessionExercise.id, v, "notes")
+                }
+              />
+
+              <Input
+                label="Tags"
+                type="text"
+                onKeyDown={(e) => props.handleRowTagInput(props.row.index, e)}
+                placeholder="Add tags (press Enter)"
+              />
+              <div class="">
+                <For each={props.row.original.sessionExercise.expand.tags}>
+                  {(t) => (
+                    <TagComponent name={t.name} onClick={() => props.deleteRowTag(props.row.index, t)} />
+                  )}
+                </For>
+              </div>
+            </Show>
           </Show>
         </div>
         <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>

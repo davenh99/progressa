@@ -92,7 +92,7 @@ const LogSession: Component = () => {
       await updateRecord("userSessions", params.id, t.id, "tags-");
       setSession(
         "tags",
-        session.tags.filter((tag) => tag.name !== t.name)
+        session.tags.filter((tag) => tag.id !== t.id)
       );
     } catch (e) {
       console.log(e);
@@ -101,7 +101,7 @@ const LogSession: Component = () => {
 
   const getSession = async () => {
     const expandFields =
-      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation";
+      "tags, userSessionExercises_via_userSession.exercise.measurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation, userSessionExercises_via_userSession.tags";
     if (params.id) {
       // TODO need to come up with better way to avoid the double call to backend
       // atm, if a matching date is found, we nav to it's id then get it again...

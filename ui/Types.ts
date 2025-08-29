@@ -103,6 +103,7 @@ export interface UserSessionExercise extends UserSessionExerciseCreateData {
     exercise?: Exercise;
     variation?: ExerciseVariation;
     measurementValue?: MeasurementValue;
+    tags?: Tag[];
   };
 }
 

@@ -41,7 +41,7 @@ export const ExerciseList: Component<Props> = (props) => {
         .getFullList({ expand: "measurementType, exerciseVariations_via_exercise" });
 
       // console.log(exercises);
-      setExercises(exercises);
+      setExercises(exercises.slice(0, 10));
     } catch (e) {
       console.log("get exercises error: ", e);
     }
