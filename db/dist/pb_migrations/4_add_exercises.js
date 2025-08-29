@@ -22,6 +22,7 @@ migrate(
         id: "a5wjd65ifgrjt8f",
         n: "Boulder",
         mType: "8ldlgghjvy4ircl",
+        mTypes: ["8ldlgghjvy4ircl", "8ldlgghjvy5yrcl"],
         b: true,
         d: "Select grade",
       },
@@ -63,7 +64,7 @@ migrate(
       {
         id: "a5wjd65ifgrjt9k",
         n: "Running",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: false,
         d: "Cardio exercise",
       },
@@ -91,7 +92,7 @@ migrate(
       {
         id: "a5wjd65ifgrjt9o",
         n: "Swimming",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: false,
         d: "Good cardio",
       },
@@ -154,7 +155,7 @@ migrate(
       {
         id: "a5wjd65ifgrjt9x",
         n: "Skipping",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "Also sounds tiring",
       },
@@ -176,6 +177,7 @@ migrate(
         id: "b5wjd65ifgrjt9a",
         n: "Sport climb",
         mType: "8ldlyyhjvt7yrbl",
+        mTypes: ["8ldlyyhjvt7yrbl", "8ldlgghjvt7yrcl"],
         b: true,
         d: "Very fun, highly recommend",
       },
@@ -183,6 +185,7 @@ migrate(
         id: "b5wjd65ifgrjt9b",
         n: "Top-rope climb",
         mType: "8ldlyyhjvt7yrbl",
+        mTypes: ["8ldlyyhjvt7yrbl", "8ldlgghjvt7yrcl"],
         b: true,
         d: "Pretty fun, highly recommend",
       },
@@ -217,7 +220,7 @@ migrate(
       {
         id: "b5wjd65ifgrjt9g",
         n: "Plank",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "How long can you hold?",
       },
@@ -245,7 +248,7 @@ migrate(
       {
         id: "b5wjd65ifgrjt9k",
         n: "Bar dead hang",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "How long can you hold?",
       },
@@ -259,14 +262,14 @@ migrate(
       {
         id: "b5wjd55ifggjt9k",
         n: "Roling bar dead hang",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "How long can you hold?",
       },
       {
         id: "b5wjd65ifgrjt9l",
         n: "One arm bar dead hang",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "You must have strong arms",
       },
@@ -329,7 +332,7 @@ migrate(
       {
         id: "b5wjd65ifgrjt9o",
         n: "Cycling",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: false,
         d: "Ride your bike",
       },
@@ -343,7 +346,7 @@ migrate(
       {
         id: "b5wjd65ifgrjt9q",
         n: "Climbing",
-        mType: "8ldlggjjvy2ircl",
+        mType: "8ldlgtjjvy3ircl",
         b: true,
         d: "Open climbing, measure for a climbing session that you can rate intensity at a general level, not for individual climbs",
       },
@@ -355,7 +358,8 @@ migrate(
       record.set("id", e.id);
       record.set("system", true);
       record.set("name", e.n);
-      record.set("measurementType", e.mType);
+      record.set("defaultMeasurementType", e.mType);
+      record.set("allowedMeasurementTypes", e.mTypes);
       record.set("public", true);
       record.set("bodyweight", e.b);
       record.set("description", e.d);

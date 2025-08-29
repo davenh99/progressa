@@ -11,6 +11,7 @@ export interface MeasurementType {
   id: string;
   system: boolean;
   name: string;
+  displayName: string;
   public: boolean;
   createdBy: string;
   numeric: boolean;
@@ -41,7 +42,8 @@ export interface Exercise {
   name: string;
   description: string;
   bodyweight: boolean;
-  measurementType: string;
+  defaultMeasurementType: string;
+  allowedMeasurementTypes: string;
   public: boolean;
   usersSaved: string[];
   createdBy: string;
@@ -56,14 +58,6 @@ export interface ExerciseVariation {
   exercise: string;
   name: string;
   description: string;
-}
-
-export interface SessionExercise {
-  id: string;
-  session: string;
-  exercise: string;
-  setCount: number;
-  supersetParent: string | null;
 }
 
 export interface UserSessionCreateData {
