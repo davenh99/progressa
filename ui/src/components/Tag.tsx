@@ -29,12 +29,14 @@ interface TagAreaProps {
   tags?: TagType[];
   setTags: (tags: TagType[]) => void;
   modelName: string;
-  recordID?: string;
-  updateRecord?: (modelName: string, recordID: string, column: string, newVal: any) => Promise<any>;
+  recordID: string;
+  updateRecord?: (modelName: string, recordID: string, field: string, newVal: any) => Promise<any>;
 }
 
 export const TagArea: Component<TagAreaProps> = (props) => {
   const { pb, user, updateRecord } = useAuthPB();
+
+  const updateFn = props.updateRecord ?? updateRecord;
 
   const handleTagInput = async (
     e: KeyboardEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }
@@ -49,8 +51,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
             .collection<TagType>("tags")
             .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
 
-          (await props.updateRecord?.(props.modelName, props.recordID, "+tags", foundTag.id)) ??
-            updateRecord(props.modelName, props.recordID, foundTag.id, "+tags");
+          await updateFn(props.modelName, props.recordID, "+tags", foundTag.id);
           props.setTags([...(props.tags || []), foundTag]);
         } catch (e) {
           if (e instanceof ClientResponseError && e.status == 404) {
@@ -58,8 +59,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
               .collection<TagType>("tags")
               .create({ name: newTag, public: false, createdBy: user.id });
 
-            (await props.updateRecord?.(props.modelName, props.recordID, "+tags", createdTag.id)) ??
-              updateRecord(props.modelName, props.recordID, createdTag.id, "+tags");
+            await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
             props.setTags([...(props.tags || []), createdTag]);
           } else {
             console.log(e);
@@ -73,8 +73,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
 
   const deleteTag = async (t: TagType) => {
     try {
-      (await props.updateRecord?.(props.modelName, props.recordID, "tags-", t.id)) ??
-        updateRecord(props.modelName, props.recordID, t.id, "tags-");
+      await updateFn(props.modelName, props.recordID, "tags-", t.id);
       props.setTags((props.tags || []).filter((tag) => tag.id !== t.id));
     } catch (e) {
       console.log(e);

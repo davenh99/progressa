@@ -83,14 +83,14 @@ export function useAuthPB() {
     }
   };
 
-  const updateRecord = async <T>(collectionName: string, recordID: string, newVal: any, column: any) => {
+  const updateRecord = async <T>(collectionName: string, recordID: string, field: string, newVal: any) => {
     const data = {};
-    data[`${column}`] = newVal;
+    data[`${field}`] = newVal;
 
     try {
       const record = await pb
         .collection<T>(collectionName)
-        .update(recordID, data, { requestKey: `${collectionName}.${recordID}.${column}` });
+        .update(recordID, data, { requestKey: `${collectionName}.${recordID}.${field}` });
       return record as T;
     } catch (e) {
       if (e instanceof ClientResponseError && e.status === 0) {

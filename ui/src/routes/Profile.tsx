@@ -24,7 +24,7 @@ const Profile: Component = () => {
                   label="Height"
                   initial={user.height}
                   type="number"
-                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "height")}
+                  saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
                 />
               </div>
               <div class="flex flex-row">
@@ -32,7 +32,7 @@ const Profile: Component = () => {
                   label="Weight"
                   initial={user.weight}
                   type="number"
-                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "weight")}
+                  saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
                 />
               </div>
               <div class="flex flex-row">
@@ -40,7 +40,7 @@ const Profile: Component = () => {
                   label="DOB"
                   type="date"
                   initial={user.dob}
-                  saveFunc={(v) => updateRecord<any>("users", user.id, v, "dob")}
+                  saveFunc={(v) => updateRecord<any>("users", user.id, "dob", v)}
                 />
                 <Show when={!!user.dob}>
                   <p>(Age {getAge(user.dob)})</p>

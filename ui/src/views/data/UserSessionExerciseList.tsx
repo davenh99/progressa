@@ -97,7 +97,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         >
           <DataCheckbox
             initial={ctx.getValue() as boolean}
-            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, v, "isWarmup")}
+            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, "isWarmup", v)}
           />
         </Show>
       ),
@@ -119,14 +119,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                     ?.measurementValues_via_measurementType ?? []
                 }
                 initial={ctx.row.original.sessionExercise.expand?.measurementValue}
-                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, v, "measurementValue")}
+                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, "measurementValue", v)}
               />
             }
           >
             <DataInput
               type="number"
               initial={ctx.row.original.sessionExercise.measurementNumeric}
-              saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "measurementNumeric")}
+              saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
             />
           </Show>
         );
@@ -139,7 +139,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         <DataInput
           type="number"
           initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "addedWeight")}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
         />
       ),
     },
@@ -149,7 +149,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => (
         <DataSlider
           initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, v, "perceivedEffort")}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "perceivedEffort", v)}
         />
       ),
     },
@@ -186,9 +186,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
   ]);
 
-  const saveRow = async (recordID: string, newVal: any, column: any) => {
+  const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
-      await updateRecord("userSessionExercises", recordID, newVal, column);
+      await updateRecord("userSessionExercises", recordID, field, newVal);
     } catch (e) {
       console.error(e);
     }
@@ -206,8 +206,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       await updateRecord(
         "userSessions",
         props.sessionID,
-        newRows.map((r) => r.sessionExercise.id),
-        "itemsOrder"
+        "itemsOrder",
+        newRows.map((r) => r.sessionExercise.id)
       );
     } catch (e) {
       console.log(e);
@@ -229,8 +229,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     updateRecord(
       "userSessions",
       props.sessionID,
-      newRows.map((r) => r.sessionExercise.id),
-      "itemsOrder"
+      "itemsOrder",
+      newRows.map((r) => r.sessionExercise.id)
     ).catch(console.error);
   };
 
@@ -281,8 +281,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       updateRecord(
         "userSessions",
         props.sessionID,
-        newRows.map((r) => r.sessionExercise.id),
-        "itemsOrder"
+        "itemsOrder",
+        newRows.map((r) => r.sessionExercise.id)
       ).catch(console.error);
     } else if (duplicateInds) {
       pb.autoCancellation(false);
@@ -341,8 +341,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       updateRecord(
         "userSessions",
         props.sessionID,
-        newRows.map((r) => r.sessionExercise.id),
-        "itemsOrder"
+        "itemsOrder",
+        newRows.map((r) => r.sessionExercise.id)
       ).catch(console.error);
     }
   };

@@ -29,9 +29,9 @@ const LogSession: Component = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const sessionUpdate = async (recordID: string, column: string, newVal: any) => {
+  const sessionUpdate = async (recordID: string, field: string, newVal: any) => {
     if (params.id) {
-      return await updateRecord<UserSession>("userSessions", recordID, newVal, column);
+      return await updateRecord<UserSession>("userSessions", recordID, field, newVal);
     } else {
       const createData: UserSessionCreateData = {
         name: "",
@@ -46,7 +46,7 @@ const LogSession: Component = () => {
       };
 
       // TODO is something like 'tags+' valid when creating??
-      createData[column] = newVal;
+      createData[field] = newVal;
 
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
 
@@ -123,7 +123,7 @@ const LogSession: Component = () => {
   const updateWeight = async (v: number) => {
     // also update the profile weight if it's the current day
     if (date() === new Date().toLocaleDateString("en-CA")) {
-      updateRecord("users", user.id, v, "weight");
+      updateRecord("users", user.id, "weight", v);
     }
     return sessionUpdate(params.id, "userWeight", v);
   };

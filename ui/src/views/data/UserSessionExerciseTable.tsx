@@ -42,7 +42,7 @@ interface DraggableRowProps {
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
-  saveRow: (recordID: string, newVal: any, column: any) => Promise<void>;
+  saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   expandAtInd: (index: number) => void;
   collapse: () => void;
   setTagsByID: (recordID: string, tags: Tag[]) => void;
@@ -255,7 +255,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                   label="Rest: "
                   initial={props.row.original.sessionExercise.restAfter}
                   saveFunc={(v: number) =>
-                    props.saveRow(props.row.original.sessionExercise.id, v, "restAfter")
+                    props.saveRow(props.row.original.sessionExercise.id, "restAfter", v)
                   }
                 />
                 <p>s</p>
@@ -282,7 +282,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 label="Notes"
                 initial={props.row.original.sessionExercise.notes}
                 saveFunc={(v: string) =>
-                  updateRecord("userSessionExercises", props.row.original.sessionExercise.id, v, "notes")
+                  updateRecord("userSessionExercises", props.row.original.sessionExercise.id, "notes", v)
                 }
               />
 
