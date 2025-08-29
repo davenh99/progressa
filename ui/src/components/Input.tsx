@@ -17,7 +17,10 @@ export const Input: ParentComponent<InputProps> = (props) => {
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
-      <TextField.Input class="input input-bordered w-14 text-center" {...others} />
+      <TextField.Input
+        class={`input input-bordered ${others.type === "number" ? "w-14 text-center" : "w-full"}`}
+        {...others}
+      />
     </TextField>
   );
 };
