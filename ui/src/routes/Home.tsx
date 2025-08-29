@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 
 import Sessions from "./Sessions";
-import Header from "../components/Header";
+import Header from "../views/Header";
 
 const Home: Component = () => {
   return (

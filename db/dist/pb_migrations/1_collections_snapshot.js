@@ -1706,7 +1706,7 @@ migrate(
             collectionId: "pbc_1219621782",
             hidden: false,
             id: "relation1874629670",
-            maxSelect: 1,
+            maxSelect: 999,
             minSelect: 0,
             name: "tags",
             presentable: false,

@@ -2,7 +2,7 @@ import { Component, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import Header from "../components/Header";
+import Header from "../views/Header";
 import { DataInput } from "../components";
 
 const Profile: Component = () => {

@@ -14,7 +14,7 @@ import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
-import { Tag as TagComponent, DataInput, DataTextArea, IconButton, Input } from "../../components";
+import { DataInput, DataTextArea, IconButton, Input, TagArea } from "../../components";
 import { Tag } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 
@@ -45,14 +45,7 @@ interface DraggableRowProps {
   saveRow: (recordID: string, newVal: any, column: any) => Promise<void>;
   expandAtInd: (index: number) => void;
   collapse: () => void;
-  handleRowTagInput: (
-    rowIndex: number,
-    e: KeyboardEvent & {
-      currentTarget: HTMLInputElement;
-      target: HTMLInputElement;
-    }
-  ) => Promise<void>;
-  deleteRowTag: (rowIndex: number, t: Tag) => Promise<void>;
+  setTagsByID: (recordID: string, tags: Tag[]) => void;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -293,19 +286,12 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 }
               />
 
-              <Input
-                label="Tags"
-                type="text"
-                onKeyDown={(e) => props.handleRowTagInput(props.row.index, e)}
-                placeholder="Add tags (press Enter)"
+              <TagArea
+                tags={props.row.original.sessionExercise.expand.tags}
+                setTags={(tags) => props.setTagsByID(props.row.original.sessionExercise.id, tags)}
+                modelName="userSessionExercises"
+                recordID={props.row.original.sessionExercise.id}
               />
-              <div class="">
-                <For each={props.row.original.sessionExercise.expand.tags}>
-                  {(t) => (
-                    <TagComponent name={t.name} onClick={() => props.deleteRowTag(props.row.index, t)} />
-                  )}
-                </For>
-              </div>
             </Show>
           </Show>
         </div>

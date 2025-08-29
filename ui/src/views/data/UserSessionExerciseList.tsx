@@ -30,7 +30,6 @@ import {
 } from "./UserSessionExerciseTable";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import { Portal } from "solid-js/web";
-import { ClientResponseError } from "pocketbase";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -63,113 +62,24 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
-  const handleRowTagInput = async (
-    rowIndex: number,
-    e: KeyboardEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }
-  ) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      e.preventDefault();
-      const newTag = e.target.value.trim();
-
-      if (!exerciseRows.rows[rowIndex].sessionExercise.expand?.tags.map((t) => t.name).includes(newTag)) {
-        try {
-          const foundTag = await pb
-            .collection<Tag>("tags")
-            .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
-
-          await updateRecord<UserSession>(
-            "userSessionExercises",
-            exerciseRows.rows[rowIndex].sessionExercise.id,
-            foundTag.id,
-            "+tags"
-          );
-          // TODO clean this monstrosity up...
-          setExerciseRows(
-            "rows",
-            exerciseRows.rows.map((row, ind) =>
-              ind === rowIndex
-                ? {
-                    ...row,
-                    sessionExercise: {
-                      ...row.sessionExercise,
-                      expand: {
-                        ...row.sessionExercise.expand,
-                        tags: [...row.sessionExercise.expand.tags, foundTag],
-                      },
-                    },
-                  }
-                : row
-            )
-          );
-        } catch (e) {
-          if (e instanceof ClientResponseError && e.status == 404) {
-            const createdTag = await pb
-              .collection<Tag>("tags")
-              .create({ name: newTag, public: false, createdBy: user.id });
-
-            await updateRecord<UserSession>(
-              "userSessionExercises",
-              exerciseRows.rows[rowIndex].sessionExercise.id,
-              createdTag.id,
-              "+tags"
-            );
-            // TODO clean this monstrosity up...
-            setExerciseRows(
-              "rows",
-              exerciseRows.rows.map((row, ind) =>
-                ind === rowIndex
-                  ? {
-                      ...row,
-                      sessionExercise: {
-                        ...row.sessionExercise,
-                        expand: {
-                          ...row.sessionExercise.expand,
-                          tags: [...row.sessionExercise.expand.tags, createdTag],
-                        },
-                      },
-                    }
-                  : row
-              )
-            );
-          } else {
-            console.log(e);
-          }
-        } finally {
-          e.target.value = "";
-        }
-      }
-    }
-  };
-
-  const deleteRowTag = async (rowIndex: number, t: Tag) => {
-    try {
-      await updateRecord<UserSession>(
-        "userSessionExercises",
-        exerciseRows.rows[rowIndex].sessionExercise.id,
-        t.id,
-        "tags-"
-      );
-      // TODO clean this monstrosity up...
-      setExerciseRows(
-        "rows",
-        exerciseRows.rows.map((row, ind) =>
-          ind === rowIndex
-            ? {
-                ...row,
-                sessionExercise: {
-                  ...row.sessionExercise,
-                  expand: {
-                    ...row.sessionExercise.expand,
-                    tags: row.sessionExercise.expand.tags.filter((tag) => tag.id !== t.id),
-                  },
+  const setTagsByID = (recordID: string, tags: Tag[]) => {
+    setExerciseRows(
+      "rows",
+      exerciseRows.rows.map((row) =>
+        row.sessionExercise.id === recordID
+          ? {
+              ...row,
+              sessionExercise: {
+                ...row.sessionExercise,
+                expand: {
+                  ...row.sessionExercise.expand,
+                  tags,
                 },
-              }
-            : row
-        )
-      );
-    } catch (e) {
-      console.log(e);
-    }
+              },
+            }
+          : row
+      )
+    );
   };
 
   const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
@@ -569,8 +479,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 getGroupInds={() => getGroupInds(row.index, exerciseRows.rows)}
                 expandAtInd={expandAtInd}
                 collapse={collapse}
-                handleRowTagInput={handleRowTagInput}
-                deleteRowTag={deleteRowTag}
+                setTagsByID={setTagsByID}
               />
             )}
           </For>

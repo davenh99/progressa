@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import Header from "../components/Header";
+import Header from "../views/Header";
 import { Link } from "@kobalte/core/link";
 
 const NotFound: Component = () => {

@@ -1,13 +1,13 @@
-import { Component, createSignal, For, onMount, Show } from "solid-js";
+import { Component, createSignal, onMount, Show } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
-import Header from "../components/Header";
-import { Tag as TagComponent, DataInput, Input, DataTextArea } from "../components";
-import Container from "../components/Container";
+import Header from "../views/Header";
+import { DataInput, Input, DataTextArea, TagArea } from "../components";
+import Container from "../views/Container";
 import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } from "../../Types";
 import { UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
@@ -51,51 +51,6 @@ const LogSession: Component = () => {
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
 
       navigate(`/workouts/log/${newSession.id}`, { replace: true });
-    }
-  };
-
-  const handleTagInput = async (
-    e: KeyboardEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }
-  ) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      e.preventDefault();
-      const newTag = e.target.value.trim();
-
-      if (!session.tags.map((t) => t.name).includes(newTag)) {
-        try {
-          const foundTag = await pb
-            .collection<Tag>("tags")
-            .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
-
-          await sessionUpdate(params.id, "+tags", foundTag.id);
-          setSession("tags", [...session.tags, foundTag]);
-        } catch (e) {
-          if (e instanceof ClientResponseError && e.status == 404) {
-            const createdTag = await pb
-              .collection<Tag>("tags")
-              .create({ name: newTag, public: false, createdBy: user.id });
-
-            await sessionUpdate(params.id, "+tags", createdTag.id);
-            setSession("tags", [...session.tags, createdTag]);
-          } else {
-            console.log(e);
-          }
-        } finally {
-          e.target.value = "";
-        }
-      }
-    }
-  };
-
-  const deleteTag = async (t: Tag) => {
-    try {
-      await updateRecord("userSessions", params.id, t.id, "tags-");
-      setSession(
-        "tags",
-        session.tags.filter((tag) => tag.id !== t.id)
-      );
-    } catch (e) {
-      console.log(e);
     }
   };
 
@@ -213,12 +168,13 @@ const LogSession: Component = () => {
               saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
             />
 
-            <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-            <div class="">
-              <For each={session.tags}>
-                {(t) => <TagComponent name={t.name} onClick={() => deleteTag(t)} />}
-              </For>
-            </div>
+            <TagArea
+              tags={session.tags}
+              setTags={(tags) => setSession("tags", tags)}
+              modelName="userSessions"
+              recordID={params.id}
+              updateRecord={(_, recordID, column, newVal) => sessionUpdate(recordID, column, newVal)}
+            />
           </div>
 
           <Tabs>
