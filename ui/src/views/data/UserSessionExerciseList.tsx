@@ -284,7 +284,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       // add to array
       const record = await pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
         expand:
-          "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
+          "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
       });
 
       const newRows = [...exerciseRows.rows];
@@ -320,7 +320,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         .collection<UserSessionExercise>("userSessionExercises")
         .create(createData, {
           expand:
-            "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
+            "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
         });
       const newRecords = [parentRecord];
 
@@ -342,7 +342,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
         return pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
           expand:
-            "exercise.measurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
+            "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, variation, tags",
         });
       });
       newRecords.push(...(await Promise.all(createPromises)));
