@@ -1,36 +1,28 @@
-import { createEffect, createSignal, ParentComponent, Show } from "solid-js";
-import { TextField } from "@kobalte/core/text-field";
+import { createEffect, createSignal, ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
+import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
+import type { PolymorphicProps } from "@kobalte/core";
 
-interface Props {
+interface ExtraProps {
   label?: string;
-  type: "number" | "text" | "date";
-  value?: number | string;
-  onInput?: (e: InputEvent & { target: HTMLInputElement }) => void;
-  onKeyDown?: (e: KeyboardEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }) => void;
-  placeholder?: string;
-  onBlur?: () => void;
 }
 
-export const Input: ParentComponent<Props> = (props) => {
+export type InputProps<T extends ValidComponent = "input"> = ExtraProps &
+  PolymorphicProps<T, TextFieldInputProps<T>>;
+
+export const Input: ParentComponent<InputProps> = (props) => {
+  const [local, others] = splitProps(props, ["label"]);
+
   return (
     <TextField class="flex flex-row space-x-1">
-      <Show when={props.label}>
-        <TextField.Label>{props.label}</TextField.Label>
+      <Show when={local.label}>
+        <TextField.Label>{local.label}</TextField.Label>
       </Show>
-      <TextField.Input
-        class="input input-bordered w-full"
-        type={props.type}
-        value={props.value}
-        onInput={props.onInput}
-        onKeyDown={props.onKeyDown}
-        placeholder={props.placeholder}
-        onBlur={props.onBlur}
-      />
+      <TextField.Input class="input input-bordered w-14 text-center" {...others} />
     </TextField>
   );
 };
 
-interface DataProps extends Props {
+interface DataProps extends InputProps {
   initial: number | string;
   saveFunc: (v: number | string) => Promise<any>;
 }
@@ -46,10 +38,13 @@ export const DataInput: ParentComponent<DataProps> = (props) => {
     <Input
       value={val()}
       onBlur={() => props.saveFunc(val())}
-      onInput={(e: InputEvent & { target: HTMLInputElement }) => {
-        setVal(e.target.value);
-        if (props.type == "number") {
-          props.saveFunc(e.target.value);
+      onInput={(e) => {
+        const target = e.currentTarget as HTMLInputElement;
+        const value = props.type === "number" ? Number(target.value) : target.value;
+
+        setVal(value);
+        if (props.type === "number") {
+          props.saveFunc(value);
         }
       }}
       label={props.label}

@@ -14,7 +14,7 @@ import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
-import { DataInput, DataTextArea, IconButton, Input, TagArea } from "../../components";
+import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
 import { Tag } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 
@@ -250,16 +250,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           </div>
           <Show when={props.lastOfSuperset}>
             <div class="flex flex-row justify-between">
-              <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 w-30 flex flex-row">
-                <DataInput
-                  type="number"
+              <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 flex flex-row">
+                <DataTime
                   label="Rest: "
                   initial={props.row.original.sessionExercise.restAfter}
                   saveFunc={(v: number) =>
                     props.saveRow(props.row.original.sessionExercise.id, "restAfter", v)
                   }
                 />
-                <p>s</p>
               </div>
               <div>
                 <Show when={props.lastOfSuperset}>

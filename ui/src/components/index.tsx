@@ -6,3 +6,4 @@ export * from "./Slider";
 export * from "./Input";
 export * from "./TextArea";
 export * from "./MeasurementValueSelect";
+export * from "./Time";
