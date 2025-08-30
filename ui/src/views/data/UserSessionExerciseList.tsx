@@ -109,18 +109,19 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     {
       accessorFn: (row) =>
-        row.sessionExercise.expand?.exercise?.expand?.measurementType?.numeric
+        row.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric
           ? "sessionExercise.measurementNumeric"
           : "sessionExercise.measurementValue",
-      header: "Measurement",
+      header: "",
+      id: "measurement",
       cell: (ctx) => {
         return (
           <Show
-            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.measurementType?.numeric}
+            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
             fallback={
               <DataSelect
                 values={
-                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.measurementType?.expand
+                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.expand
                     ?.measurementValues_via_measurementType ?? []
                 }
                 initial={ctx.row.original.sessionExercise.expand?.measurementValue}
@@ -128,24 +129,35 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
               />
             }
           >
-            <DataInput
-              type="number"
-              initial={ctx.row.original.sessionExercise.measurementNumeric}
-              saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
-            />
+            <div class="flex flex-row space-x-1">
+              <DataInput
+                type="number"
+                initial={ctx.row.original.sessionExercise.measurementNumeric}
+                saveFunc={(v: number) =>
+                  saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)
+                }
+              />
+              <p>
+                {ctx.row.original.sessionExercise.expand.exercise.expand.defaultMeasurementType.displayName ??
+                  ""}
+              </p>
+            </div>
           </Show>
         );
       },
     },
     {
       accessorKey: "sessionExercise.addedWeight",
-      header: "Weight Added (kg)",
+      header: "",
       cell: (ctx) => (
-        <DataInput
-          type="number"
-          initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
-        />
+        <div class="flex flex-row space-x-1">
+          <DataInput
+            type="number"
+            initial={ctx.getValue() as number}
+            saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
+          />
+          <p>kg</p>
+        </div>
       ),
     },
     {

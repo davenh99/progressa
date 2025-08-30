@@ -26,6 +26,7 @@ const Profile: Component = () => {
                   type="number"
                   saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
                 />
+                <p>cm</p>
               </div>
               <div class="flex flex-row">
                 <DataInput
@@ -34,6 +35,7 @@ const Profile: Component = () => {
                   type="number"
                   saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
                 />
+                <p>kg</p>
               </div>
               <div class="flex flex-row">
                 <DataInput

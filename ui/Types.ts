@@ -50,7 +50,7 @@ export interface Exercise {
   usersSaved: string[];
   createdBy: string;
   expand?: {
-    measurementType?: MeasurementType;
+    defaultMeasurementType?: MeasurementType;
     exerciseVariations_via_exercise?: ExerciseVariation[];
   };
 }
