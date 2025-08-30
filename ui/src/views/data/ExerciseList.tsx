@@ -40,8 +40,7 @@ export const ExerciseList: Component<Props> = (props) => {
         .collection<Exercise>("exercises")
         .getFullList({ expand: "measurementType, exerciseVariations_via_exercise" });
 
-      // console.log(exercises);
-      setExercises(exercises.slice(0, 10));
+      setExercises(exercises);
     } catch (e) {
       console.log("get exercises error: ", e);
     }

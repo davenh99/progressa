@@ -6,10 +6,10 @@ import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
 import Header from "../views/Header";
-import { DataInput, Input, DataTextArea, TagArea } from "../components";
+import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
 import Container from "../views/Container";
 import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } from "../../Types";
-import { UserSessionExerciseList } from "../views/data";
+import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
 
@@ -19,6 +19,8 @@ const Basesession = {
   userWeight: undefined as number,
   tags: [] as Tag[],
   sessionExercises: [] as UserSessionExercise[],
+  sleepQuality: undefined,
+  meals: [],
 };
 
 const LogSession: Component = () => {
@@ -55,8 +57,12 @@ const LogSession: Component = () => {
   };
 
   const getSession = async () => {
-    const expandFields =
-      "tags, userSessionExercises_via_userSession.exercise.defaultMeasurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation, userSessionExercises_via_userSession.tags";
+    const expandFields = `tags,
+      userSessionExercises_via_userSession.exercise.defaultMeasurementType.measurementValues_via_measurementType,
+      userSessionExercises_via_userSession.measurementValue,
+      userSessionExercises_via_userSession.variation,
+      userSessionExercises_via_userSession.tags,
+      meals_via_userSession.tags`;
     if (params.id) {
       // TODO need to come up with better way to avoid the double call to backend
       // atm, if a matching date is found, we nav to it's id then get it again...
@@ -71,6 +77,8 @@ const LogSession: Component = () => {
         setSession("name", s.name);
         setSession("userWeight", s.userWeight);
         setSession("notes", s.notes);
+        setSession("sleepQuality", s.sleepQuality);
+        setSession("meals", s.expand.meals_via_userSession);
         setSession("tags", s.expand?.tags ?? []);
         setSession(
           "sessionExercises",
@@ -94,6 +102,8 @@ const LogSession: Component = () => {
         setSession("userWeight", s.userWeight);
         setSession("notes", s.notes);
         setSession("tags", s.expand?.tags ?? []);
+        setSession("sleepQuality", s.sleepQuality);
+        setSession("meals", s.expand.meals_via_userSession);
         setSession(
           "sessionExercises",
           sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
@@ -199,7 +209,14 @@ const LogSession: Component = () => {
             </Tabs.Content>
             <Tabs.Content value="meals-sleep">
               <div class="m-10">
-                <p>meal an sleep. coming soon...</p>
+                <div>
+                  <p>rate your sleep quality: </p>
+                  <DataSleepQualitySelector
+                    initial={session.sleepQuality}
+                    saveFunc={(v: string) => sessionUpdate(params.id, "sleepQuality", v)}
+                  />
+                </div>
+                <MealList />
               </div>
             </Tabs.Content>
           </Tabs>

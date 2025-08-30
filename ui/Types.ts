@@ -1,3 +1,5 @@
+export type SleepQuality = "terrible" | "poor" | "fair" | "good" | "great";
+
 export interface User {
   id: string;
   name: string;
@@ -69,7 +71,7 @@ export interface UserSessionCreateData {
   userHeight: number;
   userWeight: number;
   itemsOrder: string[] | null;
-  sleepQuality: "poor" | "fair" | "good" | "great";
+  sleepQuality: SleepQuality;
 }
 
 export interface UserSession extends UserSessionCreateData {
@@ -118,8 +120,13 @@ export interface Meal {
   id: string;
   userSession: string;
   name: string;
+  description: string;
+  tags: string[];
   kj: number;
   gramsProtein: number;
   gramsCarbohydrate: number;
   gramsFat: number;
+  expand: {
+    tags: Tag[];
+  };
 }
