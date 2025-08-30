@@ -57,12 +57,6 @@ const LogSession: Component = () => {
   };
 
   const getSession = async () => {
-    const expandFields = `tags,
-      userSessionExercises_via_userSession.exercise.defaultMeasurementType.measurementValues_via_measurementType,
-      userSessionExercises_via_userSession.measurementValue,
-      userSessionExercises_via_userSession.variation,
-      userSessionExercises_via_userSession.tags,
-      meals_via_userSession.tags`;
     if (params.id) {
       // TODO need to come up with better way to avoid the double call to backend
       // atm, if a matching date is found, we nav to it's id then get it again...
@@ -70,7 +64,7 @@ const LogSession: Component = () => {
         setLoading(true);
         const s = await pb
           .collection<UserSession>("userSessions")
-          .getOne(params.id, { expand: expandFields });
+          .getOne(params.id, { expand: USER_SESSION_EXPAND });
 
         // TODO should tidy up below to avoid the duplication
         setDate(s.userDay);
@@ -94,7 +88,7 @@ const LogSession: Component = () => {
     } else {
       try {
         const s = await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date()}'`, {
-          expand: expandFields,
+          expand: USER_SESSION_EXPAND,
         });
 
         setDate(s.userDay);
