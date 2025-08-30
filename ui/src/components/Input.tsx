@@ -10,7 +10,7 @@ export type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
 export const Input: ParentComponent<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label"]);
+  const [local, others] = splitProps(props, ["label", "class"]);
 
   return (
     <TextField class="flex flex-row space-x-1">
@@ -18,7 +18,9 @@ export const Input: ParentComponent<InputProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`input input-bordered ${others.type === "number" ? "w-14 text-center" : "w-full"}`}
+        class={`${local.class ?? ""} input input-bordered border-1 rounded-sm ${
+          others.type === "number" ? "w-14 text-center" : "w-full"
+        }`}
         {...others}
       />
     </TextField>

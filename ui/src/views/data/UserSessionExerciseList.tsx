@@ -9,17 +9,13 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 
 import { useAuthPB } from "../../config/pocketbase";
 import {
-  Exercise,
-  ExerciseVariation,
   Tag,
   UserSession,
   UserSessionCreateData,
   UserSessionExercise,
   UserSessionExerciseCreateData,
 } from "../../../Types";
-import { ExerciseList } from ".";
 import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } from "../../components";
-import { ExerciseVariationList } from "./ExerciseVariationList";
 import {
   DraggableRow,
   Row,
@@ -29,7 +25,7 @@ import {
   TableHeaderCell,
 } from "./UserSessionExerciseTable";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
-import { Portal } from "solid-js/web";
+import ExerciseSelectModal from "../ExerciseSelectModal";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -37,11 +33,6 @@ interface Props {
   sessionDay: Accessor<string>;
   getSession: () => Promise<void>;
 }
-
-const BaseNewExercise = {
-  exercise: null as Exercise,
-  variation: null as ExerciseVariation,
-};
 
 export interface SessionExerciseRow {
   sessionExercise: UserSessionExercise;
@@ -55,10 +46,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       expanded: false,
     })),
   });
-  const [newExercise, setNewExercise] = createStore(BaseNewExercise);
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
-  const [showAddExerciseVariation, setShowAddExerciseVariation] = createSignal(false);
-  const [variations, setVariations] = createSignal<ExerciseVariation[]>([]);
   const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
@@ -365,21 +353,17 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     }
   };
 
-  const addSessionExercise = async () => {
+  const addSessionExercise = async (exerciseID: string, variationID?: string) => {
     const data: UserSessionExerciseCreateData = {
       user: user.id,
       userSession: props.sessionID,
-      variation: newExercise.variation?.id || undefined,
-      exercise: newExercise.exercise.id,
+      variation: variationID || undefined,
+      exercise: exerciseID,
       perceivedEffort: 70,
     };
 
-    if (variations.length > 0 && !newExercise.variation) {
-      alert("must select a variation for this exercise");
-    } else {
-      addRowsAtIndex(exerciseRows.rows.length, null, data);
-      setShowCreateSessionExercise(false);
-    }
+    addRowsAtIndex(exerciseRows.rows.length, null, data);
+    setShowCreateSessionExercise(false);
   };
 
   const expandAtInd = (index: number) => {
@@ -504,41 +488,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           </For>
         </TableBody>
       </Table>
-      <Button onClick={() => setShowCreateSessionExercise(true)}>Add Set</Button>
+      <Button onClick={() => setShowCreateSessionExercise(true)} class="mt-2">
+        Add Set
+      </Button>
       <Show when={showCreateSessionExercise()}>
-        <Portal>
-          <div
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/35"
-            onClick={() => setShowCreateSessionExercise(false)}
-          >
-            <div class="bg-white rounded-xl shadow-lg p-6 w-[400px]" onClick={(e) => e.stopPropagation()}>
-              <p>Select Exercise</p>
-              <ExerciseList
-                onClick={(exercise: Exercise) => {
-                  if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
-                    setShowAddExerciseVariation(true);
-                    setVariations(exercise.expand.exerciseVariations_via_exercise);
-                  }
-                  setNewExercise("exercise", exercise);
-                }}
-              />
-              <Show when={showAddExerciseVariation()}>
-                <ExerciseVariationList
-                  variations={variations}
-                  onClick={(v) => {
-                    setShowAddExerciseVariation(false);
-                    setNewExercise("variation", v);
-                  }}
-                />
-              </Show>
-              <p>
-                Selected: {newExercise.exercise?.name ?? "None"}{" "}
-                {newExercise.variation?.name ? `(${newExercise.variation?.name})` : ""}
-              </p>
-              <Button onClick={addSessionExercise}>Add</Button>
-            </div>
-          </div>
-        </Portal>
+        <ExerciseSelectModal
+          setModalVisible={setShowCreateSessionExercise}
+          addSessionExercise={addSessionExercise}
+        />
       </Show>
     </>
   );

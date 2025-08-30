@@ -1,9 +1,7 @@
-import { Accessor, Component, createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { Accessor, Component, createMemo, For, Show } from "solid-js";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 
-import { useAuthPB } from "../../config/pocketbase";
 import { ExerciseVariation } from "../../../Types";
-import Loading from "../Loading";
 
 interface Props {
   onClick: (variation: ExerciseVariation) => void;
@@ -11,8 +9,6 @@ interface Props {
 }
 
 export const ExerciseVariationList: Component<Props> = (props) => {
-  const { pb } = useAuthPB();
-
   const columns = createMemo<ColumnDef<ExerciseVariation>[]>(() => [
     {
       accessorKey: "name",
@@ -60,7 +56,9 @@ export const ExerciseVariationList: Component<Props> = (props) => {
           </tbody>
         </table>
       </div>
-      {props.variations.length === 0 && <div class="text-center py-4">No Variations found</div>}
+      <Show when={props.variations().length === 0}>
+        <div class="text-center py-4">No Variations found</div>
+      </Show>
     </div>
   );
 };
