@@ -1,8 +1,16 @@
-import { Component } from "solid-js";
+import { Accessor, Component } from "solid-js";
+import { Meal } from "../../../Types";
 
-export const MealList: Component = (props) => {
+interface Props {
+  meals: Meal[];
+  sessionID: string;
+  sessionDay: Accessor<string>;
+  getSession: () => Promise<void>;
+}
+
+export const MealList: Component<Props> = (props) => {
   return (
-    <div class="p-2">
+    <div class="mt-3">
       <p>meal list</p>
     </div>
   );

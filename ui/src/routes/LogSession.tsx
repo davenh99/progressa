@@ -1,4 +1,4 @@
-import { Component, createSignal, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore, reconcile } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -133,7 +133,7 @@ const LogSession: Component = () => {
     return sessionUpdate(params.id, "userWeight", v);
   };
 
-  onMount(() => {
+  createEffect(() => {
     getSession();
   });
 
@@ -182,7 +182,7 @@ const LogSession: Component = () => {
             />
           </div>
 
-          <Tabs>
+          <Tabs class="mt-5">
             <Tabs.List class="border-b-1">
               <Tabs.Trigger value="exercises" class="p-2 hover:bg-ash-gray-600">
                 Exercises
@@ -197,7 +197,7 @@ const LogSession: Component = () => {
                 <UserSessionExerciseList
                   sessionExercises={session.sessionExercises}
                   sessionID={params.id}
-                  sessionDay={date()}
+                  sessionDay={date}
                   getSession={getSession}
                 />
               </div>
@@ -211,7 +211,12 @@ const LogSession: Component = () => {
                     saveFunc={(v: string) => sessionUpdate(params.id, "sleepQuality", v)}
                   />
                 </div>
-                <MealList />
+                <MealList
+                  meals={session.meals}
+                  sessionID={params.id}
+                  sessionDay={date}
+                  getSession={getSession}
+                />
               </div>
             </Tabs.Content>
           </Tabs>

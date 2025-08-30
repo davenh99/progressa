@@ -1,4 +1,4 @@
-import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Accessor, Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
@@ -34,7 +34,7 @@ import { Portal } from "solid-js/web";
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
-  sessionDay: string;
+  sessionDay: Accessor<string>;
   getSession: () => Promise<void>;
 }
 
@@ -257,13 +257,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     createData?: UserSessionExerciseCreateData
   ) => {
     // create session if doesn't exist
+    // TODO this is a double up! can dry out...
     if (!props.sessionID) {
       const createSessionData: UserSessionCreateData = {
         name: "",
         notes: "",
         tags: [],
         user: user.id,
-        userDay: props.sessionDay,
+        userDay: props.sessionDay(),
         userHeight: user.height,
         userWeight: user.weight,
         itemsOrder: [],
