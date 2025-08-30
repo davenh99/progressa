@@ -12,6 +12,7 @@ import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } fro
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
+import { USER_SESSION_EXPAND } from "../config/constants";
 
 const Basesession = {
   name: "",
