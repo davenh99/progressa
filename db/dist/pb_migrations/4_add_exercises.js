@@ -6,7 +6,7 @@ migrate(
     const newExercises = [
       {
         id: "70vlzfveuudrmax",
-        n: "20mm Edge lift",
+        n: "20mm edge lift",
         mType: "8ldlggjjvy2ircl",
         b: false,
         d: "A one-hand lift on a 20mm edge, an excellent choice for building finger strength. Select from grip type.",

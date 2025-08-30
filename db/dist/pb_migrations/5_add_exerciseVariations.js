@@ -4,9 +4,17 @@ migrate(
     let exerciseVariations = app.findCollectionByNameOrId("exerciseVariations");
 
     variations = [
-       // 20mm edge lift
-      { e: "70vlzfveuudrmax", n: "Full crimp", d: "Be careful with this one. Thumb fully wrapped over fingers" },
-      { e: "70vlzfveuudrmax", n: "Half crimp", d: "Fingers engaged at slightly more than 90 degrees, no thumb wrap" },
+      // 20mm edge lift
+      {
+        e: "70vlzfveuudrmax",
+        n: "Full crimp",
+        d: "Be careful with this one. Thumb fully wrapped over fingers",
+      },
+      {
+        e: "70vlzfveuudrmax",
+        n: "Half crimp",
+        d: "Fingers engaged at slightly more than 90 degrees, no thumb wrap",
+      },
       { e: "70vlzfveuudrmax", n: "Chisel grip", d: "Half way between half crimp and open hand" },
       { e: "70vlzfveuudrmax", n: "Open hand", d: "Also known as 3-finger drag" },
       // Pull-up
@@ -28,7 +36,11 @@ migrate(
       // Push-up
       { e: "a5wjd65ifgrjt9g", n: "Standard", d: "Shoulder-width hand placement" },
       { e: "a5wjd65ifgrjt9g", n: "Wide", d: "Hands placed wider than shoulders, chest emphasis" },
-      { e: "a5wjd65ifgrjt9g", n: "Diamond", d: "Hands close together under chest forming a diamond, triceps focus" },
+      {
+        e: "a5wjd65ifgrjt9g",
+        n: "Diamond",
+        d: "Hands close together under chest forming a diamond, triceps focus",
+      },
       { e: "a5wjd65ifgrjt9g", n: "Staggered", d: "One hand forward, one hand back" },
       { e: "a5wjd65ifgrjt9g", n: "Incline", d: "Hands elevated on a surface, easier version" },
       { e: "a5wjd65ifgrjt9g", n: "Decline", d: "Feet elevated on a surface, harder, upper chest focus" },
@@ -113,9 +125,21 @@ migrate(
       // Deadlift
       { e: "a5wjd65ifgrjt9r", n: "Conventional", d: "Standard stance, bar over mid-foot" },
       { e: "a5wjd65ifgrjt9r", n: "Sumo", d: "Wide stance, hands inside knees" },
-      { e: "a5wjd65ifgrjt9r", n: "Romanian", d: "Bar lowered to mid-shin with slight knee bend, hamstring focus" },
-      { e: "a5wjd65ifgrjt9r", n: "Deficit", d: "Performed standing on platform for increased range of motion" },
-      { e: "a5wjd65ifgrjt9r", n: "Block pull / Rack pull", d: "Barbell elevated, shorter range, heavy overload" },
+      {
+        e: "a5wjd65ifgrjt9r",
+        n: "Romanian",
+        d: "Bar lowered to mid-shin with slight knee bend, hamstring focus",
+      },
+      {
+        e: "a5wjd65ifgrjt9r",
+        n: "Deficit",
+        d: "Performed standing on platform for increased range of motion",
+      },
+      {
+        e: "a5wjd65ifgrjt9r",
+        n: "Block pull / Rack pull",
+        d: "Barbell elevated, shorter range, heavy overload",
+      },
       { e: "a5wjd65ifgrjt9r", n: "Trap bar", d: "Using hex bar, more quad and trap emphasis" },
       // Hammer curl
       { e: "a5wjd65ifgrjt9s", n: "Standard", d: "Neutral grip dumbbell curl" },
@@ -127,7 +151,11 @@ migrate(
       { e: "a5wjd65ifgrjt9t", n: "Standard", d: "Hands on bench, feet on floor" },
       { e: "a5wjd65ifgrjt9t", n: "Feet elevated", d: "Feet placed on another bench or platform, harder" },
       { e: "a5wjd65ifgrjt9t", n: "Weighted", d: "Plate or dumbbell placed on lap for added resistance" },
-      { e: "a5wjd65ifgrjt9t", n: "Single-leg", d: "One foot elevated, other leg extended for more stability challenge" },
+      {
+        e: "a5wjd65ifgrjt9t",
+        n: "Single-leg",
+        d: "One foot elevated, other leg extended for more stability challenge",
+      },
       // Skull crusher
       { e: "a5wjd65ifgrjt9u", n: "Barbell (EZ bar)", d: "Classic version with EZ curl bar" },
       { e: "a5wjd65ifgrjt9u", n: "Dumbbell", d: "Each arm works independently" },
@@ -169,34 +197,34 @@ migrate(
       { e: "b5wjd65ifgrjt9d", n: "Knee drive", d: "Drive opposite knee upward explosively" },
       // Crunch
       { e: "b5wjd65ifgrjt9e", n: "Standard", d: "Basic bodyweight crunch" },
-      { e: "b5wjd65ifgrjt9e", n: "Bicycle crunch", d: "Alternating elbow to opposite knee" },
-      { e: "b5wjd65ifgrjt9e", n: "Reverse crunch", d: "Lift hips off floor, lower abs focus" },
-      { e: "b5wjd65ifgrjt9e", n: "Oblique crunch", d: "Twist torso, target obliques" },
+      { e: "b5wjd65ifgrjt9e", n: "Bicycle", d: "Alternating elbow to opposite knee" },
+      { e: "b5wjd65ifgrjt9e", n: "Reverse", d: "Lift hips off floor, lower abs focus" },
+      { e: "b5wjd65ifgrjt9e", n: "Oblique", d: "Twist torso, target obliques" },
       // Sit-up
       { e: "b5wjd65ifgrjt9f", n: "Standard", d: "Full sit-up with bodyweight" },
-      { e: "b5wjd65ifgrjt9f", n: "Butterfly sit-up", d: "Feet together, knees out" },
-      { e: "b5wjd65ifgrjt9f", n: "Incline sit-up", d: "Perform on decline bench" },
-      { e: "b5wjd65ifgrjt9f", n: "Twisting sit-up", d: "Rotate torso to target obliques" },
+      { e: "b5wjd65ifgrjt9f", n: "Butterfly", d: "Feet together, knees out" },
+      { e: "b5wjd65ifgrjt9f", n: "Incline", d: "Perform on decline bench" },
+      { e: "b5wjd65ifgrjt9f", n: "Twisting", d: "Rotate torso to target obliques" },
       // Plank
-      { e: "b5wjd65ifgrjt9g", n: "Standard plank", d: "Forearms on ground, straight body" },
-      { e: "b5wjd65ifgrjt9g", n: "High plank", d: "Arms extended like push-up position" },
-      { e: "b5wjd65ifgrjt9g", n: "Plank with leg lift", d: "Alternate lifting one leg" },
-      { e: "b5wjd65ifgrjt9g", n: "Plank with shoulder tap", d: "Tap alternating shoulders" },
+      { e: "b5wjd65ifgrjt9g", n: "Standard", d: "Forearms on ground, straight body" },
+      { e: "b5wjd65ifgrjt9g", n: "High", d: "Arms extended like push-up position" },
+      { e: "b5wjd65ifgrjt9g", n: "With leg lift", d: "Alternate lifting one leg" },
+      { e: "b5wjd65ifgrjt9g", n: "With shoulder tap", d: "Tap alternating shoulders" },
       // Side plank
-      { e: "b5wjd65ifgrjt9h", n: "Standard side plank", d: "On one forearm, body straight" },
-      { e: "b5wjd65ifgrjt9h", n: "Side plank with hip dip", d: "Lower and raise hips" },
-      { e: "b5wjd65ifgrjt9h", n: "Side plank with leg lift", d: "Raise top leg for extra challenge" },
-      { e: "b5wjd65ifgrjt9h", n: "Side plank reach-through", d: "Rotate and thread arm under body" },
+      { e: "b5wjd65ifgrjt9h", n: "Standard", d: "On one forearm, body straight" },
+      { e: "b5wjd65ifgrjt9h", n: "With hip dip", d: "Lower and raise hips" },
+      { e: "b5wjd65ifgrjt9h", n: "With leg lift", d: "Raise top leg for extra challenge" },
+      { e: "b5wjd65ifgrjt9h", n: "Reach-through", d: "Rotate and thread arm under body" },
       // Hanging sit-up
       { e: "b5wjd65ifgrjt9i", n: "Standard", d: "Sit-up motion while hanging from bar" },
       { e: "b5wjd65ifgrjt9i", n: "Twisting", d: "Rotate torso to alternate sides" },
       { e: "b5wjd65ifgrjt9i", n: "L-sit hold", d: "Hold legs straight out instead of sit-up reps" },
-      { e: "b5wjd65ifgrjt9i", n: "Toes-to-bar progression", d: "Lift legs fully to bar" },
+      { e: "b5wjd65ifgrjt9i", n: "Toes-to-bar", d: "Lift legs fully to bar" },
       // Calf raise
       { e: "b5wjd65ifgrjt9j", n: "Standing", d: "Basic calf raise on flat ground" },
-      { e: "b5wjd65ifgrjt9j", n: "Single-leg calf raise", d: "One leg at a time" },
-      { e: "b5wjd65ifgrjt9j", n: "Seated calf raise", d: "Focuses on soleus muscle" },
-      { e: "b5wjd65ifgrjt9j", n: "Donkey calf raise", d: "Bent-over position, bodyweight or loaded" },
+      { e: "b5wjd65ifgrjt9j", n: "Single-leg", d: "One leg at a time" },
+      { e: "b5wjd65ifgrjt9j", n: "Seated", d: "Focuses on soleus muscle" },
+      { e: "b5wjd65ifgrjt9j", n: "Donkey", d: "Bent-over position, bodyweight or loaded" },
       // Bar dead hang
       { e: "b5wjd65ifgrjt9k", n: "Standard grip", d: "Shoulder-width overhand grip" },
       { e: "b5wjd65ifgrjt9k", n: "Wide grip", d: "Hands wider than shoulders" },
@@ -246,20 +274,24 @@ migrate(
       { e: "b5wjd65ifgrjt9n", n: "Standard", d: "Seated or standing, palms up" },
       { e: "b5wjd65ifgrjt9n", n: "Reverse", d: "Palms down, forearm extensors" },
       // Cycling
-      { e: "b5wjd65ifgrjt9o", n: "1 km ride", d: "Surely you can do more than that?" },
-      { e: "b5wjd65ifgrjt9o", n: "5 km ride", d: "Short ride for warm-up or recovery" },
-      { e: "b5wjd65ifgrjt9o", n: "10 km ride", d: "Moderate distance ride" },
-      { e: "b5wjd65ifgrjt9o", n: "20 km ride", d: "Endurance-focused ride" },
-      { e: "b5wjd65ifgrjt9o", n: "50 km ride", d: "Long distance, aerobic challenge" },
-      { e: "b5wjd65ifgrjt9o", n: "100 km ride", d: "Epic endurance ride" },
+      { e: "b5wjd65ifgrjt9o", n: "1 km", d: "Surely you can do more than that?" },
+      { e: "b5wjd65ifgrjt9o", n: "5 km", d: "Short ride for warm-up or recovery" },
+      { e: "b5wjd65ifgrjt9o", n: "10 km", d: "Moderate distance ride" },
+      { e: "b5wjd65ifgrjt9o", n: "20 km", d: "Endurance-focused ride" },
+      { e: "b5wjd65ifgrjt9o", n: "50 km", d: "Long distance, aerobic challenge" },
+      { e: "b5wjd65ifgrjt9o", n: "100 km", d: "Epic endurance ride" },
       // Lunge
-      { e: "b5wjd65ifgrjt9p", n: "Forward lunge", d: "Step forward, drop back knee toward ground" },
-      { e: "b5wjd65ifgrjt9p", n: "Reverse lunge", d: "Step backward, focus on glutes and balance" },
-      { e: "b5wjd65ifgrjt9p", n: "Walking lunge", d: "Alternate legs moving forward with each step" },
-      { e: "b5wjd65ifgrjt9p", n: "Side lunge", d: "Step sideways, targets inner thighs" },
-      { e: "b5wjd65ifgrjt9p", n: "Curtsy lunge", d: "Step back and across, targets glutes and outer thigh" },
-      { e: "b5wjd65ifgrjt9p", n: "Weighted lunge", d: "Hold dumbbells or barbell for added resistance" },
-      { e: "b5wjd65ifgrjt9p", n: "Bulgarian split lunge", d: "Rear foot elevated on bench, increases range of motion" },
+      { e: "b5wjd65ifgrjt9p", n: "Forward", d: "Step forward, drop back knee toward ground" },
+      { e: "b5wjd65ifgrjt9p", n: "Reverse", d: "Step backward, focus on glutes and balance" },
+      { e: "b5wjd65ifgrjt9p", n: "Walking", d: "Alternate legs moving forward with each step" },
+      { e: "b5wjd65ifgrjt9p", n: "Side", d: "Step sideways, targets inner thighs" },
+      { e: "b5wjd65ifgrjt9p", n: "Curtsy", d: "Step back and across, targets glutes and outer thigh" },
+      { e: "b5wjd65ifgrjt9p", n: "Weighted", d: "Hold dumbbells or barbell for added resistance" },
+      {
+        e: "b5wjd65ifgrjt9p",
+        n: "Bulgarian split",
+        d: "Rear foot elevated on bench, increases range of motion",
+      },
       // Climbing
       { e: "b5wjd65ifgrjt9q", n: "Bouldering", d: "" },
       { e: "b5wjd65ifgrjt9q", n: "Route climbing", d: "Could be sport, top rope, trad" },
