@@ -1,4 +1,4 @@
-import { Component, createSignal, Show } from "solid-js";
+import { Component, createSignal, Show, JSX } from "solid-js";
 import { usePB } from "../../config/pocketbase";
 
 const AuthEmail: Component = () => {
@@ -10,7 +10,7 @@ const AuthEmail: Component = () => {
   const [isCreatingAccount, setIsCreatingAccount] = createSignal(false);
   const { login, signUp } = usePB();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
@@ -29,7 +29,7 @@ const AuthEmail: Component = () => {
       } else {
         await login(email(), password());
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoading(false);

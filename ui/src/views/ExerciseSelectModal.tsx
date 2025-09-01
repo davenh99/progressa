@@ -13,7 +13,7 @@ interface Props {
 
 export const ExerciseSelectModal: Component<Props> = (props) => {
   const [variations, setVariations] = createSignal<ExerciseVariation[]>([]);
-  const [selectedExercise, setSelectedExercise] = createSignal<Exercise>();
+  const [selectedExercise, setSelectedExercise] = createSignal<Exercise | null>(null);
 
   return (
     <Portal>
@@ -31,8 +31,8 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
             fallback={
               <ExerciseList
                 onClick={(exercise: Exercise) => {
-                  if (exercise.expand?.exerciseVariations_via_exercise?.length > 0) {
-                    setVariations(exercise.expand.exerciseVariations_via_exercise);
+                  if (exercise.expand?.exerciseVariations_via_exercise?.length || 0 > 0) {
+                    setVariations(exercise.expand?.exerciseVariations_via_exercise ?? []);
                     setSelectedExercise(exercise);
                   } else {
                     props.addSessionExercise(exercise.id);
@@ -43,13 +43,16 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
           >
             <Button onClick={() => setSelectedExercise(null)} class="flex flex-row">
               <ArrowLeft />
-              <p>{selectedExercise().name}</p>
+              <p>{selectedExercise()?.name || ""}</p>
             </Button>
 
             <ExerciseVariationList
               variations={variations}
               onClick={(v) => {
-                props.addSessionExercise(selectedExercise().id, v.id);
+                const sel = selectedExercise();
+                if (sel) {
+                  props.addSessionExercise(sel.id, v.id);
+                }
               }}
             />
           </Show>

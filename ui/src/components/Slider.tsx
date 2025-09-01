@@ -45,7 +45,7 @@ export const DataSlider: ParentComponent<DataProps> = (props) => {
 
   return (
     <Slider
-      label={props.label}
+      label={props.label || ""}
       value={val()}
       onChange={(v: number) => {
         props.saveFunc(v);

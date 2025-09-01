@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const ExerciseList: Component<Props> = (props) => {
-  const [exercises, setExercises] = createSignal<Exercise[]>();
+  const [exercises, setExercises] = createSignal<Exercise[] | null>(null);
   const [nameFilter, setNameFilter] = createSignal<string>("");
   const { pb } = useAuthPB();
 
@@ -36,7 +36,7 @@ export const ExerciseList: Component<Props> = (props) => {
 
   const table = createSolidTable({
     get data() {
-      return exercises();
+      return exercises() || [];
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),

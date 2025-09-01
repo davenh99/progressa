@@ -6,8 +6,8 @@ import { MeasurementValue } from "../../Types";
 
 interface Props {
   values: MeasurementValue[];
-  value: Accessor<MeasurementValue>;
-  onChange: (v: MeasurementValue) => void;
+  value: Accessor<MeasurementValue | null>;
+  onChange: (v: MeasurementValue | null) => void;
   placeholder?: string;
 }
 
@@ -47,18 +47,18 @@ export const Select: ParentComponent<Props> = (props) => {
 
 interface DataProps {
   values: MeasurementValue[];
-  initial: MeasurementValue;
+  initial?: MeasurementValue;
   saveFunc: (id: string) => Promise<void>;
 }
 
 export const DataSelect: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal<MeasurementValue>(props.initial);
+  const [val, setVal] = createSignal<MeasurementValue | null>(props.initial ?? null);
 
   return (
     <Select
       value={val}
       values={props.values}
-      onChange={(v: MeasurementValue) => props.saveFunc(v?.id || "").then(() => setVal(v))}
+      onChange={(v) => props.saveFunc(v?.id || "").then(() => setVal(v))}
     />
   );
 };

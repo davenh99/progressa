@@ -80,13 +80,13 @@ export function useAuthPB() {
       });
 
       return userSessions;
-    } catch (e) {
+    } catch (e: any) {
       throw new Error("get userSessions error", e);
     }
   };
 
   const updateRecord = async <T>(collectionName: string, recordID: string, field: string, newVal: any) => {
-    const data = {};
+    const data: any = {};
     data[`${field}`] = newVal;
 
     try {
@@ -104,14 +104,16 @@ export function useAuthPB() {
 
   const userSessionToSortedExercises = (session: UserSession) => {
     const newSession = { ...session };
-    newSession.expand.userSessionExercises_via_userSession = sortUserSessionExercises(
-      newSession.expand.userSessionExercises_via_userSession ?? [],
-      newSession.itemsOrder ?? []
-    );
+    if (newSession.expand?.userSessionExercises_via_userSession) {
+      newSession.expand.userSessionExercises_via_userSession = sortUserSessionExercises(
+        newSession.expand.userSessionExercises_via_userSession ?? [],
+        newSession.itemsOrder ?? []
+      );
+    }
     return newSession;
   };
 
-  const getSessionByID = async (id: string) => {
+  const getSessionByID = async (id: string): Promise<UserSession | null> => {
     try {
       return userSessionToSortedExercises(
         await pb.collection<UserSession>("userSessions").getOne(id, { expand: USER_SESSION_EXPAND })
@@ -125,7 +127,7 @@ export function useAuthPB() {
     }
   };
 
-  const getSessionByDate = async (date: string) => {
+  const getSessionByDate = async (date: string): Promise<UserSession | null> => {
     try {
       return userSessionToSortedExercises(
         await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date}'`, {

@@ -26,7 +26,7 @@ export const UserSessionList: Component = (props) => {
       cell: (ctx) => ctx.getValue() || "-",
     },
     {
-      accessorFn: (row) => (row.expand.tags ? row.expand.tags : []),
+      accessorFn: (row) => (row.expand?.tags ? row.expand.tags : []),
       header: "Tags",
       cell: (ctx) => (
         <div class="flex gap-1">

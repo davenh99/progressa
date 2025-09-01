@@ -131,14 +131,12 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             <div class="flex flex-row space-x-1">
               <DataInput
                 type="number"
-                initial={ctx.row.original.sessionExercise.measurementNumeric}
-                saveFunc={(v: number) =>
-                  saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)
-                }
+                initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
               />
               <p>
-                {ctx.row.original.sessionExercise.expand.exercise.expand.defaultMeasurementType.displayName ??
-                  ""}
+                {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
+                  ?.displayName ?? ""}
               </p>
             </div>
           </Show>
@@ -153,7 +151,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           <DataInput
             type="number"
             initial={ctx.getValue() as number}
-            saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
+            saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
           />
           <p>kg</p>
         </div>
@@ -174,7 +172,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       id: "add-dropset",
       cell: (ctx) => (
         <Show when={!ctx.row.original.sessionExercise.supersetParent}>
-          <Button onClick={() => addRowsAtIndex(ctx.row.index, null, getDropsetAddData(ctx.row.original))}>
+          <Button
+            onClick={() => addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original))}
+          >
             + dropset
           </Button>
         </Show>
@@ -373,7 +373,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       perceivedEffort: 70,
     };
 
-    addRowsAtIndex(exerciseRows.rows.length, null, data);
+    addRowsAtIndex(exerciseRows.rows.length, undefined, data);
     setShowCreateSessionExercise(false);
   };
 

@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { Component, For, JSX } from "solid-js";
 import { Button as KobalteButton } from "@kobalte/core/button";
 import CloseIcon from "lucide-solid/icons/x";
 
@@ -38,12 +38,10 @@ export const TagArea: Component<TagAreaProps> = (props) => {
 
   const updateFn = props.updateRecord ?? updateRecord;
 
-  const handleTagInput = async (
-    e: KeyboardEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }
-  ) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
+  const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
+    if (e.key === "Enter" && e.currentTarget.value.trim()) {
       e.preventDefault();
-      const newTag = e.target.value.trim();
+      const newTag = e.currentTarget.value.trim();
 
       if (!(props.tags || []).map((t) => t.name).includes(newTag)) {
         try {
@@ -65,7 +63,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
             console.log(e);
           }
         } finally {
-          e.target.value = "";
+          e.currentTarget.value = "";
         }
       }
     }

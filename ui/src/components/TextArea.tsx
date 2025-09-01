@@ -1,10 +1,10 @@
-import { createEffect, createSignal, ParentComponent, Show } from "solid-js";
+import { createEffect, createSignal, JSX, ParentComponent, Show } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 
 interface Props {
   label?: string;
   value?: string;
-  onInput?: (e: InputEvent & { target: HTMLInputElement }) => void;
+  onInput?: JSX.EventHandlerUnion<HTMLTextAreaElement, InputEvent>;
   onBlur?: () => void;
 }
 
@@ -35,7 +35,7 @@ export const DataTextArea: ParentComponent<DataProps> = (props) => {
     <TextArea
       value={val()}
       onBlur={() => props.saveFunc(val())}
-      onInput={(e: InputEvent & { target: HTMLInputElement }) => setVal(e.target.value)}
+      onInput={(e) => setVal(e.currentTarget.value)}
       label={props.label}
     />
   );

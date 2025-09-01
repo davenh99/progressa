@@ -35,9 +35,7 @@ interface DataProps extends InputProps {
 export const DataInput: ParentComponent<DataProps> = (props) => {
   const [val, setVal] = createSignal(props.initial);
 
-  createEffect(() => {
-    setVal(props.initial);
-  });
+  createEffect(() => setVal(props.initial));
 
   return (
     <Input

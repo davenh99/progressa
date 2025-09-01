@@ -6,7 +6,6 @@ import { Router, Route } from "@solidjs/router";
 import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
 import Auth from "./routes/Auth";
-import Session from "./routes/Session";
 import Sessions from "./routes/Sessions";
 import { ThemeProvider } from "./config/theme";
 import LogSession from "./routes/LogSession";

@@ -16,7 +16,7 @@ const sleepOptions: EmojiOption[] = [
 ];
 
 interface Props {
-  value: string;
+  value?: string;
   onChange: (v: string) => void;
 }
 
@@ -42,7 +42,7 @@ export const SleepQualitySelector: ParentComponent<Props> = (props) => {
 };
 
 interface DataProps {
-  initial: string;
+  initial?: string;
   saveFunc: (v: string) => Promise<any>;
   label?: string;
 }

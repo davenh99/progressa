@@ -10,10 +10,11 @@ import Container from "../views/Container";
 import type { UserSession, UserSessionCreateData } from "../../Types";
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
+import { ClientResponseError } from "pocketbase";
 
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(false);
-  const [session, setSession] = createStore<UserSession>(null);
+  const [session, setSession] = createStore<{ session: UserSession | null }>({ session: null });
   const [date, setDate] = createSignal<string>(new Date().toLocaleDateString("en-CA"));
   const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
   const navigate = useNavigate();
@@ -32,13 +33,12 @@ const LogSession: Component = () => {
         userHeight: user.height,
         userWeight: user.weight,
         itemsOrder: [],
-        sleepQuality: undefined,
       };
-
-      // TODO is something like 'tags+' valid when creating??
-      createData[field] = newVal;
+      (createData as any)[field] = newVal;
 
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
+      setSession({ session: newSession });
+      setLoading(true);
 
       navigate(`/workouts/log/${newSession.id}`, { replace: true });
     }
@@ -55,7 +55,7 @@ const LogSession: Component = () => {
   // id
   createEffect(() => {
     (async () => {
-      if (untrack(loading)) {
+      if (untrack(() => loading())) {
         // if id was set by date...
         setLoading(false);
       } else {
@@ -63,14 +63,18 @@ const LogSession: Component = () => {
           setLoading(true);
           try {
             const s = await getSessionByID(params.id);
-            setSession(s);
+            setSession("session", s);
             if (s) {
               setDate(s.userDay);
             } else {
               navigate(`/workouts/log`, { replace: true });
             }
           } catch (e) {
-            console.log(e);
+            if (e instanceof ClientResponseError && e.status === 0) {
+              // ignore auto cancels
+            } else {
+              console.log(e);
+            }
           } finally {
             setLoading(false);
           }
@@ -86,9 +90,16 @@ const LogSession: Component = () => {
         setLoading(true);
         try {
           const s = await getSessionByDate(date());
-          setSession(s);
+          setSession("session", s);
+          if (s) {
+            navigate(`/workouts/log/${s.id}`, { replace: true });
+          }
         } catch (e) {
-          console.log(e);
+          if (e instanceof ClientResponseError && e.status === 0) {
+            // ignore auto cancels
+          } else {
+            console.log(e);
+          }
         } finally {
           setLoading(false);
         }
@@ -105,8 +116,8 @@ const LogSession: Component = () => {
           type="date"
           value={date()}
           onInput={(e) => {
+            navigate("/workouts/log", { replace: true });
             setDate(e.currentTarget.value);
-            navigate("/workouts/log/", { replace: true });
           }}
         />
 
@@ -114,27 +125,27 @@ const LogSession: Component = () => {
           <div class="space-y-2">
             <DataInput
               label="Session Name"
-              initial={session?.name ?? ""}
+              initial={session.session?.name ?? ""}
               type="text"
-              saveFunc={(v: string) => sessionUpdate(params.id, "name", v)}
+              saveFunc={(v) => sessionUpdate(params.id, "name", v)}
             />
 
             <DataInput
               label="your weight this day:"
               type="number"
-              initial={session?.userWeight ?? user.weight}
-              saveFunc={updateWeight}
+              initial={session.session?.userWeight ?? user.weight}
+              saveFunc={(v) => updateWeight(v as number)}
             />
 
             <DataTextArea
               label="Notes"
-              initial={session?.notes ?? ""}
+              initial={session.session?.notes ?? ""}
               saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
             />
 
             <TagArea
-              tags={session?.expand?.tags ?? []}
-              setTags={(tags) => setSession("expand", "tags", tags)}
+              tags={session.session?.expand?.tags ?? []}
+              setTags={(tags) => setSession("session", "expand", "tags", tags)}
               modelName="userSessions"
               recordID={params.id}
               updateRecord={(_, recordID, column, newVal) => sessionUpdate(recordID, column, newVal)}
@@ -154,7 +165,7 @@ const LogSession: Component = () => {
             <Tabs.Content value="exercises">
               <div class="m-10">
                 <UserSessionExerciseList
-                  sessionExercises={session?.expand?.userSessionExercises_via_userSession ?? []}
+                  sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
                 />
@@ -165,12 +176,12 @@ const LogSession: Component = () => {
                 <div>
                   <p>rate your sleep quality: </p>
                   <DataSleepQualitySelector
-                    initial={session?.sleepQuality}
+                    initial={session.session?.sleepQuality}
                     saveFunc={(v: string) => sessionUpdate(params.id, "sleepQuality", v)}
                   />
                 </div>
                 <MealList
-                  meals={session?.expand?.meals_via_userSession ?? []}
+                  meals={session.session?.expand?.meals_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
                 />

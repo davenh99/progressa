@@ -84,7 +84,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return true;
       },
       getData({ input }) {
-        const allowedEdges = [];
+        const allowedEdges: Edge[] = [];
         if (props.firstOfSuperset) allowedEdges.push("top");
         if (props.lastOfSuperset) allowedEdges.push("bottom");
 
@@ -292,7 +292,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               />
 
               <TagArea
-                tags={props.row.original.sessionExercise.expand.tags}
+                tags={props.row.original.sessionExercise.expand?.tags}
                 setTags={(tags) => props.setTagsByID(props.row.original.sessionExercise.id, tags)}
                 modelName="userSessionExercises"
                 recordID={props.row.original.sessionExercise.id}

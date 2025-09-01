@@ -71,7 +71,7 @@ export interface UserSessionCreateData {
   userHeight: number;
   userWeight: number;
   itemsOrder: string[] | null;
-  sleepQuality: SleepQuality;
+  sleepQuality?: SleepQuality;
 }
 
 export interface UserSession extends UserSessionCreateData {
@@ -87,7 +87,7 @@ export interface UserSessionExerciseCreateData {
   user: string;
   exercise: string;
   userSession: string;
-  variation: string;
+  variation?: string;
   perceivedEffort: number; // 0 - 100
 }
 
