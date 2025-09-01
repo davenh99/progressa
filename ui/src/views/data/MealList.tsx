@@ -5,7 +5,6 @@ interface Props {
   meals: Meal[];
   sessionID: string;
   sessionDay: Accessor<string>;
-  getSession: () => Promise<void>;
 }
 
 export const MealList: Component<Props> = (props) => {

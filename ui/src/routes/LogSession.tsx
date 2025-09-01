@@ -1,34 +1,21 @@
-import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, Show, untrack } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
-import { createStore, reconcile } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
-import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
 import Header from "../views/Header";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
 import Container from "../views/Container";
-import type { Tag, UserSession, UserSessionCreateData, UserSessionExercise } from "../../Types";
+import type { UserSession, UserSessionCreateData } from "../../Types";
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
-import { sortUserSessionExercises } from "../methods/sortUserSessionExercises";
-import { USER_SESSION_EXPAND } from "../config/constants";
-
-const Basesession = {
-  name: "",
-  notes: "",
-  userWeight: undefined as number,
-  tags: [] as Tag[],
-  sessionExercises: [] as UserSessionExercise[],
-  sleepQuality: undefined,
-  meals: [],
-};
 
 const LogSession: Component = () => {
-  const [loading, setLoading] = createSignal(true);
-  const [session, setSession] = createStore(Basesession);
+  const [loading, setLoading] = createSignal(false);
+  const [session, setSession] = createStore<UserSession>(null);
   const [date, setDate] = createSignal<string>(new Date().toLocaleDateString("en-CA"));
-  const { pb, user, updateRecord } = useAuthPB();
+  const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
   const navigate = useNavigate();
   const params = useParams();
 
@@ -57,74 +44,6 @@ const LogSession: Component = () => {
     }
   };
 
-  const getSession = async () => {
-    if (params.id) {
-      // TODO need to come up with better way to avoid the double call to backend
-      // atm, if a matching date is found, we nav to it's id then get it again...
-      try {
-        setLoading(true);
-        const s = await pb
-          .collection<UserSession>("userSessions")
-          .getOne(params.id, { expand: USER_SESSION_EXPAND });
-
-        // TODO should tidy up below to avoid the duplication
-        setDate(s.userDay);
-        setSession("name", s.name);
-        setSession("userWeight", s.userWeight);
-        setSession("notes", s.notes);
-        setSession("sleepQuality", s.sleepQuality);
-        setSession("meals", s.expand.meals_via_userSession);
-        setSession("tags", s.expand?.tags ?? []);
-        setSession(
-          "sessionExercises",
-          sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
-        );
-      } catch (e) {
-        if (e instanceof ClientResponseError && e.status === 404) {
-          navigate(`/workouts/log`, { replace: true });
-        } else {
-          console.log(e);
-        }
-      }
-    } else {
-      try {
-        const s = await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date()}'`, {
-          expand: USER_SESSION_EXPAND,
-        });
-
-        setDate(s.userDay);
-        setSession("name", s.name);
-        setSession("userWeight", s.userWeight);
-        setSession("notes", s.notes);
-        setSession("tags", s.expand?.tags ?? []);
-        setSession("sleepQuality", s.sleepQuality);
-        setSession("meals", s.expand.meals_via_userSession);
-        setSession(
-          "sessionExercises",
-          sortUserSessionExercises(s.expand?.userSessionExercises_via_userSession ?? [], s.itemsOrder ?? [])
-        );
-
-        navigate(`/workouts/log/${s.id}`, { replace: true });
-      } catch (e) {
-        if (e instanceof ClientResponseError && e.status === 404) {
-          setSession(reconcile(Basesession));
-        } else {
-          console.log(e);
-        }
-      } finally {
-      }
-    }
-    setLoading(false);
-  };
-
-  // createEffect(() => {
-  //   console.log(session.sessionExercises.length);
-  // });
-
-  // createEffect(() => {
-  //   console.log(date());
-  // });
-
   const updateWeight = async (v: number) => {
     // also update the profile weight if it's the current day
     if (date() === new Date().toLocaleDateString("en-CA")) {
@@ -133,8 +52,48 @@ const LogSession: Component = () => {
     return sessionUpdate(params.id, "userWeight", v);
   };
 
+  // id
   createEffect(() => {
-    getSession();
+    (async () => {
+      if (untrack(loading)) {
+        // if id was set by date...
+        setLoading(false);
+      } else {
+        if (params.id) {
+          setLoading(true);
+          try {
+            const s = await getSessionByID(params.id);
+            setSession(s);
+            if (s) {
+              setDate(s.userDay);
+            } else {
+              navigate(`/workouts/log`, { replace: true });
+            }
+          } catch (e) {
+            console.log(e);
+          } finally {
+            setLoading(false);
+          }
+        }
+      }
+    })();
+  });
+
+  // date
+  createEffect(() => {
+    (async () => {
+      if (!params.id && date()) {
+        setLoading(true);
+        try {
+          const s = await getSessionByDate(date());
+          setSession(s);
+        } catch (e) {
+          console.log(e);
+        } finally {
+          setLoading(false);
+        }
+      }
+    })();
   });
 
   return (
@@ -155,7 +114,7 @@ const LogSession: Component = () => {
           <div class="space-y-2">
             <DataInput
               label="Session Name"
-              initial={session.name}
+              initial={session?.name ?? ""}
               type="text"
               saveFunc={(v: string) => sessionUpdate(params.id, "name", v)}
             />
@@ -163,19 +122,19 @@ const LogSession: Component = () => {
             <DataInput
               label="your weight this day:"
               type="number"
-              initial={session.userWeight ?? user.weight}
+              initial={session?.userWeight ?? user.weight}
               saveFunc={updateWeight}
             />
 
             <DataTextArea
               label="Notes"
-              initial={session.notes}
+              initial={session?.notes ?? ""}
               saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
             />
 
             <TagArea
-              tags={session.tags}
-              setTags={(tags) => setSession("tags", tags)}
+              tags={session?.expand?.tags ?? []}
+              setTags={(tags) => setSession("expand", "tags", tags)}
               modelName="userSessions"
               recordID={params.id}
               updateRecord={(_, recordID, column, newVal) => sessionUpdate(recordID, column, newVal)}
@@ -195,10 +154,9 @@ const LogSession: Component = () => {
             <Tabs.Content value="exercises">
               <div class="m-10">
                 <UserSessionExerciseList
-                  sessionExercises={session.sessionExercises}
+                  sessionExercises={session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
-                  getSession={getSession}
                 />
               </div>
             </Tabs.Content>
@@ -207,15 +165,14 @@ const LogSession: Component = () => {
                 <div>
                   <p>rate your sleep quality: </p>
                   <DataSleepQualitySelector
-                    initial={session.sleepQuality}
+                    initial={session?.sleepQuality}
                     saveFunc={(v: string) => sessionUpdate(params.id, "sleepQuality", v)}
                   />
                 </div>
                 <MealList
-                  meals={session.meals}
+                  meals={session?.expand?.meals_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
-                  getSession={getSession}
                 />
               </div>
             </Tabs.Content>

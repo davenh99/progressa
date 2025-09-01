@@ -2,6 +2,8 @@ import { createEffect, useContext } from "solid-js";
 import { PBContext } from "./context";
 import { UserSession, UserSessionExercise } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
+import { USER_SESSION_EXPAND } from "../constants";
+import { sortUserSessionExercises } from "../../methods/sortUserSessionExercises";
 
 const BaseSignUpData = {
   dob: "",
@@ -100,5 +102,44 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getUserSessions, updateRecord };
+  const userSessionToSortedExercises = (session: UserSession) => {
+    const newSession = { ...session };
+    newSession.expand.userSessionExercises_via_userSession = sortUserSessionExercises(
+      newSession.expand.userSessionExercises_via_userSession ?? [],
+      newSession.itemsOrder ?? []
+    );
+    return newSession;
+  };
+
+  const getSessionByID = async (id: string) => {
+    try {
+      return userSessionToSortedExercises(
+        await pb.collection<UserSession>("userSessions").getOne(id, { expand: USER_SESSION_EXPAND })
+      );
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+      } else {
+        throw e;
+      }
+      return null;
+    }
+  };
+
+  const getSessionByDate = async (date: string) => {
+    try {
+      return userSessionToSortedExercises(
+        await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date}'`, {
+          expand: USER_SESSION_EXPAND,
+        })
+      );
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+      } else {
+        throw e;
+      }
+      return null;
+    }
+  };
+
+  return { pb, user, logout, getUserSessions, updateRecord, getSessionByID, getSessionByDate };
 }

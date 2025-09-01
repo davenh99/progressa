@@ -31,7 +31,6 @@ interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
   sessionDay: Accessor<string>;
-  getSession: () => Promise<void>;
 }
 
 export interface SessionExerciseRow {
