@@ -20,27 +20,37 @@ const LogSession: Component = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const sessionUpdate = async (recordID: string, field: string, newVal: any) => {
-    if (params.id) {
-      return await updateRecord<UserSession>("userSessions", recordID, field, newVal);
-    } else {
-      const createData: UserSessionCreateData = {
-        name: "",
-        notes: "",
-        tags: [],
-        user: user.id,
-        userDay: date(),
-        userHeight: user.height,
-        userWeight: user.weight,
-        itemsOrder: [],
-      };
+  const createSession = async (field?: string, newVal?: any) => {
+    const createData: UserSessionCreateData = {
+      name: "",
+      notes: "",
+      tags: [],
+      user: user.id,
+      userDay: date(),
+      userHeight: user.height,
+      userWeight: user.weight,
+      itemsOrder: [],
+    };
+    if (field && newVal) {
       (createData as any)[field] = newVal;
-
+    }
+    try {
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
       setSession({ session: newSession });
       setLoading(true);
 
       navigate(`/workouts/log/${newSession.id}`, { replace: true });
+      return newSession;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const sessionUpdate = async (recordID: string, field: string, newVal: any) => {
+    if (params.id) {
+      return await updateRecord<UserSession>("userSessions", recordID, field, newVal);
+    } else {
+      return await createSession(field, newVal);
     }
   };
 
@@ -168,6 +178,7 @@ const LogSession: Component = () => {
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
+                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>
