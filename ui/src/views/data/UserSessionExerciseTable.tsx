@@ -282,13 +282,13 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 initial={props.getSupersetParent(props.row.index).notes}
                 saveFunc={(v: string) => {
                   props.setNotesByID(
-                    props.row.original.sessionExercise.supersetParent ??
+                    props.row.original.sessionExercise.supersetParent ||
                       props.row.original.sessionExercise.id,
                     v
                   );
                   return updateRecord(
                     "userSessionExercises",
-                    props.row.original.sessionExercise.supersetParent ??
+                    props.row.original.sessionExercise.supersetParent ||
                       props.row.original.sessionExercise.id,
                     "notes",
                     v
@@ -300,14 +300,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 tags={props.getSupersetParent(props.row.index).expand?.tags ?? []}
                 setTags={(tags) =>
                   props.setTagsByID(
-                    props.row.original.sessionExercise.supersetParent ??
+                    props.row.original.sessionExercise.supersetParent ||
                       props.row.original.sessionExercise.id,
                     tags
                   )
                 }
                 modelName="userSessionExercises"
                 recordID={
-                  props.row.original.sessionExercise.supersetParent ?? props.row.original.sessionExercise.id
+                  props.row.original.sessionExercise.supersetParent || props.row.original.sessionExercise.id
                 }
               />
             </Show>
