@@ -15,7 +15,15 @@ import {
   UserSessionExercise,
   UserSessionExerciseCreateData,
 } from "../../../Types";
-import { Button, DataCheckbox, DataInput, DataSlider, DataSelect, IconButton } from "../../components";
+import {
+  Button,
+  DataCheckbox,
+  DataInput,
+  DataSlider,
+  DataSelect,
+  IconButton,
+  DataTime,
+} from "../../components";
 import {
   DraggableRow,
   Row,
@@ -130,17 +138,30 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
               />
             }
           >
-            <div class="flex flex-row space-x-1">
-              <DataInput
-                type="number"
+            <Show
+              when={
+                ctx.row.original.sessionExercise.expand?.exercise?.defaultMeasurementType ===
+                "8ldlgtjjvy3ircl"
+              }
+              fallback={
+                <div class="flex flex-row space-x-1">
+                  <DataInput
+                    type="number"
+                    initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                    saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
+                  />
+                  <p>
+                    {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
+                      ?.displayName ?? ""}
+                  </p>
+                </div>
+              }
+            >
+              <DataTime
                 initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
                 saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
               />
-              <p>
-                {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
-                  ?.displayName ?? ""}
-              </p>
-            </div>
+            </Show>
           </Show>
         );
       },

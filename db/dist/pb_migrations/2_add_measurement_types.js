@@ -5,8 +5,7 @@ migrate(
 
     const newMeasurementTypes = [
       { id: "m01s8yx7wfk2gxd", s: true, dn: "reps", n: "Reps", num: true, p: true },
-      { id: "8ldlggjjvy2ircl", s: true, dn: "s", n: "Time (seconds)", num: true, p: true },
-      { id: "8ldlgtjjvy3ircl", s: true, dn: "min", n: "Time (minutes)", num: true, p: true },
+      { id: "8ldlgtjjvy3ircl", s: true, dn: "s", n: "Time", num: true, p: true },
       { id: "8ldlgghjvy4ircl", s: true, dn: "", n: "Boulder grade (hueco)", num: false, p: true },
       { id: "8ldlgghjvy5yrcl", s: true, dn: "", n: "Boulder grade (font)", num: false, p: true },
       { id: "8ldlgghjvt7yrcl", s: true, dn: "", n: "Route grade (ewbanks)", num: false, p: true },
@@ -29,7 +28,6 @@ migrate(
   (app) => {
     const createdIDs = [
       "m01s8yx7wfk2gxd",
-      "8ldlggjjvy2ircl",
       "8ldlgghjvy4ircl",
       "8ldlgghjvy5yrcl",
       "8ldlgghjvt7yrcl",

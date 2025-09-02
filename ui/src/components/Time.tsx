@@ -2,7 +2,7 @@ import { Component, createEffect, createSignal } from "solid-js";
 import Input from "./Input";
 
 interface Props {
-  label: string;
+  label?: string;
   initial: number;
   saveFunc: (v: number) => Promise<any>;
 }
@@ -26,7 +26,7 @@ export const DataTime: Component<Props> = (props) => {
 
   return (
     <div class="p-1 flex flex-row gap-2">
-      <p>{props.label}</p>
+      <p>{props.label || ""}</p>
       <div class="flex items-center gap-2">
         <div class="flex flex-col items-center">
           <Input
