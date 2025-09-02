@@ -206,6 +206,20 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
   ]);
 
+  const getSupersetParent = (index: number, data: SessionExerciseRow[]): UserSessionExercise => {
+    if (!data[index].sessionExercise.supersetParent) {
+      return data[index].sessionExercise;
+    } else {
+      for (const row of data.slice(0, index + 1).reverse()) {
+        if (row.sessionExercise.id === data[index].sessionExercise.supersetParent) {
+          return row.sessionExercise;
+        }
+      }
+    }
+    // we'll return this is we can't find a parent, although this would mean there's a big problem...
+    return data[index].sessionExercise;
+  };
+
   const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
       await updateRecord("userSessionExercises", recordID, field, newVal);
@@ -430,7 +444,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
               <DraggableRow
                 row={row}
                 saveRow={saveRow}
-                isDropSet={!!row.original.sessionExercise.supersetParent}
                 firstOfGroup={
                   row.index === 0 ||
                   row.original.sessionExercise.exercise !==
@@ -455,6 +468,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 collapse={collapse}
                 setTagsByID={setTagsByID}
                 setNotesByID={setNotesByID}
+                getSupersetParent={(i: number) => getSupersetParent(i, exerciseRows.rows)}
               />
             )}
           </For>

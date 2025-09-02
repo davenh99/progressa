@@ -15,7 +15,7 @@ import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
 import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
-import { Tag } from "../../../Types";
+import { Tag, UserSessionExercise } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 
 export const Table: ParentComponent = (props) => {
@@ -36,7 +36,6 @@ export const Row: ParentComponent = (props) => {
 
 interface DraggableRowProps {
   row: RowType<SessionExerciseRow>;
-  isDropSet: boolean;
   firstOfGroup: boolean;
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
@@ -47,6 +46,7 @@ interface DraggableRowProps {
   collapse: () => void;
   setTagsByID: (recordID: string, tags: Tag[]) => void;
   setNotesByID: (recordID: string, notes: string) => void;
+  getSupersetParent: (index: number) => UserSessionExercise;
 }
 
 type DraggingState = "idle" | "dragging" | "dragging-over";
@@ -212,7 +212,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         ref={groupRef}
         class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${props.isDropSet ? "" : "pt-1"}`}
+        } bg-charcoal-900 px-2 ${props.row.original.sessionExercise.supersetParent ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
           <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
@@ -279,12 +279,17 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             <Show when={props.row.original.expanded}>
               <DataTextArea
                 label="Notes"
-                initial={props.row.original.sessionExercise.notes}
+                initial={props.getSupersetParent(props.row.index).notes}
                 saveFunc={(v: string) => {
-                  props.setNotesByID(props.row.original.sessionExercise.id, v);
+                  props.setNotesByID(
+                    props.row.original.sessionExercise.supersetParent ??
+                      props.row.original.sessionExercise.id,
+                    v
+                  );
                   return updateRecord(
                     "userSessionExercises",
-                    props.row.original.sessionExercise.id,
+                    props.row.original.sessionExercise.supersetParent ??
+                      props.row.original.sessionExercise.id,
                     "notes",
                     v
                   );
@@ -292,10 +297,18 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               />
 
               <TagArea
-                tags={props.row.original.sessionExercise.expand?.tags}
-                setTags={(tags) => props.setTagsByID(props.row.original.sessionExercise.id, tags)}
+                tags={props.getSupersetParent(props.row.index).expand?.tags ?? []}
+                setTags={(tags) =>
+                  props.setTagsByID(
+                    props.row.original.sessionExercise.supersetParent ??
+                      props.row.original.sessionExercise.id,
+                    tags
+                  )
+                }
                 modelName="userSessionExercises"
-                recordID={props.row.original.sessionExercise.id}
+                recordID={
+                  props.row.original.sessionExercise.supersetParent ?? props.row.original.sessionExercise.id
+                }
               />
             </Show>
           </Show>

@@ -26,7 +26,7 @@ export const Tag: Component<Props> = (props) => {
 export default Tag;
 
 interface TagAreaProps {
-  tags?: TagType[];
+  tags: TagType[];
   setTags: (tags: TagType[]) => void;
   modelName: string;
   recordID: string;
@@ -43,14 +43,14 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       e.preventDefault();
       const newTag = e.currentTarget.value.trim();
 
-      if (!(props.tags || []).map((t) => t.name).includes(newTag)) {
+      if (!props.tags.map((t) => t.name).includes(newTag)) {
         try {
           const foundTag = await pb
             .collection<TagType>("tags")
             .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
 
           await updateFn(props.modelName, props.recordID, "+tags", foundTag.id);
-          props.setTags([...(props.tags || []), foundTag]);
+          props.setTags([...props.tags, foundTag]);
         } catch (e) {
           if (e instanceof ClientResponseError && e.status == 404) {
             const createdTag = await pb
@@ -58,7 +58,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
               .create({ name: newTag, public: false, createdBy: user.id });
 
             await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
-            props.setTags([...(props.tags || []), createdTag]);
+            props.setTags([...props.tags, createdTag]);
           } else {
             console.log(e);
           }
