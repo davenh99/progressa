@@ -8,24 +8,24 @@ import {
 } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
-import { useAuthPB } from "../../config/pocketbase";
-import { Exercise } from "../../../Types";
-import Loading from "../Loading";
-import { Input } from "../../components";
+import { useAuthPB } from "../config/pocketbase";
+import { Meal } from "../../Types";
+import Loading from "./Loading";
+import { Input } from "../components";
 
 interface Props {
-  onClick: (exercise: Exercise) => void;
+  onClick: (meal: Meal) => void;
 }
 
-export const ExerciseList: Component<Props> = (props) => {
-  const [exercises, setExercises] = createSignal<Exercise[]>([]);
+export const MealList: Component<Props> = (props) => {
+  const [meals, setMeals] = createSignal<Meal[]>([]);
   const [nameFilter, setNameFilter] = createSignal<string>("");
-  const { pb } = useAuthPB();
+  const { pb, user } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<Exercise>[]>(() => [
+  const columns = createMemo<ColumnDef<Meal>[]>(() => [
     {
       accessorKey: "name",
-      header: "Exercise",
+      header: "Meal",
     },
     {
       header: "",
@@ -36,7 +36,7 @@ export const ExerciseList: Component<Props> = (props) => {
 
   const table = createSolidTable({
     get data() {
-      return exercises();
+      return meals() || [];
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
@@ -50,13 +50,15 @@ export const ExerciseList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const exercises = await pb
-        .collection<Exercise>("exercises")
-        .getFullList({ expand: "measurementType, exerciseVariations_via_exercise", sort: "name" });
+      const meals = await pb.collection<Meal>("meals").getFullList({
+        filter: `userSession.user = '${user.id}'`,
+        expand: "measurementType, exerciseVariations_via_exercise",
+        sort: "name",
+      });
 
-      setExercises(exercises);
+      setMeals(meals);
     } catch (e) {
-      console.log("get exercises error: ", e);
+      console.log("get meals error: ", e);
     }
   };
 
@@ -65,7 +67,7 @@ export const ExerciseList: Component<Props> = (props) => {
   });
 
   return (
-    <Show when={!!exercises()} fallback={<Loading />}>
+    <Show when={!!meals()} fallback={<Loading />}>
       <div class="bg-base-100 rounded-lg shadow px-6 py-3">
         <div class="overflow-x-auto">
           <table class="table w-full">
@@ -83,7 +85,7 @@ export const ExerciseList: Component<Props> = (props) => {
           </table>
           <Input
             type="text"
-            placeholder="Search Exercises"
+            placeholder="Search Past Meals"
             class="p-1"
             value={nameFilter()}
             onInput={(e) => setNameFilter(e.currentTarget.value)}
@@ -108,7 +110,7 @@ export const ExerciseList: Component<Props> = (props) => {
           </div>
         </div>
         <Show when={table.getRowModel().rows.length === 0}>
-          <div class="text-center py-4">No Exercises found</div>
+          <div class="text-center py-4">No meals found</div>
         </Show>
       </div>
     </Show>

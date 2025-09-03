@@ -1531,6 +1531,16 @@ migrate(
           },
           {
             hidden: false,
+            id: "json4266430727",
+            maxSize: 0,
+            name: "mealsOrder",
+            presentable: false,
+            required: false,
+            system: false,
+            type: "json",
+          },
+          {
+            hidden: false,
             id: "autodate2990389176",
             name: "created",
             onCreate: true,
@@ -1943,7 +1953,7 @@ migrate(
         viewRule: "exercise.createdBy=@request.auth.id || exercise.public=true",
       },
       {
-        createRule: "userSession.user=@request.auth.id",
+        createRule: "",
         deleteRule: "userSession.user=@request.auth.id",
         fields: [
           {

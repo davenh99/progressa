@@ -30,6 +30,7 @@ const LogSession: Component = () => {
       userHeight: user.height,
       userWeight: user.weight,
       itemsOrder: [],
+      mealsOrder: [],
     };
     if (field && newVal) {
       (createData as any)[field] = newVal;
@@ -195,6 +196,7 @@ const LogSession: Component = () => {
                   meals={session.session?.expand?.meals_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
+                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>

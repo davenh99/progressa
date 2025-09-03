@@ -1,5 +1,4 @@
 import { Accessor, Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
-import { useNavigate } from "@solidjs/router";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Trash from "lucide-solid/icons/trash-2";
@@ -8,13 +7,7 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 import { useAuthPB } from "../../config/pocketbase";
-import {
-  Tag,
-  UserSession,
-  UserSessionCreateData,
-  UserSessionExercise,
-  UserSessionExerciseCreateData,
-} from "../../../Types";
+import { Tag, UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
 import {
   Button,
   DataCheckbox,
@@ -50,13 +43,9 @@ export interface SessionExerciseRow {
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
   const [exerciseRows, setExerciseRows] = createStore<{ rows: SessionExerciseRow[] }>({
-    rows: props.sessionExercises.map((sessionExercise) => ({
-      sessionExercise,
-      expanded: false,
-    })),
+    rows: props.sessionExercises.map((sessionExercise) => ({ sessionExercise, expanded: false })),
   });
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
-  const navigate = useNavigate();
   const { pb, user, updateRecord } = useAuthPB();
 
   const setTagsByID = (recordID: string, tags: Tag[]) => {
@@ -95,137 +84,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       )
     );
   };
-
-  const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
-    {
-      header: "",
-      id: "handle",
-    },
-    {
-      accessorKey: "sessionExercise.isWarmup",
-      header: "Warmup?",
-      cell: (ctx) => (
-        <Show
-          when={!ctx.row.original.sessionExercise.supersetParent}
-          fallback={<p class="italic">dropset</p>}
-        >
-          <DataCheckbox
-            initial={ctx.getValue() as boolean}
-            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, "isWarmup", v)}
-          />
-        </Show>
-      ),
-    },
-    {
-      accessorFn: (row) =>
-        row.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric
-          ? "sessionExercise.measurementNumeric"
-          : "sessionExercise.measurementValue",
-      header: "",
-      id: "measurement",
-      cell: (ctx) => {
-        return (
-          <Show
-            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
-            fallback={
-              <DataSelect
-                values={
-                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.expand
-                    ?.measurementValues_via_measurementType ?? []
-                }
-                initial={ctx.row.original.sessionExercise.expand?.measurementValue}
-                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, "measurementValue", v)}
-              />
-            }
-          >
-            <Show
-              when={
-                ctx.row.original.sessionExercise.expand?.exercise?.defaultMeasurementType ===
-                "8ldlgtjjvy3ircl"
-              }
-              fallback={
-                <div class="flex flex-row space-x-1">
-                  <DataInput
-                    type="number"
-                    initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
-                    saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
-                  />
-                  <p>
-                    {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
-                      ?.displayName ?? ""}
-                  </p>
-                </div>
-              }
-            >
-              <DataTime
-                initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
-                saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
-              />
-            </Show>
-          </Show>
-        );
-      },
-    },
-    {
-      accessorKey: "sessionExercise.addedWeight",
-      header: "",
-      cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
-            initial={ctx.getValue() as number}
-            saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
-          />
-          <p>kg</p>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "sessionExercise.perceivedEffort",
-      header: "Perceived Effort",
-      cell: (ctx) => (
-        <DataSlider
-          initial={ctx.getValue() as number}
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "perceivedEffort", v)}
-        />
-      ),
-    },
-    {
-      header: "",
-      id: "add-dropset",
-      cell: (ctx) => (
-        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
-          <Button
-            onClick={() =>
-              addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original.sessionExercise))
-            }
-          >
-            + dropset
-          </Button>
-        </Show>
-      ),
-    },
-    {
-      header: "",
-      id: "duplicate",
-      cell: (ctx) => (
-        <IconButton
-          onClick={() => addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, exerciseRows.rows))}
-        >
-          <Copy />
-        </IconButton>
-      ),
-    },
-    {
-      header: "",
-      id: "delete",
-      cell: (ctx) => (
-        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, exerciseRows.rows))}>
-          <Trash />
-        </IconButton>
-      ),
-    },
-  ]);
 
   const getSupersetParent = (index: number, data: SessionExerciseRow[]): UserSessionExercise => {
     if (!data[index].sessionExercise.supersetParent) {
@@ -383,6 +241,137 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     setExerciseRows("rows", (rows) => rows.map((row) => ({ ...row, expanded: false })));
   };
 
+  const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
+    {
+      header: "",
+      id: "handle",
+    },
+    {
+      accessorKey: "sessionExercise.isWarmup",
+      header: "Warmup?",
+      cell: (ctx) => (
+        <Show
+          when={!ctx.row.original.sessionExercise.supersetParent}
+          fallback={<p class="italic">dropset</p>}
+        >
+          <DataCheckbox
+            initial={ctx.getValue() as boolean}
+            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, "isWarmup", v)}
+          />
+        </Show>
+      ),
+    },
+    {
+      accessorFn: (row) =>
+        row.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric
+          ? "sessionExercise.measurementNumeric"
+          : "sessionExercise.measurementValue",
+      header: "",
+      id: "measurement",
+      cell: (ctx) => {
+        return (
+          <Show
+            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
+            fallback={
+              <DataSelect
+                values={
+                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.expand
+                    ?.measurementValues_via_measurementType ?? []
+                }
+                initial={ctx.row.original.sessionExercise.expand?.measurementValue}
+                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, "measurementValue", v)}
+              />
+            }
+          >
+            <Show
+              when={
+                ctx.row.original.sessionExercise.expand?.exercise?.defaultMeasurementType ===
+                "8ldlgtjjvy3ircl"
+              }
+              fallback={
+                <div class="flex flex-row space-x-1">
+                  <DataInput
+                    type="number"
+                    initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                    saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
+                  />
+                  <p>
+                    {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
+                      ?.displayName ?? ""}
+                  </p>
+                </div>
+              }
+            >
+              <DataTime
+                initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
+              />
+            </Show>
+          </Show>
+        );
+      },
+    },
+    {
+      accessorKey: "sessionExercise.addedWeight",
+      header: "",
+      cell: (ctx) => (
+        <div class="flex flex-row space-x-1">
+          <DataInput
+            type="number"
+            initial={ctx.getValue() as number}
+            saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
+          />
+          <p>kg</p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "sessionExercise.perceivedEffort",
+      header: "Perceived Effort",
+      cell: (ctx) => (
+        <DataSlider
+          initial={ctx.getValue() as number}
+          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "perceivedEffort", v)}
+        />
+      ),
+    },
+    {
+      header: "",
+      id: "add-dropset",
+      cell: (ctx) => (
+        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+          <Button
+            onClick={() =>
+              addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original.sessionExercise))
+            }
+          >
+            + dropset
+          </Button>
+        </Show>
+      ),
+    },
+    {
+      header: "",
+      id: "duplicate",
+      cell: (ctx) => (
+        <IconButton
+          onClick={() => addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, exerciseRows.rows))}
+        >
+          <Copy />
+        </IconButton>
+      ),
+    },
+    {
+      header: "",
+      id: "delete",
+      cell: (ctx) => (
+        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, exerciseRows.rows))}>
+          <Trash />
+        </IconButton>
+      ),
+    },
+  ]);
+
   const table = createSolidTable({
     get data() {
       return exerciseRows.rows;
@@ -432,6 +421,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   });
 
   // in case the base data changes, refresh
+  // TODO investigate if this is necessary
   createEffect(() => {
     setExerciseRows({
       rows: props.sessionExercises.map((sessionExercise) => ({

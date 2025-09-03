@@ -1,4 +1,5 @@
 export type SleepQuality = "terrible" | "poor" | "fair" | "good" | "great";
+export type DraggingState = "idle" | "dragging" | "dragging-over";
 
 export interface User {
   id: string;
@@ -71,6 +72,7 @@ export interface UserSessionCreateData {
   userHeight: number;
   userWeight: number;
   itemsOrder: string[] | null;
+  mealsOrder: string[] | null;
   sleepQuality?: SleepQuality;
 }
 
@@ -116,8 +118,7 @@ export interface Tag {
   public: boolean;
 }
 
-export interface Meal {
-  id: string;
+export interface MealCreateData {
   userSession: string;
   name: string;
   description: string;
@@ -126,6 +127,10 @@ export interface Meal {
   gramsProtein: number;
   gramsCarbohydrate: number;
   gramsFat: number;
+}
+
+export interface Meal extends MealCreateData {
+  id: string;
   expand: {
     tags: Tag[];
   };

@@ -15,7 +15,7 @@ import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
 import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
-import { Tag, UserSessionExercise } from "../../../Types";
+import { DraggingState, Tag, UserSessionExercise } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 
 export const Table: ParentComponent = (props) => {
@@ -49,8 +49,6 @@ interface DraggableRowProps {
   getSupersetParent: (index: number) => UserSessionExercise;
 }
 
-type DraggingState = "idle" | "dragging" | "dragging-over";
-
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
   let groupRef: HTMLDivElement | undefined = undefined;
@@ -77,7 +75,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         if (source.data.isGroup && (source.data.groupInds as number[]).includes(props.row.index)) {
           return false;
         }
-        // only allowing tasks to be dropped on me
+        // only allowing sessionExercises to be dropped on me
         return source.data.isUserSessionExerciseRow as boolean;
       },
       getIsSticky() {
