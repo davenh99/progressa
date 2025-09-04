@@ -38,13 +38,13 @@ const LogSession: Component = () => {
     try {
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
       setSession({ session: newSession });
-      setLoading(true);
 
       navigate(`/workouts/log/${newSession.id}`, { replace: true });
       return newSession;
     } catch (e) {
       console.log(e);
     }
+    return null;
   };
 
   const sessionUpdate = async (recordID: string, field: string, newVal: any) => {
@@ -66,44 +66,15 @@ const LogSession: Component = () => {
   // id
   createEffect(() => {
     (async () => {
-      if (untrack(() => loading())) {
-        // if id was set by date...
-        setLoading(false);
-      } else {
-        if (params.id) {
-          setLoading(true);
-          try {
-            const s = await getSessionByID(params.id);
-            setSession("session", s);
-            if (s) {
-              setDate(s.userDay);
-            } else {
-              navigate(`/workouts/log`, { replace: true });
-            }
-          } catch (e) {
-            if (e instanceof ClientResponseError && e.status === 0) {
-              // ignore auto cancels
-            } else {
-              console.log(e);
-            }
-          } finally {
-            setLoading(false);
-          }
-        }
-      }
-    })();
-  });
-
-  // date
-  createEffect(() => {
-    (async () => {
-      if (!params.id && date()) {
+      if (params.id) {
         setLoading(true);
         try {
-          const s = await getSessionByDate(date());
+          const s = await getSessionByID(params.id);
           setSession("session", s);
           if (s) {
-            navigate(`/workouts/log/${s.id}`, { replace: true });
+            setDate(s.userDay);
+          } else {
+            navigate(`/workouts/log`, { replace: true });
           }
         } catch (e) {
           if (e instanceof ClientResponseError && e.status === 0) {
@@ -126,9 +97,24 @@ const LogSession: Component = () => {
           label="Date"
           type="date"
           value={date()}
-          onInput={(e) => {
-            navigate("/workouts/log", { replace: true });
-            setDate(e.currentTarget.value);
+          onInput={async (e) => {
+            const newDate = e.currentTarget.value;
+            setDate(newDate);
+            setLoading(true);
+
+            try {
+              let s = await getSessionByDate(newDate);
+              if (!s) {
+                s = await createSession("userDay", newDate);
+              }
+              if (s) {
+                navigate(`/workouts/log/${s.id}`, { replace: true });
+              }
+            } catch (err) {
+              console.log(err);
+            } finally {
+              setLoading(false);
+            }
           }}
         />
 
@@ -179,7 +165,6 @@ const LogSession: Component = () => {
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
-                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>
@@ -196,7 +181,6 @@ const LogSession: Component = () => {
                   meals={session.session?.expand?.meals_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
-                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>
