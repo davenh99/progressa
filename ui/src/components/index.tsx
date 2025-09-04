@@ -8,3 +8,4 @@ export * from "./TextArea";
 export * from "./MeasurementValueSelect";
 export * from "./SleepQualitySelect";
 export * from "./Time";
+export * from "./Modal";
