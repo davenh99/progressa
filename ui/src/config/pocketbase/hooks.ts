@@ -18,18 +18,12 @@ export function usePB() {
   }
   const { pb } = context;
 
-  const login = async (email: string, password: string) => {
-    await pb.collection("users").authWithPassword(email, password);
+  const login = async (usernameOrEmail: string, password: string) => {
+    await pb.collection("users").authWithPassword(usernameOrEmail, password);
   };
 
-  const signUp = async (email: string, password: string, passwordConfirm: string) => {
-    await pb.collection("users").create({
-      ...BaseSignUpData,
-      name: email.split("@")[0],
-      email,
-      password,
-      passwordConfirm,
-    });
+  const signUp = async (email: string, name: string, password: string, passwordConfirm: string) => {
+    await pb.collection("users").create({ ...BaseSignUpData, name, email, password, passwordConfirm });
     await login(email, password);
   };
 
