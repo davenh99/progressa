@@ -1811,7 +1811,7 @@ migrate(
           {
             hidden: false,
             id: "number1794094383",
-            max: 100,
+            max: 150,
             min: 0,
             name: "perceivedEffort",
             onlyInt: false,

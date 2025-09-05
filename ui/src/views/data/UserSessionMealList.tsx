@@ -28,43 +28,14 @@ export const MealList: Component<Props> = (props) => {
     rows: props.meals.map((meal) => ({ meal, expanded: false })),
   });
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
-  const { pb, user, updateRecord } = useAuthPB();
+  const { pb, updateRecord } = useAuthPB();
 
   const setTagsByID = (recordID: string, tags: Tag[]) => {
-    setMealRows(
-      "rows",
-      mealRows.rows.map((row) =>
-        row.meal.id === recordID
-          ? {
-              ...row,
-              meal: {
-                ...row.meal,
-                expand: {
-                  ...row.meal.expand,
-                  tags,
-                },
-              },
-            }
-          : row
-      )
-    );
+    setMealRows("rows", (r) => r.meal.id === recordID, "meal", "expand", "tags", tags);
   };
 
   const setDescriptionByID = (recordID: string, description: string) => {
-    setMealRows(
-      "rows",
-      mealRows.rows.map((row) =>
-        row.meal.id === recordID
-          ? {
-              ...row,
-              meal: {
-                ...row.meal,
-                description,
-              },
-            }
-          : row
-      )
-    );
+    setMealRows("rows", (r) => r.meal.id === recordID, "meal", "description", description);
   };
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {

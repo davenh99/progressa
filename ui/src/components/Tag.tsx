@@ -79,9 +79,10 @@ export const TagArea: Component<TagAreaProps> = (props) => {
   };
 
   return (
-    <div class="border-2 rounded-lg p-2">
-      <Input label="Tags" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
-      <div class="">
+    <div>
+      <p>Tags</p>
+      <div class="border-2 rounded-lg p-2">
+        <Input label="" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
         <For each={props.tags || []}>{(t) => <Tag name={t.name} onClick={() => deleteTag(t)} />}</For>
       </div>
     </div>

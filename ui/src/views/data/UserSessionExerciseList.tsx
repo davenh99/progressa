@@ -50,38 +50,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const setTagsByID = (recordID: string, tags: Tag[]) => {
     setExerciseRows(
       "rows",
-      exerciseRows.rows.map((row) =>
-        row.sessionExercise.id === recordID
-          ? {
-              ...row,
-              sessionExercise: {
-                ...row.sessionExercise,
-                expand: {
-                  ...row.sessionExercise.expand,
-                  tags,
-                },
-              },
-            }
-          : row
-      )
+      (r) => r.sessionExercise.id === recordID,
+      "sessionExercise",
+      "expand",
+      "tags",
+      tags
     );
   };
 
   const setNotesByID = (recordID: string, notes: string) => {
-    setExerciseRows(
-      "rows",
-      exerciseRows.rows.map((row) =>
-        row.sessionExercise.id === recordID
-          ? {
-              ...row,
-              sessionExercise: {
-                ...row.sessionExercise,
-                notes,
-              },
-            }
-          : row
-      )
-    );
+    setExerciseRows("rows", (r) => r.sessionExercise.id === recordID, "sessionExercise", "notes", notes);
   };
 
   const getSupersetParent = (index: number, data: SessionExerciseRow[]): UserSessionExercise => {
@@ -319,7 +297,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     {
       accessorKey: "sessionExercise.perceivedEffort",
-      header: "Perceived Effort",
+      header: "RPE",
       cell: (ctx) => (
         <DataSlider
           initial={ctx.getValue() as number}
