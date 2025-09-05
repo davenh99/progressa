@@ -32,7 +32,7 @@ const LogSession: Component = () => {
       itemsOrder: [],
       mealsOrder: [],
     };
-    if (field && newVal) {
+    if (field !== undefined) {
       (createData as any)[field] = newVal;
     }
     try {
