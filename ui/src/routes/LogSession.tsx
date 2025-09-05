@@ -19,7 +19,8 @@ const LogSession: Component = () => {
   const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
   const navigate = useNavigate();
   const params = useParams();
-
+  let setSessionFromDate = false;
+  
   const createSession = async (field?: string, newVal?: any) => {
     const createData: UserSessionCreateData = {
       name: "",
@@ -67,8 +68,9 @@ const LogSession: Component = () => {
     setLoading(true);
 
     try {
-      let s = await getSessionByDate(date);
+      const s = await getSessionByDate(date);
       if (s) {
+        setSessionFromDate = true;
         setSession("session", s);
         navigate(`/workouts/log/${s.id}`, { replace: true });
       } else {
@@ -82,30 +84,35 @@ const LogSession: Component = () => {
     }
   };
 
-  // id
-  createEffect(() => {
-    (async () => {
-      if (params.id) {
-        setLoading(true);
-        try {
-          const s = await getSessionByID(params.id);
-          setSession("session", s);
-          if (s) {
-            setDate(s.userDay);
-          } else {
-            navigate(`/workouts/log`, { replace: true });
-          }
-        } catch (e) {
-          if (e instanceof ClientResponseError && e.status === 0) {
-            // ignore auto cancels
-          } else {
-            console.log(e);
-          }
-        } finally {
-          setLoading(false);
+  const _getSessionByID = async () => {
+    if (fromDateNav) {
+      fromDateNav = false;
+      return; // skip refetch
+    }
+    if (params.id) {
+      setLoading(true);
+      try {
+        const s = await getSessionByID(params.id);
+        setSession("session", s);
+        if (s) {
+          setDate(s.userDay);
+        } else {
+          navigate(`/workouts/log`, { replace: true });
         }
+      } catch (e) {
+        if (e instanceof ClientResponseError && e.status === 0) {
+          // ignore auto cancels
+        } else {
+          console.log(e);
+        }
+      } finally {
+        setLoading(false);
       }
-    })();
+    }
+  }
+
+  createEffect(() => {
+    _getSessionByID();
   });
 
   onMount(() => {
