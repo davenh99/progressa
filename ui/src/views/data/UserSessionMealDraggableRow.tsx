@@ -17,14 +17,14 @@ import { DataTextArea, IconButton, TagArea } from "../../components";
 import { DraggingState, Tag } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { MealRow } from "./UserSessionMealList";
+import { SetStoreFunction } from "solid-js/store";
 
 interface DraggableRowProps {
   row: Row<MealRow>;
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   expandAtInd: (index: number) => void;
   collapse: () => void;
-  setTagsByID: (recordID: string, tags: Tag[]) => void;
-  setDescriptionByID: (recordID: string, notes: string) => void;
+  setMealRows: SetStoreFunction<{ rows: MealRow[] }>;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -165,16 +165,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         <Show when={props.row.original.expanded}>
           <DataTextArea
             label="Description"
-            initial={props.row.original.meal.description}
-            saveFunc={(v: string) => {
-              props.setDescriptionByID(props.row.original.meal.id, v);
-              return updateRecord("meals", props.row.original.meal.id, "description", v);
-            }}
+            value={props.row.original.meal.description}
+            saveFunc={(v: string) => updateRecord("meals", props.row.original.meal.id, "description", v)}
+            onValueChange={(v) => props.setMealRows("rows", props.row.index, "meal", "description", v)}
           />
 
           <TagArea
             tags={props.row.original.meal.expand?.tags ?? []}
-            setTags={(tags) => props.setTagsByID(props.row.original.meal.id, tags)}
+            setTags={(tags) => props.setMealRows("rows", props.row.index, "meal", "expand", "tags", tags)}
             modelName="meals"
             recordID={props.row.original.meal.id}
           />

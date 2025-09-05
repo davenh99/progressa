@@ -31,25 +31,20 @@ export const Slider: ParentComponent<Props> = (props) => {
 };
 
 interface DataProps {
-  initial: number;
+  value: number;
+  onValueChange: (v: number) => void;
   saveFunc: (v: number) => Promise<void>;
   label?: string;
 }
 
 export const DataSlider: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal(props.initial);
-
-  createEffect(() => {
-    setVal(props.initial);
-  });
-
   return (
     <Slider
       label={props.label || ""}
-      value={val()}
+      value={props.value}
       onChange={(v: number) => {
         props.saveFunc(v);
-        setVal(v);
+        props.onValueChange(v);
       }}
     />
   );

@@ -7,7 +7,7 @@ import { useAuthPB } from "../config/pocketbase";
 import Header from "../views/Header";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
 import Container from "../views/Container";
-import type { UserSession, UserSessionCreateData } from "../../Types";
+import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import { ClientResponseError } from "pocketbase";
@@ -122,7 +122,8 @@ const LogSession: Component = () => {
           <div class="space-y-2">
             <DataInput
               label="Session Name"
-              initial={session.session?.name ?? ""}
+              value={session.session?.name ?? ""}
+              onValueChange={(v) => setSession("session", "name", v as string)}
               type="text"
               saveFunc={(v) => sessionUpdate(params.id, "name", v)}
             />
@@ -130,13 +131,15 @@ const LogSession: Component = () => {
             <DataInput
               label="your weight this day:"
               type="number"
-              initial={session.session?.userWeight ?? user.weight}
+              value={session.session?.userWeight ?? user.weight}
+              onValueChange={(v) => setSession("session", "userWeight", Number(v))}
               saveFunc={(v) => updateWeight(v as number)}
             />
 
             <DataTextArea
               label="Notes"
-              initial={session.session?.notes ?? ""}
+              value={session.session?.notes ?? ""}
+              onValueChange={(v) => setSession("session", "notes", v)}
               saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
             />
 
@@ -173,7 +176,8 @@ const LogSession: Component = () => {
                 <div>
                   <p>rate your sleep quality: </p>
                   <DataSleepQualitySelector
-                    initial={session.session?.sleepQuality}
+                    value={session.session?.sleepQuality ?? ""}
+                    onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
                     saveFunc={(v: string) => sessionUpdate(params.id, "sleepQuality", v)}
                   />
                 </div>

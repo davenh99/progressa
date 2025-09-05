@@ -42,26 +42,21 @@ export const SleepQualitySelector: ParentComponent<Props> = (props) => {
 };
 
 interface DataProps {
-  initial?: string;
+  value: string;
+  onValueChange: (v: string) => void;
   saveFunc: (v: string) => Promise<any>;
   label?: string;
 }
 
 export const DataSleepQualitySelector: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal(props.initial);
-
-  createEffect(() => {
-    setVal(props.initial);
-  });
-
   return (
     <div class="flex flex-col gap-2">
       {props.label && <label class="text-sm">{props.label}</label>}
       <SleepQualitySelector
-        value={val()}
+        value={props.value}
         onChange={(v) => {
           props.saveFunc(v);
-          setVal(v);
+          props.onValueChange(v);
         }}
       />
     </div>

@@ -47,21 +47,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const { pb, user, updateRecord } = useAuthPB();
 
-  const setTagsByID = (recordID: string, tags: Tag[]) => {
-    setExerciseRows(
-      "rows",
-      (r) => r.sessionExercise.id === recordID,
-      "sessionExercise",
-      "expand",
-      "tags",
-      tags
-    );
-  };
-
-  const setNotesByID = (recordID: string, notes: string) => {
-    setExerciseRows("rows", (r) => r.sessionExercise.id === recordID, "sessionExercise", "notes", notes);
-  };
-
   const getSupersetParent = (index: number, data: SessionExerciseRow[]): UserSessionExercise => {
     if (!data[index].sessionExercise.supersetParent) {
       return data[index].sessionExercise;
@@ -224,10 +209,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           when={!ctx.row.original.sessionExercise.supersetParent}
           fallback={<p class="italic">dropset</p>}
         >
-          <DataCheckbox
-            initial={ctx.getValue() as boolean}
-            saveFunc={(v: boolean) => saveRow(ctx.row.original.sessionExercise.id, "isWarmup", v)}
-          />
+          <Show when={ctx.getValue() as boolean} fallback={<p>{ctx.row.index + 1}</p>}>
+            <p>W</p>
+          </Show>
         </Show>
       ),
     },
@@ -248,7 +232,18 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                   ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.expand
                     ?.measurementValues_via_measurementType ?? []
                 }
-                initial={ctx.row.original.sessionExercise.expand?.measurementValue}
+                // TODO maybe we don't need to switch between null and undefined here?
+                value={ctx.row.original.sessionExercise.expand?.measurementValue ?? null}
+                onValueChange={(v) =>
+                  setExerciseRows(
+                    "rows",
+                    ctx.row.index,
+                    "sessionExercise",
+                    "expand",
+                    "measurementValue",
+                    v ?? undefined
+                  )
+                }
                 saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, "measurementValue", v)}
               />
             }
@@ -262,7 +257,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 <div class="flex flex-row space-x-1">
                   <DataInput
                     type="number"
-                    initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                    value={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                    onValueChange={(v) =>
+                      setExerciseRows(
+                        "rows",
+                        ctx.row.index,
+                        "sessionExercise",
+                        "measurementNumeric",
+                        v as number
+                      )
+                    }
                     saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
                   />
                   <p>
@@ -273,7 +277,10 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
               }
             >
               <DataTime
-                initial={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                value={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                onValueChange={(v) =>
+                  setExerciseRows("rows", ctx.row.index, "sessionExercise", "measurementNumeric", v)
+                }
                 saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
               />
             </Show>
@@ -288,7 +295,10 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         <div class="flex flex-row space-x-1">
           <DataInput
             type="number"
-            initial={ctx.getValue() as number}
+            value={ctx.getValue() as number}
+            onValueChange={(v) =>
+              setExerciseRows("rows", ctx.row.index, "sessionExercise", "addedWeight", v as number)
+            }
             saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
           />
           <p>kg</p>
@@ -300,7 +310,10 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "RPE",
       cell: (ctx) => (
         <DataSlider
-          initial={ctx.getValue() as number}
+          value={ctx.getValue() as number}
+          onValueChange={(v) =>
+            setExerciseRows("rows", ctx.row.index, "sessionExercise", "perceivedEffort", v as number)
+          }
           saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "perceivedEffort", v)}
         />
       ),
@@ -447,8 +460,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 getGroupInds={() => getGroupInds(row.index, exerciseRows.rows)}
                 expandAtInd={expandAtInd}
                 collapse={collapse}
-                setTagsByID={setTagsByID}
-                setNotesByID={setNotesByID}
+                setExerciseRows={setExerciseRows}
                 getSupersetParent={(i: number) => getSupersetParent(i, exerciseRows.rows)}
               />
             )}

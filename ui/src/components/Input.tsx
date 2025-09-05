@@ -28,24 +28,21 @@ export const Input: ParentComponent<InputProps> = (props) => {
 };
 
 interface DataProps extends InputProps {
-  initial: number | string;
+  value: number | string;
+  onValueChange: (v: number | string) => void;
   saveFunc: (v: number | string) => Promise<any>;
 }
 
 export const DataInput: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal(props.initial);
-
-  createEffect(() => setVal(props.initial));
-
   return (
     <Input
-      value={val()}
-      onBlur={() => props.saveFunc(val())}
+      value={props.value}
+      onBlur={() => props.saveFunc(props.value)}
       onInput={(e) => {
         const target = e.currentTarget as HTMLInputElement;
         const value = props.type === "number" ? Number(target.value) : target.value;
 
-        setVal(value);
+        props.onValueChange(value);
         if (props.type === "number") {
           props.saveFunc(value);
         }

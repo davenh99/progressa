@@ -25,18 +25,18 @@ export const Checkbox: ParentComponent<Props> = (props) => {
 };
 
 interface DataProps {
-  initial: boolean;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
   saveFunc: (v: boolean) => Promise<void>;
 }
 
 export const DataCheckbox: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal(props.initial);
-
-  createEffect(() => {
-    setVal(props.initial);
-  });
-
-  return <Checkbox checked={val()} onChange={(v: boolean) => props.saveFunc(v).then(() => setVal(v))} />;
+  return (
+    <Checkbox
+      checked={props.value}
+      onChange={(v: boolean) => props.saveFunc(v).then(() => props.onValueChange(v))}
+    />
+  );
 };
 
 export default Checkbox;

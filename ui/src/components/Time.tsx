@@ -3,7 +3,8 @@ import Input from "./Input";
 
 interface Props {
   label?: string;
-  initial: number;
+  value: number;
+  onValueChange: (v: number) => void;
   saveFunc: (v: number) => Promise<any>;
 }
 
@@ -15,13 +16,15 @@ export const DataTime: Component<Props> = (props) => {
     const min = minutes() || 0;
     const sec = seconds() || 0;
 
-    props.saveFunc(min * 60 + sec);
+    const newVal = min * 60 + sec;
+
+    props.saveFunc(newVal).then(() => props.onValueChange(newVal));
   });
 
   // not onMount, should be reactive to external state changes...
   createEffect(() => {
-    setMinutes(Math.floor(props.initial / 60));
-    setSeconds(Math.round(props.initial % 60));
+    setMinutes(Math.floor(props.value / 60));
+    setSeconds(Math.round(props.value % 60));
   });
 
   return (

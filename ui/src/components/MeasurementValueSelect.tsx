@@ -6,7 +6,7 @@ import { MeasurementValue } from "../../Types";
 
 interface Props {
   values: MeasurementValue[];
-  value: Accessor<MeasurementValue | null>;
+  value: MeasurementValue | null;
   onChange: (v: MeasurementValue | null) => void;
   placeholder?: string;
 }
@@ -15,7 +15,7 @@ export const Select: ParentComponent<Props> = (props) => {
   return (
     <KobalteSelect
       multiple={false}
-      value={props.value()}
+      value={props.value}
       optionValue="id"
       optionTextValue="value"
       onChange={props.onChange}
@@ -47,18 +47,17 @@ export const Select: ParentComponent<Props> = (props) => {
 
 interface DataProps {
   values: MeasurementValue[];
-  initial?: MeasurementValue;
+  value: MeasurementValue | null;
+  onValueChange: (v: MeasurementValue | null) => void;
   saveFunc: (id: string) => Promise<void>;
 }
 
 export const DataSelect: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal<MeasurementValue | null>(props.initial ?? null);
-
   return (
     <Select
-      value={val}
+      value={props.value}
       values={props.values}
-      onChange={(v) => props.saveFunc(v?.id || "").then(() => setVal(v))}
+      onChange={(v) => props.saveFunc(v?.id || "").then(() => props.onValueChange(v))}
     />
   );
 };

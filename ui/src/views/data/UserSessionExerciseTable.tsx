@@ -15,8 +15,9 @@ import Up from "lucide-solid/icons/chevron-up";
 
 import { SessionExerciseRow } from ".";
 import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
-import { DraggingState, Tag, UserSessionExercise } from "../../../Types";
+import { DraggingState, UserSessionExercise } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
+import { SetStoreFunction } from "solid-js/store";
 
 export const Table: ParentComponent = (props) => {
   return <div class="w-full">{props.children}</div>;
@@ -44,8 +45,7 @@ interface DraggableRowProps {
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   expandAtInd: (index: number) => void;
   collapse: () => void;
-  setTagsByID: (recordID: string, tags: Tag[]) => void;
-  setNotesByID: (recordID: string, notes: string) => void;
+  setExerciseRows: SetStoreFunction<{ rows: SessionExerciseRow[] }>;
   getSupersetParent: (index: number) => UserSessionExercise;
 }
 
@@ -251,7 +251,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 flex flex-row">
                 <DataTime
                   label="Rest: "
-                  initial={props.row.original.sessionExercise.restAfter}
+                  value={props.row.original.sessionExercise.restAfter}
+                  onValueChange={(v) =>
+                    props.setExerciseRows("rows", props.row.index, "sessionExercise", "restAfter", v)
+                  }
                   saveFunc={(v: number) =>
                     props.saveRow(props.row.original.sessionExercise.id, "restAfter", v)
                   }
@@ -277,32 +280,47 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             <Show when={props.row.original.expanded}>
               <DataTextArea
                 label="Notes"
-                initial={props.getSupersetParent(props.row.index).notes}
-                saveFunc={(v: string) => {
-                  props.setNotesByID(
+                value={props.getSupersetParent(props.row.index).notes}
+                onValueChange={(notes) => {
+                  const recordID =
                     props.row.original.sessionExercise.supersetParent ||
-                      props.row.original.sessionExercise.id,
-                    v
+                    props.row.original.sessionExercise.id;
+
+                  props.setExerciseRows(
+                    "rows",
+                    (r) => r.sessionExercise.id === recordID,
+                    "sessionExercise",
+                    "notes",
+                    notes
                   );
-                  return updateRecord(
+                }}
+                saveFunc={(v: string) =>
+                  updateRecord(
                     "userSessionExercises",
                     props.row.original.sessionExercise.supersetParent ||
                       props.row.original.sessionExercise.id,
                     "notes",
                     v
-                  );
-                }}
+                  )
+                }
               />
 
               <TagArea
                 tags={props.getSupersetParent(props.row.index).expand?.tags ?? []}
-                setTags={(tags) =>
-                  props.setTagsByID(
+                setTags={(tags) => {
+                  const recordID =
                     props.row.original.sessionExercise.supersetParent ||
-                      props.row.original.sessionExercise.id,
+                    props.row.original.sessionExercise.id;
+
+                  props.setExerciseRows(
+                    "rows",
+                    (r) => r.sessionExercise.id === recordID,
+                    "sessionExercise",
+                    "expand",
+                    "tags",
                     tags
-                  )
-                }
+                  );
+                }}
                 modelName="userSessionExercises"
                 recordID={
                   props.row.original.sessionExercise.supersetParent || props.row.original.sessionExercise.id

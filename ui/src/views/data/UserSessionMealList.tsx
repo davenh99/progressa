@@ -30,14 +30,6 @@ export const MealList: Component<Props> = (props) => {
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
   const { pb, updateRecord } = useAuthPB();
 
-  const setTagsByID = (recordID: string, tags: Tag[]) => {
-    setMealRows("rows", (r) => r.meal.id === recordID, "meal", "expand", "tags", tags);
-  };
-
-  const setDescriptionByID = (recordID: string, description: string) => {
-    setMealRows("rows", (r) => r.meal.id === recordID, "meal", "description", description);
-  };
-
   const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
       await updateRecord("meals", recordID, field, newVal);
@@ -138,7 +130,8 @@ export const MealList: Component<Props> = (props) => {
       cell: (ctx) => (
         <DataInput
           type="text"
-          initial={ctx.row.original.meal.name}
+          value={ctx.row.original.meal.name}
+          onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "name", v as string)}
           saveFunc={(v) => saveRow(ctx.row.original.meal.id, "name", v)}
         />
       ),
@@ -150,7 +143,8 @@ export const MealList: Component<Props> = (props) => {
         <div class="flex flex-row space-x-1">
           <DataInput
             type="number"
-            initial={ctx.getValue() as number}
+            value={ctx.getValue() as number}
+            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "kj", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "kj", v)}
           />
           <p>kj</p>
@@ -164,7 +158,8 @@ export const MealList: Component<Props> = (props) => {
         <div class="flex flex-row space-x-1">
           <DataInput
             type="number"
-            initial={ctx.getValue() as number}
+            value={ctx.getValue() as number}
+            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsProtein", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsProtein", v)}
           />
           <p>g</p>
@@ -178,7 +173,10 @@ export const MealList: Component<Props> = (props) => {
         <div class="flex flex-row space-x-1">
           <DataInput
             type="number"
-            initial={ctx.getValue() as number}
+            value={ctx.getValue() as number}
+            onValueChange={(v) =>
+              setMealRows("rows", ctx.row.index, "meal", "gramsCarbohydrate", v as number)
+            }
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsCarbohydrate", v)}
           />
           <p>g</p>
@@ -192,7 +190,8 @@ export const MealList: Component<Props> = (props) => {
         <div class="flex flex-row space-x-1">
           <DataInput
             type="number"
-            initial={ctx.getValue() as number}
+            value={ctx.getValue() as number}
+            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsFat", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsFat", v)}
           />
           <p>g</p>
@@ -267,8 +266,7 @@ export const MealList: Component<Props> = (props) => {
               saveRow={saveRow}
               expandAtInd={expandAtInd}
               collapse={collapse}
-              setTagsByID={setTagsByID}
-              setDescriptionByID={setDescriptionByID}
+              setMealRows={setMealRows}
             />
           )}
         </For>

@@ -20,22 +20,17 @@ export const TextArea: ParentComponent<Props> = (props) => {
 };
 
 interface DataProps extends Props {
-  initial: string;
+  value: string;
+  onValueChange: (v: string) => void;
   saveFunc: (v: string) => Promise<any>;
 }
 
 export const DataTextArea: ParentComponent<DataProps> = (props) => {
-  const [val, setVal] = createSignal(props.initial);
-
-  createEffect(() => {
-    setVal(props.initial);
-  });
-
   return (
     <TextArea
-      value={val()}
-      onBlur={() => props.saveFunc(val())}
-      onInput={(e) => setVal(e.currentTarget.value)}
+      value={props.value}
+      onBlur={() => props.saveFunc(props.value)}
+      onInput={(e) => props.onValueChange(e.currentTarget.value)}
       label={props.label}
     />
   );

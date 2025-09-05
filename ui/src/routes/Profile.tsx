@@ -1,4 +1,4 @@
-import { Component, Show } from "solid-js";
+import { Component, createSignal, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
@@ -7,6 +7,9 @@ import { DataInput } from "../components";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
+  const [height, setHeight] = createSignal(user.height);
+  const [weight, setWeight] = createSignal(user.weight);
+  const [dob, setDob] = createSignal(user.dob);
 
   return (
     <>
@@ -22,7 +25,8 @@ const Profile: Component = () => {
               <div class="flex flex-row">
                 <DataInput
                   label="Height"
-                  initial={user.height}
+                  value={height()}
+                  onValueChange={(v) => setHeight(Number(v))}
                   type="number"
                   saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
                 />
@@ -31,7 +35,8 @@ const Profile: Component = () => {
               <div class="flex flex-row">
                 <DataInput
                   label="Weight"
-                  initial={user.weight}
+                  value={weight()}
+                  onValueChange={(v) => setWeight(Number(v))}
                   type="number"
                   saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
                 />
@@ -41,7 +46,8 @@ const Profile: Component = () => {
                 <DataInput
                   label="DOB"
                   type="date"
-                  initial={user.dob}
+                  value={dob()}
+                  onValueChange={(v) => setDob(v as string)}
                   saveFunc={(v) => updateRecord<any>("users", user.id, "dob", v)}
                 />
                 <Show when={!!user.dob}>
