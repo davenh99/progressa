@@ -7,16 +7,8 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { Tag, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
-import {
-  Button,
-  DataCheckbox,
-  DataInput,
-  DataSlider,
-  DataSelect,
-  IconButton,
-  DataTime,
-} from "../../components";
+import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
+import { Button, DataInput, DataSlider, DataSelect, IconButton, DataTime } from "../../components";
 import {
   DraggableRow,
   Row,
@@ -29,15 +21,16 @@ import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/
 import ExerciseSelectModal from "../ExerciseSelectModal";
 import { USER_SESSION_EXERCISE_EXPAND } from "../../config/constants";
 
+export interface SessionExerciseRow {
+  sessionExercise: UserSessionExercise;
+  expanded: boolean;
+}
+
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
   sessionDay: Accessor<string>;
-}
-
-export interface SessionExerciseRow {
-  sessionExercise: UserSessionExercise;
-  expanded: boolean;
+  createSession: (field?: string | undefined, newVal?: any) => Promise<UserSession | null>;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
@@ -143,6 +136,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     duplicateInds?: number[],
     createData?: UserSessionExerciseCreateData
   ) => {
+    if (!props.sessionID) {
+      const newSession = await props.createSession();
+
+      if (newSession && createData) {
+        createData.userSession = newSession.id;
+      }
+    }
+
     if (createData) {
       const record = await pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
         expand: USER_SESSION_EXERCISE_EXPAND,

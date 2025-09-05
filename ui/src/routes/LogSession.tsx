@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, Show, untrack } from "solid-js";
+import { Component, createEffect, createSignal, onMount, Show, untrack } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -63,6 +63,25 @@ const LogSession: Component = () => {
     return sessionUpdate(params.id, "userWeight", v);
   };
 
+  const _getSessionByDate = async (date: string) => {
+    setLoading(true);
+
+    try {
+      let s = await getSessionByDate(date);
+      if (s) {
+        setSession("session", s);
+        navigate(`/workouts/log/${s.id}`, { replace: true });
+      } else {
+        setSession("session", null);
+        navigate(`/workouts/log`, { replace: true });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // id
   createEffect(() => {
     (async () => {
@@ -89,6 +108,12 @@ const LogSession: Component = () => {
     })();
   });
 
+  onMount(() => {
+    if (!params.id) {
+      _getSessionByDate(date());
+    }
+  });
+
   return (
     <>
       <Header />
@@ -100,21 +125,7 @@ const LogSession: Component = () => {
           onInput={async (e) => {
             const newDate = e.currentTarget.value;
             setDate(newDate);
-            setLoading(true);
-
-            try {
-              let s = await getSessionByDate(newDate);
-              if (!s) {
-                s = await createSession("userDay", newDate);
-              }
-              if (s) {
-                navigate(`/workouts/log/${s.id}`, { replace: true });
-              }
-            } catch (err) {
-              console.log(err);
-            } finally {
-              setLoading(false);
-            }
+            _getSessionByDate(newDate);
           }}
         />
 
@@ -122,7 +133,7 @@ const LogSession: Component = () => {
           <div class="space-y-2">
             <DataInput
               label="Session Name"
-              value={session.session?.name ?? ""}
+              value={session.session?.name ?? `Workout on ${date()}`}
               onValueChange={(v) => setSession("session", "name", v as string)}
               type="text"
               saveFunc={(v) => sessionUpdate(params.id, "name", v)}
@@ -168,6 +179,7 @@ const LogSession: Component = () => {
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
+                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>
@@ -185,6 +197,7 @@ const LogSession: Component = () => {
                   meals={session.session?.expand?.meals_via_userSession ?? []}
                   sessionID={params.id}
                   sessionDay={date}
+                  createSession={createSession}
                 />
               </div>
             </Tabs.Content>

@@ -4,7 +4,7 @@ import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanst
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
-import { Meal, Tag } from "../../../Types";
+import { Meal, Tag, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, DataInput } from "../../components";
 import CopyMealModal from "../CopyMealModal";
@@ -12,15 +12,16 @@ import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/userSessionMealMethods";
 import { DraggableRow } from "./UserSessionMealDraggableRow";
 
+export interface MealRow {
+  meal: Meal;
+  expanded: boolean;
+}
+
 interface Props {
   meals: Meal[];
   sessionID: string;
   sessionDay: Accessor<string>;
-}
-
-export interface MealRow {
-  meal: Meal;
-  expanded: boolean;
+  createSession: (field?: string | undefined, newVal?: any) => Promise<UserSession | null>;
 }
 
 export const MealList: Component<Props> = (props) => {
@@ -90,6 +91,14 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const addRowAtIndex = async (index: number, duplicateInd?: number, createData?: { [k: string]: any }) => {
+    if (!props.sessionID) {
+      const newSession = await props.createSession();
+
+      if (newSession && createData) {
+        createData.userSession = newSession.id;
+      }
+    }
+
     if (createData) {
       const record = await pb.collection<Meal>("meals").create(createData, {
         expand: USER_SESSION_MEAL_EXPAND,
