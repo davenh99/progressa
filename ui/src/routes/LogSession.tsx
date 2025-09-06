@@ -85,8 +85,8 @@ const LogSession: Component = () => {
   };
 
   const _getSessionByID = async () => {
-    if (fromDateNav) {
-      fromDateNav = false;
+    if (setSessionFromDate) {
+      setSessionFromDate = false;
       return; // skip refetch
     }
     if (params.id) {
