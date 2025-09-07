@@ -5,14 +5,14 @@ import { Router, Route } from "@solidjs/router";
 
 import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
-import Auth from "./routes/Auth";
-import Sessions from "./routes/Sessions";
 import { ThemeProvider } from "./config/theme";
-import LogSession from "./routes/LogSession";
-import Profile from "./routes/Profile";
+import AppLayout from "./views/AppLayout";
 
-const Home = lazy(() => import("./routes/Home"));
 const NotFound = lazy(() => import("./routes/NotFound"));
+const Auth = lazy(() => import("./routes/Auth"));
+const LogSession = lazy(() => import("./routes/LogSession"));
+const Sessions = lazy(() => import("./routes/Sessions"));
+const Profile = lazy(() => import("./routes/Profile"));
 
 const root = document.getElementById("root");
 
@@ -44,15 +44,17 @@ function Content() {
       <Show when={!!store.user} fallback={<Auth />}>
         <Show when={!store.networkError} fallback={<p>Network Error, could not connect to server.</p>}>
           <Router>
-            <Route path="/" component={Home} />
-            <Route path="/auth" component={Auth} />
-            <Route path="/profile" component={Profile} />
-            <Route path="/workouts">
+            <Route path="/" component={AppLayout}>
               <Route path="/" component={Sessions} />
-              <Route path="/log" component={LogSession} />
-              <Route path="/log/:id" component={LogSession} />
+              <Route path="/profile" component={Profile} />
+              <Route path="/log">
+                <Route path="/" component={LogSession} />
+                <Route path="/:id" component={LogSession} />
+              </Route>
+              <Route path="/*paramName" component={NotFound} />
             </Route>
-            <Route path="/*paramName" component={NotFound} />
+
+            <Route path="/auth" component={Auth} />
           </Router>
         </Show>
       </Show>

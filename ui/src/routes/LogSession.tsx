@@ -4,7 +4,6 @@ import { createStore } from "solid-js/store";
 import { useNavigate, useParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
-import Header from "../views/Header";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
 import Container from "../views/Container";
 import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
@@ -20,7 +19,7 @@ const LogSession: Component = () => {
   const navigate = useNavigate();
   const params = useParams();
   let setSessionFromDate = false;
-  
+
   const createSession = async (field?: string, newVal?: any) => {
     const createData: UserSessionCreateData = {
       name: "",
@@ -40,7 +39,7 @@ const LogSession: Component = () => {
       const newSession = await pb.collection<UserSession>("userSessions").create(createData);
       setSession({ session: newSession });
 
-      navigate(`/workouts/log/${newSession.id}`, { replace: true });
+      navigate(`/log/${newSession.id}`, { replace: true });
       return newSession;
     } catch (e) {
       console.log(e);
@@ -65,6 +64,7 @@ const LogSession: Component = () => {
   };
 
   const _getSessionByDate = async (date: string) => {
+    // console.log(`getting session by date: ${date}`);
     setLoading(true);
 
     try {
@@ -72,10 +72,10 @@ const LogSession: Component = () => {
       if (s) {
         setSessionFromDate = true;
         setSession("session", s);
-        navigate(`/workouts/log/${s.id}`, { replace: true });
+        navigate(`/log/${s.id}`, { replace: true });
       } else {
         setSession("session", null);
-        navigate(`/workouts/log`, { replace: true });
+        navigate(`/log`, { replace: true });
       }
     } catch (err) {
       console.log(err);
@@ -85,6 +85,7 @@ const LogSession: Component = () => {
   };
 
   const _getSessionByID = async () => {
+    // console.log(`getting session by id: ${params.id}, fromdate?: ${setSessionFromDate}`);
     if (setSessionFromDate) {
       setSessionFromDate = false;
       return; // skip refetch
@@ -97,7 +98,7 @@ const LogSession: Component = () => {
         if (s) {
           setDate(s.userDay);
         } else {
-          navigate(`/workouts/log`, { replace: true });
+          navigate(`/log`, { replace: true });
         }
       } catch (e) {
         if (e instanceof ClientResponseError && e.status === 0) {
@@ -109,13 +110,14 @@ const LogSession: Component = () => {
         setLoading(false);
       }
     }
-  }
+  };
 
   createEffect(() => {
     _getSessionByID();
   });
 
   onMount(() => {
+    // console.log("on mount called");
     if (!params.id) {
       _getSessionByDate(date());
     }
@@ -123,7 +125,6 @@ const LogSession: Component = () => {
 
   return (
     <>
-      <Header />
       <Container>
         <Input
           label="Date"

@@ -2,8 +2,8 @@ import { Component, createSignal, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import Header from "../views/Header";
 import { DataInput } from "../components";
+import Container from "../views/Container";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
@@ -13,8 +13,7 @@ const Profile: Component = () => {
 
   return (
     <>
-      <Header />
-      <div class="container mx-auto p-4">
+      <Container>
         <div class="bg-base-100 rounded-lg shadow p-6 mb-6">
           <h2 class="text-2xl font-bold mb-4">Profile</h2>
           <div>
@@ -60,7 +59,7 @@ const Profile: Component = () => {
             </button>
           </div>
         </div>
-      </div>
+      </Container>
     </>
   );
 };

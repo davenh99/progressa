@@ -1,4 +1,4 @@
-import { Accessor, createSignal, ParentComponent } from "solid-js";
+import { ParentComponent } from "solid-js";
 import { Select as KobalteSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
 import UpDown from "lucide-solid/icons/chevrons-up-down";

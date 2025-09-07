@@ -25,7 +25,7 @@ export const UserSessionList: Component = (props) => {
       id: "more-info",
       header: "",
       cell: (ctx) => (
-        <a href={`/workouts/log/${ctx.row.original.id}`}>
+        <a href={`/log/${ctx.row.original.id}`}>
           <ArrowRight />
         </a>
       ),

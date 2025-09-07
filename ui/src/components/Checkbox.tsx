@@ -1,4 +1,4 @@
-import { createEffect, createSignal, ParentComponent, Show } from "solid-js";
+import { ParentComponent, Show } from "solid-js";
 import { Checkbox as KobalteCheckbox } from "@kobalte/core/checkbox";
 import Check from "lucide-solid/icons/check";
 
