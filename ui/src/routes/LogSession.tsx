@@ -10,6 +10,7 @@ import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Typ
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import { ClientResponseError } from "pocketbase";
+import LogSessionNav from "../views/LogSessionNav";
 
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(false);
@@ -126,6 +127,10 @@ const LogSession: Component = () => {
   return (
     <>
       <Container>
+        <header class="p-4 border-b bg-white">
+          <h1 class="text-xl font-bold">Log Session</h1>
+          <p>{session.session?.name ?? ""}</p>
+        </header>
         <Input
           label="Date"
           type="date"
@@ -138,49 +143,9 @@ const LogSession: Component = () => {
         />
 
         <Show when={!loading()} fallback={<Loading />}>
-          <div class="space-y-2">
-            <DataInput
-              label="Session Name"
-              value={session.session?.name ?? `Workout on ${date()}`}
-              onValueChange={(v) => setSession("session", "name", v as string)}
-              type="text"
-              saveFunc={(v) => sessionUpdate(params.id, "name", v)}
-            />
+          <Tabs>
+            <LogSessionNav />
 
-            <DataInput
-              label="your weight this day:"
-              type="number"
-              value={session.session?.userWeight ?? user.weight}
-              onValueChange={(v) => setSession("session", "userWeight", Number(v))}
-              saveFunc={(v) => updateWeight(v as number)}
-            />
-
-            <DataTextArea
-              label="Notes"
-              value={session.session?.notes ?? ""}
-              onValueChange={(v) => setSession("session", "notes", v)}
-              saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
-            />
-
-            <TagArea
-              tags={session.session?.expand?.tags ?? []}
-              setTags={(tags) => setSession("session", "expand", "tags", tags)}
-              modelName="userSessions"
-              recordID={params.id}
-              updateRecord={(_, recordID, column, newVal) => sessionUpdate(recordID, column, newVal)}
-            />
-          </div>
-
-          <Tabs class="mt-5">
-            <Tabs.List class="border-b-1">
-              <Tabs.Trigger value="exercises" class="p-2 hover:bg-ash-gray-600">
-                Exercises
-              </Tabs.Trigger>
-              <Tabs.Trigger value="meals-sleep" class="p-2 hover:bg-ash-gray-600">
-                Meals + Sleep
-              </Tabs.Trigger>
-              <Tabs.Indicator />
-            </Tabs.List>
             <Tabs.Content value="exercises">
               <div class="m-10">
                 <UserSessionExerciseList
@@ -191,6 +156,7 @@ const LogSession: Component = () => {
                 />
               </div>
             </Tabs.Content>
+
             <Tabs.Content value="meals-sleep">
               <div class="m-10">
                 <div>
@@ -206,6 +172,42 @@ const LogSession: Component = () => {
                   sessionID={params.id}
                   sessionDay={date}
                   createSession={createSession}
+                />
+              </div>
+            </Tabs.Content>
+
+            <Tabs.Content value="settings">
+              <div class="m-10 space-y-2">
+                <DataInput
+                  label="Session Name"
+                  // TODO below doesn't save to db, bad design
+                  value={session.session?.name ?? `Workout on ${date()}`}
+                  onValueChange={(v) => setSession("session", "name", v as string)}
+                  type="text"
+                  saveFunc={(v) => sessionUpdate(params.id, "name", v)}
+                />
+
+                <DataInput
+                  label="your weight this day:"
+                  type="number"
+                  value={session.session?.userWeight ?? user.weight}
+                  onValueChange={(v) => setSession("session", "userWeight", Number(v))}
+                  saveFunc={(v) => updateWeight(v as number)}
+                />
+
+                <DataTextArea
+                  label="Notes"
+                  value={session.session?.notes ?? ""}
+                  onValueChange={(v) => setSession("session", "notes", v)}
+                  saveFunc={(v: string) => sessionUpdate(params.id, "notes", v)}
+                />
+
+                <TagArea
+                  tags={session.session?.expand?.tags ?? []}
+                  setTags={(tags) => setSession("session", "expand", "tags", tags)}
+                  modelName="userSessions"
+                  recordID={params.id}
+                  updateRecord={(_, recordID, column, newVal) => sessionUpdate(recordID, column, newVal)}
                 />
               </div>
             </Tabs.Content>
