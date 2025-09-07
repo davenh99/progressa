@@ -28,7 +28,7 @@ const AuthEmail: Component = () => {
       if (isCreatingAccount()) {
         await signUp(email(), username(), password(), passwordConfirm());
       } else {
-        await login(username(), password());
+        await login(email() ?? username(), password());
       }
     } catch (err: any) {
       setError(err.message);
@@ -68,7 +68,7 @@ const AuthEmail: Component = () => {
 
         <div>
           <label for="email">{isCreatingAccount() ? "email" : "email or username"}</label>
-          <input type="email" id="email" value={email()} onInput={(e) => setEmail(e.target.value)} required />
+          <input type={isCreatingAccount() ? "email" : "text"} id="email" value={email()} onInput={(e) => setEmail(e.target.value)} required />
         </div>
 
         <div>
