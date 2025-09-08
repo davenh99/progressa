@@ -122,13 +122,11 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const expandAtInd = (index: number) => {
-    setMealRows("rows", (rows) =>
-      rows.map((row, ind) => (ind === index ? { ...row, expanded: true } : { ...row, expanded: false }))
-    );
+    setMealRows("rows", (_, i) => i === index, "expanded", true);
   };
 
   const collapse = () => {
-    setMealRows("rows", (rows) => rows.map((row) => ({ ...row, expanded: false })));
+    setMealRows("rows", (r) => r.expanded, "expanded", false);
   };
 
   const columns = createMemo<ColumnDef<MealRow>[]>(() => [
