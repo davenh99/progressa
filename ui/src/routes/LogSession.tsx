@@ -23,7 +23,7 @@ const LogSession: Component = () => {
 
   const createSession = async (field?: string, newVal?: any) => {
     const createData: UserSessionCreateData = {
-      name: "",
+      name: `Workout on ${date()}`,
       notes: "",
       tags: [],
       user: user.id,
