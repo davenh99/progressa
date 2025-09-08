@@ -1,4 +1,4 @@
-import { Accessor, Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Trash from "lucide-solid/icons/trash-2";
@@ -7,7 +7,7 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
+import { UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
 import { Button, DataInput, DataSlider, DataSelect, IconButton, DataTime } from "../../components";
 import {
   DraggableRow,
@@ -29,8 +29,6 @@ export interface SessionExerciseRow {
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
-  sessionDay: Accessor<string>;
-  createSession: (field?: string | undefined, newVal?: any) => Promise<UserSession | null>;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
@@ -136,14 +134,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     duplicateInds?: number[],
     createData?: UserSessionExerciseCreateData
   ) => {
-    if (!props.sessionID) {
-      const newSession = await props.createSession();
-
-      if (newSession && createData) {
-        createData.userSession = newSession.id;
-      }
-    }
-
     if (createData) {
       const record = await pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
         expand: USER_SESSION_EXERCISE_EXPAND,

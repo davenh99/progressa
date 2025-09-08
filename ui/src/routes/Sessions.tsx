@@ -1,4 +1,5 @@
 import { Component } from "solid-js";
+import { A } from "@solidjs/router";
 
 import { UserSessionList } from "../views/data";
 import Container from "../views/Container";
@@ -8,9 +9,9 @@ const Sessions: Component = () => {
     <Container>
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold">Your Workout Sessions</h3>
-        <a href="/log" class="btn btn-primary">
+        <A href="/log" class="btn btn-primary">
           Log workout
-        </a>
+        </A>
       </div>
       <UserSessionList />
     </Container>

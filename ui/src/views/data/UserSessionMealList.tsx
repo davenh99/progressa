@@ -1,10 +1,10 @@
-import { Accessor, Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
-import { Meal, Tag, UserSession } from "../../../Types";
+import { Meal } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, DataInput } from "../../components";
 import CopyMealModal from "../CopyMealModal";
@@ -20,8 +20,6 @@ export interface MealRow {
 interface Props {
   meals: Meal[];
   sessionID: string;
-  sessionDay: Accessor<string>;
-  createSession: (field?: string | undefined, newVal?: any) => Promise<UserSession | null>;
 }
 
 export const MealList: Component<Props> = (props) => {
@@ -91,14 +89,6 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const addRowAtIndex = async (index: number, duplicateInd?: number, createData?: { [k: string]: any }) => {
-    if (!props.sessionID) {
-      const newSession = await props.createSession();
-
-      if (newSession && createData) {
-        createData.userSession = newSession.id;
-      }
-    }
-
     if (createData) {
       const record = await pb.collection<Meal>("meals").create(createData, {
         expand: USER_SESSION_MEAL_EXPAND,

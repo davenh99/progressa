@@ -1,4 +1,5 @@
 import { Component, createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { A } from "@solidjs/router";
 import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
@@ -25,9 +26,9 @@ export const UserSessionList: Component = (props) => {
       id: "more-info",
       header: "",
       cell: (ctx) => (
-        <a href={`/log/${ctx.row.original.id}`}>
+        <A href={`/log?date=${ctx.row.original.userDay}`}>
           <ArrowRight />
-        </a>
+        </A>
       ),
     },
   ]);

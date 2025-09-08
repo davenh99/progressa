@@ -107,20 +107,6 @@ export function useAuthPB() {
     return newSession;
   };
 
-  const getSessionByID = async (id: string): Promise<UserSession | null> => {
-    try {
-      return userSessionToSortedExercises(
-        await pb.collection<UserSession>("userSessions").getOne(id, { expand: USER_SESSION_EXPAND })
-      );
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-      } else {
-        throw e;
-      }
-      return null;
-    }
-  };
-
   const getSessionByDate = async (date: string): Promise<UserSession | null> => {
     try {
       return userSessionToSortedExercises(
@@ -137,5 +123,5 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getUserSessions, updateRecord, getSessionByID, getSessionByDate };
+  return { pb, user, logout, getUserSessions, updateRecord, getSessionByDate };
 }

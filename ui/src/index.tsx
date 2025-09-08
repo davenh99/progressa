@@ -47,14 +47,11 @@ function Content() {
             <Route path="/" component={AppLayout}>
               <Route path="/" component={Sessions} />
               <Route path="/profile" component={Profile} />
-              <Route path="/log">
-                <Route path="/" component={LogSession} />
-                <Route path="/:id" component={LogSession} />
-              </Route>
-              <Route path="/*paramName" component={NotFound} />
+              <Route path="/log" component={LogSession} />
             </Route>
 
             <Route path="/auth" component={Auth} />
+            <Route path="/*paramName" component={NotFound} />
           </Router>
         </Show>
       </Show>
