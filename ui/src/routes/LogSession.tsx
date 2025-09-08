@@ -1,7 +1,7 @@
 import { Component, createEffect, createSignal, onMount, Show, untrack } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore } from "solid-js/store";
-import { useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams, useLocation } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
@@ -17,9 +17,9 @@ const LogSession: Component = () => {
   const [session, setSession] = createStore<{ session: UserSession | null }>({ session: null });
   const [date, setDate] = createSignal<string>(new Date().toLocaleDateString("en-CA"));
   const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
+  const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
-  let setSessionFromDate = false;
 
   const createSession = async (field?: string, newVal?: any) => {
     const createData: UserSessionCreateData = {
@@ -71,9 +71,8 @@ const LogSession: Component = () => {
     try {
       const s = await getSessionByDate(date);
       if (s) {
-        setSessionFromDate = true;
         setSession("session", s);
-        navigate(`/log/${s.id}`, { replace: true });
+        navigate(`/log/${s.id}`, { replace: true, state: { skipFetch: true } });
       } else {
         setSession("session", null);
         navigate(`/log`, { replace: true });
@@ -87,11 +86,11 @@ const LogSession: Component = () => {
 
   const _getSessionByID = async () => {
     // console.log(`getting session by id: ${params.id}, fromdate?: ${setSessionFromDate}`);
-    if (setSessionFromDate) {
-      setSessionFromDate = false;
-      return; // skip refetch
-    }
     if (params.id) {
+      if (location.state?.skipFetch) {
+        navigate(location.pathname, { replace: true, state: {} });
+        return;
+      }
       setLoading(true);
       try {
         const s = await getSessionByID(params.id);
