@@ -1,10 +1,14 @@
 import { ParentComponent } from "solid-js";
-import { A } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import Home from "lucide-solid/icons/home";
 import ClipboardList from "lucide-solid/icons/clipboard-list";
 import User from "lucide-solid/icons/user";
 
 export const AppLayout: ParentComponent = (props) => {
+  const location = useLocation();
+
+  const isLogActive = () => location.pathname.startsWith("/log");
+
   return (
     <div class="flex h-screen">
       {/* Sidebar (desktop global nav) */}
@@ -13,7 +17,15 @@ export const AppLayout: ParentComponent = (props) => {
           <Home size={24} />
           <p>History</p>
         </A>
-        <A href="/log" class="hover:text-gray-300 flex flex-row space-x-2 mx-4">
+        <A
+          href="/log"
+          class="hover:text-gray-300 flex flex-row space-x-2 mx-4"
+          onClick={(e) => {
+            if (isLogActive()) {
+              e.preventDefault();
+            }
+          }}
+        >
           <ClipboardList size={24} />
           <p>Log</p>
         </A>
@@ -31,7 +43,15 @@ export const AppLayout: ParentComponent = (props) => {
         <A href="/" class="flex flex-col items-center">
           <Home size={20} />
         </A>
-        <A href="/log" class="flex flex-col items-center">
+        <A
+          href="/log"
+          class="flex flex-col items-center"
+          onClick={(e) => {
+            if (isLogActive()) {
+              e.preventDefault();
+            }
+          }}
+        >
           <ClipboardList size={20} />
         </A>
         <A href="/profile" class="flex flex-col items-center">
