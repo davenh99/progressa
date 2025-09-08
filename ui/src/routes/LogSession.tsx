@@ -1,7 +1,7 @@
 import { Component, createEffect, createSignal, onMount, Show, untrack } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore } from "solid-js/store";
-import { useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams, useLocation } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector } from "../components";
@@ -17,6 +17,7 @@ const LogSession: Component = () => {
   const [session, setSession] = createStore<{ session: UserSession | null }>({ session: null });
   const [date, setDate] = createSignal<string>(new Date().toLocaleDateString("en-CA"));
   const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
+  const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
 
@@ -86,8 +87,8 @@ const LogSession: Component = () => {
   const _getSessionByID = async () => {
     // console.log(`getting session by id: ${params.id}, fromdate?: ${setSessionFromDate}`);
     if (params.id) {
-      if ((history.state as any)?.skipFetch) {
-        history.replaceState({}, ""); // clear the flag
+      if (location.state?.skipFetch) {
+        navigate(location.pathname, { replace: true, state: {} });
         return;
       }
       setLoading(true);
