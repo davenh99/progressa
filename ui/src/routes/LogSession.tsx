@@ -19,7 +19,6 @@ const LogSession: Component = () => {
   const { pb, user, updateRecord, getSessionByDate, getSessionByID } = useAuthPB();
   const navigate = useNavigate();
   const params = useParams();
-  let setSessionFromDate = false;
 
   const createSession = async (field?: string, newVal?: any) => {
     const createData: UserSessionCreateData = {
@@ -71,9 +70,8 @@ const LogSession: Component = () => {
     try {
       const s = await getSessionByDate(date);
       if (s) {
-        setSessionFromDate = true;
         setSession("session", s);
-        navigate(`/log/${s.id}`, { replace: true });
+        navigate(`/log/${s.id}`, { replace: true, state: { skipFetch: true } });
       } else {
         setSession("session", null);
         navigate(`/log`, { replace: true });
@@ -87,11 +85,11 @@ const LogSession: Component = () => {
 
   const _getSessionByID = async () => {
     // console.log(`getting session by id: ${params.id}, fromdate?: ${setSessionFromDate}`);
-    if (setSessionFromDate) {
-      setSessionFromDate = false;
-      return; // skip refetch
-    }
     if (params.id) {
+      if ((history.state as any)?.skipFetch) {
+        history.replaceState({}, ""); // clear the flag
+        return;
+      }
       setLoading(true);
       try {
         const s = await getSessionByID(params.id);
