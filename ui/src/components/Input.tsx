@@ -1,6 +1,7 @@
 import { ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
 import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
+import { debounce } from "../methods/debounce";
 
 interface ExtraProps {
   label?: string;
@@ -37,15 +38,12 @@ export const DataInput: ParentComponent<DataProps> = (props) => {
   return (
     <Input
       value={props.value}
-      onBlur={() => props.saveFunc(props.value)}
       onInput={(e) => {
         const target = e.currentTarget as HTMLInputElement;
         const value = props.type === "number" ? Number(target.value) : target.value;
 
         props.onValueChange(value);
-        if (props.type === "number") {
-          props.saveFunc(value);
-        }
+        debounce(props.saveFunc)(value);
       }}
       label={props.label}
       type={props.type}

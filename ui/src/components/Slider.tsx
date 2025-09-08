@@ -1,5 +1,6 @@
 import { createEffect, createSignal, ParentComponent } from "solid-js";
 import { Slider as KobalteSlider } from "@kobalte/core/slider";
+import { debounce } from "../methods/debounce";
 
 interface Props {
   label: string;
@@ -43,8 +44,8 @@ export const DataSlider: ParentComponent<DataProps> = (props) => {
       label={props.label || ""}
       value={props.value}
       onChange={(v: number) => {
-        props.saveFunc(v);
         props.onValueChange(v);
+        debounce(props.saveFunc)(v);
       }}
     />
   );

@@ -1,5 +1,6 @@
 import { createSignal, createEffect, ParentComponent, For } from "solid-js";
 import { SleepQuality } from "../../Types";
+import { debounce } from "../methods/debounce";
 
 interface EmojiOption {
   emoji: string;
@@ -55,8 +56,8 @@ export const DataSleepQualitySelector: ParentComponent<DataProps> = (props) => {
       <SleepQualitySelector
         value={props.value}
         onChange={(v) => {
-          props.saveFunc(v);
           props.onValueChange(v);
+          debounce(props.saveFunc)(v);
         }}
       />
     </div>
