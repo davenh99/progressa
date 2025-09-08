@@ -89,7 +89,7 @@ export function useAuthPB() {
         .update(recordID, data, { requestKey: `${collectionName}.${recordID}.${field}` });
       return record as T;
     } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 0) {
+      if (e instanceof ClientResponseError && e.isAbort) {
       } else {
         throw e;
       }
