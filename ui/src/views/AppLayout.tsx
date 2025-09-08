@@ -41,7 +41,7 @@ export const AppLayout: ParentComponent = (props) => {
       {/* Bottom nav (mobile global nav) */}
       <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white flex justify-around py-2 border-t border-gray-800">
         <A href="/" class="flex flex-col items-center">
-          <Home size={20} />
+          <Home size={30} />
         </A>
         <A
           href="/log"
@@ -52,10 +52,10 @@ export const AppLayout: ParentComponent = (props) => {
             }
           }}
         >
-          <ClipboardList size={20} />
+          <ClipboardList size={30} />
         </A>
         <A href="/profile" class="flex flex-col items-center">
-          <User size={20} />
+          <User size={30} />
         </A>
       </nav>
     </div>

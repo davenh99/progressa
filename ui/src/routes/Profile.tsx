@@ -15,7 +15,7 @@ const Profile: Component = () => {
     <>
       <Container>
         <div class="bg-base-100 rounded-lg shadow p-6 mb-6">
-          <h2 class="text-2xl font-bold mb-4">Profile</h2>
+          <h1 class="text-2xl font-bold mb-4">Profile</h1>
           <div>
             <h4 class="text-xl font-semibold">Logged in as {user.name}</h4>
             <h5 class="text-lg font-medium mt-4">Stats</h5>

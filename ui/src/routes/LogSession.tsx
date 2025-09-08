@@ -108,7 +108,7 @@ const LogSession: Component = () => {
               </>
             }
           >
-            <Tabs>
+            <Tabs aria-label="Log session navigation" class="w-full">
               <LogSessionNav />
 
               <Tabs.Content value="exercises">

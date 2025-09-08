@@ -1,44 +1,40 @@
-import { ParentComponent } from "solid-js";
+import { Component, ParentComponent } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import Dumbbell from "lucide-solid/icons/dumbbell";
 import Utensils from "lucide-solid/icons/utensils";
 import Settings from "lucide-solid/icons/settings";
 
-export const LogSessionNav: ParentComponent = (props) => {
+export const LogSessionNav: Component = () => {
   return (
-    <>
-      {/* mobile */}
-      <Tabs.List class="sm:hidden flex justify-around border-b bg-white py-2">
-        <Tabs.Trigger value="exercises" class="p-2 hover:bg-ash-gray-600">
-          <Dumbbell size={20} />
-        </Tabs.Trigger>
-        <Tabs.Trigger value="meals-sleep" class="p-2 hover:bg-ash-gray-600">
-          <Utensils size={20} />
-        </Tabs.Trigger>
-        <Tabs.Trigger value="settings" class="p-2 hover:bg-ash-gray-600">
-          <Settings size={20} />
-        </Tabs.Trigger>
-        <Tabs.Indicator />
+    <div class="sm:px-[15vw] px-4 border-b bg-white">
+      <Tabs.List class="relative flex justify-between">
+        <TabTrigger value="exercises" label="Exercises">
+          <Dumbbell size={30} />
+        </TabTrigger>
+        <TabTrigger value="meals-sleep" label="Meals">
+          <Utensils size={30} />
+        </TabTrigger>
+        <TabTrigger value="settings" label="Settings">
+          <Settings size={30} />
+        </TabTrigger>
+        <Tabs.Indicator class="absolute bottom-0 h-0.5 bg-blue-500 transition-all duration-250" />
       </Tabs.List>
-
-      {/* desktop */}
-      <Tabs.List class="hidden sm:flex border-b bg-white px-4 space-x-6">
-        <Tabs.Trigger value="exercises" class="p-2 hover:bg-ash-gray-600">
-          <Dumbbell size={20} />
-          <p>Exercises</p>
-        </Tabs.Trigger>
-        <Tabs.Trigger value="meals-sleep" class="p-2 hover:bg-ash-gray-600">
-          <Utensils size={20} />
-          <p>Meals</p>
-        </Tabs.Trigger>
-        <Tabs.Trigger value="settings" class="p-2 hover:bg-ash-gray-600">
-          <Settings size={20} />
-          <p>Settings</p>
-        </Tabs.Trigger>
-        <Tabs.Indicator />
-      </Tabs.List>
-    </>
+    </div>
   );
 };
 
 export default LogSessionNav;
+
+interface TabTriggerProps {
+  label: string;
+  value: string;
+}
+
+const TabTrigger: ParentComponent<TabTriggerProps> = (props) => {
+  return (
+    <Tabs.Trigger value={props.value} class="flex flex-col items-center p-2 hover:bg-ash-gray-600 w-20">
+      {props.children}
+      <p class="hidden sm:flex">{props.label}</p>
+    </Tabs.Trigger>
+  );
+};
