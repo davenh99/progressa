@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
+import { A } from "@solidjs/router";
+
 import { useAuthPB } from "../config/pocketbase";
-import { Link } from "@kobalte/core/link";
 
 export const Header: Component = () => {
   const { user } = useAuthPB();
@@ -10,14 +11,14 @@ export const Header: Component = () => {
       <header class="w-[85vw] bg-primary-light rounded-md">
         <div class="flex flex-row mx-[2rem] my-[1rem] justify-between items-center">
           <div>
-            <Link href="/">
+            <A href="/">
               <h1 class="bg-text-primary-light">Workouter</h1>
-            </Link>
+            </A>
           </div>
           <div>
-            <Link href="/profile">
+            <A href="/profile">
               <p>profile: {user.name}</p>
-            </Link>
+            </A>
           </div>
         </div>
       </header>

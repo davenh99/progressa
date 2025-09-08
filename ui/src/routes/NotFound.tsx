@@ -1,5 +1,6 @@
 import { Component } from "solid-js";
-import { Link } from "@kobalte/core/link";
+import { A } from "@solidjs/router";
+
 import Container from "../views/Container";
 
 const NotFound: Component = () => {
@@ -7,9 +8,9 @@ const NotFound: Component = () => {
     <div>
       <Container>
         <p>You appear to be lost</p>
-        <Link href="/">
+        <A href="/">
           <p>take me back home</p>
-        </Link>
+        </A>
       </Container>
     </div>
   );
