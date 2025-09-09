@@ -11,6 +11,7 @@ import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import LogSessionNav from "../views/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
+import SectionHeader from "../views/SectionHeader";
 
 type SearchParams = {
   date: string;
@@ -89,14 +90,17 @@ const LogSession: Component = () => {
   return (
     <>
       <Container>
-        <header class="p-4 border-b bg-white flex flex-row justify-between">
-          <h1 class="text-xl font-bold">Log Session</h1>
-          <Input
-            type="date"
-            value={searchParams.date}
-            onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
-          />
-        </header>
+        <SectionHeader>
+          <div class="flex flex-row justify-between">
+            <h1 class="text-xl font-bold">Log Session</h1>
+            <Input
+              type="date"
+              class="rounded-md bg-cambridge-blue-800 px-2 py-1"
+              value={searchParams.date}
+              onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
+            />
+          </div>
+        </SectionHeader>
 
         <Show when={!loading()} fallback={<Loading />}>
           <Show

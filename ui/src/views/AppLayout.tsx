@@ -39,7 +39,7 @@ export const AppLayout: ParentComponent = (props) => {
       <main class="flex-1 overflow-y-auto bg-gray-100">{props.children}</main>
 
       {/* Bottom nav (mobile global nav) */}
-      <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white flex justify-around py-2 border-t border-gray-800">
+      <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white flex justify-around py-4 border-t border-gray-800">
         <A href="/" class="flex flex-col items-center">
           <Home size={30} />
         </A>

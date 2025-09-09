@@ -1,18 +1,19 @@
 import { Component } from "solid-js";
-import { A } from "@solidjs/router";
 
 import { UserSessionList } from "../views/data";
 import Container from "../views/Container";
+import { Button } from "../components";
+import SectionHeader from "../views/SectionHeader";
 
 const Sessions: Component = () => {
   return (
     <Container>
-      <div class="flex justify-between items-center mb-4">
-        <h1 class="text-xl font-bold">Your Workout Sessions</h1>
-        <A href="/log" class="btn btn-primary">
-          Log workout
-        </A>
-      </div>
+      <SectionHeader>
+        <div class="flex justify-between items-center">
+          <h1 class="text-xl font-bold">Your Workout Sessions</h1>
+          <Button href="/log">Log workout</Button>
+        </div>
+      </SectionHeader>
       <UserSessionList />
     </Container>
   );

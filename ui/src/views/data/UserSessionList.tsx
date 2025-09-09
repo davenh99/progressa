@@ -22,15 +22,15 @@ export const UserSessionList: Component = (props) => {
       header: "Date",
       cell: (ctx) => new Date(ctx.getValue<string>()).toLocaleDateString(),
     },
-    {
-      id: "more-info",
-      header: "",
-      cell: (ctx) => (
-        <A href={`/log?date=${ctx.row.original.userDay}`}>
-          <ArrowRight />
-        </A>
-      ),
-    },
+    // {
+    //   id: "select",
+    //   header: "",
+    //   cell: (ctx) => (
+    //     <A >
+    //       <ArrowRight />
+    //     </A>
+    //   ),
+    // },
   ]);
 
   const table = createSolidTable({
@@ -57,33 +57,32 @@ export const UserSessionList: Component = (props) => {
 
   return (
     <Show when={!!sessions()} fallback={<Loading />}>
-      <div class="bg-base-100 rounded-lg shadow p-6">
-        <div class="overflow-x-auto">
-          <table class="table w-full">
-            <thead>
-              <For each={table.getHeaderGroups()}>
-                {(headerGroup) => (
-                  <tr>
-                    <For each={headerGroup.headers}>
-                      {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
-                    </For>
-                  </tr>
+      <div class="p-4 w-full">
+        <For each={table.getHeaderGroups()}>
+          {(headerGroup) => (
+            <div class="flex flex-row w-full justify-between">
+              <For each={headerGroup.headers}>
+                {(header) => (
+                  <div class="text-left font-bold">
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </div>
                 )}
               </For>
-            </thead>
-            <tbody>
-              <For each={table.getRowModel().rows}>
-                {(row) => (
-                  <tr class="hover">
-                    <For each={row.getVisibleCells()}>
-                      {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
-                    </For>
-                  </tr>
-                )}
+            </div>
+          )}
+        </For>
+        <For each={table.getRowModel().rows}>
+          {(row) => (
+            <A
+              href={`/log?date=${row.original.userDay}`}
+              class="hover flex flex-row w-full justify-between py-2 border-b-2 border-ash-gray-800"
+            >
+              <For each={row.getVisibleCells()}>
+                {(cell) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>}
               </For>
-            </tbody>
-          </table>
-        </div>
+            </A>
+          )}
+        </For>
         {sessions().length === 0 && <div class="text-center py-4">No sessions found</div>}
       </div>
     </Show>

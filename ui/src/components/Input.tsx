@@ -19,8 +19,8 @@ export const Input: ParentComponent<InputProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${local.class ?? ""} input input-bordered border-1 rounded-sm ${
-          others.type === "number" ? "w-14 text-center" : "w-full"
+        class={`${local.class ?? ""} input outline-none ${
+          others.type === "number" ? "w-16 text-center focus:border-b-1" : "w-full"
         }`}
         {...others}
       />
