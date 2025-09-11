@@ -1,7 +1,6 @@
 import { Component, createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { A } from "@solidjs/router";
 import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
-import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import { UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
@@ -22,15 +21,6 @@ export const UserSessionList: Component = (props) => {
       header: "Date",
       cell: (ctx) => new Date(ctx.getValue<string>()).toLocaleDateString(),
     },
-    // {
-    //   id: "select",
-    //   header: "",
-    //   cell: (ctx) => (
-    //     <A >
-    //       <ArrowRight />
-    //     </A>
-    //   ),
-    // },
   ]);
 
   const table = createSolidTable({
@@ -57,7 +47,7 @@ export const UserSessionList: Component = (props) => {
 
   return (
     <Show when={!!sessions()} fallback={<Loading />}>
-      <div class="p-4 w-full">
+      <div class="w-full">
         <For each={table.getHeaderGroups()}>
           {(headerGroup) => (
             <div class="flex flex-row w-full justify-between">
@@ -75,7 +65,7 @@ export const UserSessionList: Component = (props) => {
           {(row) => (
             <A
               href={`/log?date=${row.original.userDay}`}
-              class="hover flex flex-row w-full justify-between py-2 border-b-2 border-ash-gray-800"
+              class="hover:bg-ash-gray-800 flex flex-row w-full justify-between py-2 border-b-2 border-ash-gray-800"
             >
               <For each={row.getVisibleCells()}>
                 {(cell) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>}

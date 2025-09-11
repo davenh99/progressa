@@ -14,11 +14,11 @@ const Profile: Component = () => {
 
   return (
     <>
+      <SectionHeader>
+        <h1 class="text-2xl font-bold">Profile</h1>
+      </SectionHeader>
       <Container>
-        <SectionHeader>
-          <h1 class="text-2xl font-bold">Profile</h1>
-        </SectionHeader>
-        <div class="flex flex-col p-4">
+        <div class="flex flex-col">
           <h2 class="text-xl font-semibold">{user.name}</h2>
           <div class="flex flex-col space-y-2 mt-2">
             <p>Email: {user.email}</p>

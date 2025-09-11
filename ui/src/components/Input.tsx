@@ -7,7 +7,7 @@ interface ExtraProps {
   label?: string;
 }
 
-export type InputProps<T extends ValidComponent = "input"> = ExtraProps &
+type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
 export const Input: ParentComponent<InputProps> = (props) => {
@@ -19,9 +19,11 @@ export const Input: ParentComponent<InputProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${local.class ?? ""} input outline-none ${
-          others.type === "number" ? "w-16 text-center focus:border-b-1" : "w-full"
-        }`}
+        class={`input outline-none ${
+          others.type === "number"
+            ? "w-16 text-right focus:border-b-1"
+            : "w-full border-2 border-ash-gray-400 rounded-sm px-2 py-1"
+        } ${local.class ?? ""}`}
         {...others}
       />
     </TextField>

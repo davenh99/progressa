@@ -1,25 +1,34 @@
-import { JSX, ParentComponent, Show } from "solid-js";
-import { TextField } from "@kobalte/core/text-field";
+import { ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
+import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
+import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
 
-interface Props {
+interface ExtraProps {
   label?: string;
-  value?: string;
-  onInput?: JSX.EventHandlerUnion<HTMLTextAreaElement, InputEvent>;
 }
 
-export const TextArea: ParentComponent<Props> = (props) => {
+type TextAreaProps<T extends ValidComponent = "input"> = ExtraProps &
+  PolymorphicProps<T, TextFieldInputProps<T>>;
+
+export const TextArea: ParentComponent<TextAreaProps> = (props) => {
+  const [local, others] = splitProps(props, ["label", "class"]);
+
   return (
     <TextField>
-      <Show when={props.label}>
-        <TextField.Label>{props.label}</TextField.Label>
+      <Show when={local.label}>
+        <TextField.Label>{local.label}</TextField.Label>
       </Show>
-      <TextField.TextArea type="text" value={props.value} onInput={props.onInput} />
+      <TextField.TextArea
+        class={`${
+          local.class ?? ""
+        } w-full resize-none border-2 border-ash-gray-400 rounded-sm overflow-hidden`}
+        {...others}
+      />
     </TextField>
   );
 };
 
-interface DataProps extends Props {
+interface DataProps extends TextAreaProps {
   value: string;
   onValueChange: (v: string) => void;
   saveFunc: (v: string) => Promise<any>;

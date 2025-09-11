@@ -1,4 +1,4 @@
-import { Component, For, JSX } from "solid-js";
+import { Component, createSignal, For, JSX } from "solid-js";
 import { Button as KobalteButton } from "@kobalte/core/button";
 import CloseIcon from "lucide-solid/icons/x";
 
@@ -14,10 +14,10 @@ interface Props {
 
 export const Tag: Component<Props> = (props) => {
   return (
-    <div class="badge border-1 rounded-full p-2 flex flex-row">
-      {props.name}
-      <KobalteButton onClick={props.onClick} class="ml-1">
-        <CloseIcon />
+    <div class="flex items-center bg-cambridge-blue-600 pl-2 pr-1 py-1 rounded-full select-none">
+      <span class="text-sm font-bold">{props.name}</span>
+      <KobalteButton onClick={props.onClick} class="ml-1 p-1 rounded-full flex items-center justify-center">
+        <CloseIcon size={14} />
       </KobalteButton>
     </div>
   );
@@ -34,8 +34,8 @@ interface TagAreaProps {
 }
 
 export const TagArea: Component<TagAreaProps> = (props) => {
+  const [tagInput, setTagInput] = createSignal("");
   const { pb, user, updateRecord } = useAuthPB();
-
   const updateFn = props.updateRecord ?? updateRecord;
 
   const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
@@ -62,10 +62,9 @@ export const TagArea: Component<TagAreaProps> = (props) => {
           } else {
             console.log(e);
           }
-        } finally {
-          e.currentTarget.value = "";
         }
       }
+      setTagInput("");
     }
   };
 
@@ -79,10 +78,17 @@ export const TagArea: Component<TagAreaProps> = (props) => {
   };
 
   return (
-    <div>
-      <p>Tags</p>
-      <div class="border-2 rounded-lg p-2">
-        <Input label="" type="text" onKeyDown={handleTagInput} placeholder="Add tags (press Enter)" />
+    <div class="border-2 border-ash-gray-400 rounded-sm p-2 flex flex-col">
+      <Input
+        label=""
+        type="text"
+        value={tagInput()}
+        onInput={(e) => setTagInput(e.currentTarget.value)}
+        onKeyDown={handleTagInput}
+        placeholder="Add tags (press Enter)"
+        class="flex-1 min-w-[120px] mb-2"
+      />
+      <div class="flex flex-wrap gap-2">
         <For each={props.tags || []}>{(t) => <Tag name={t.name} onClick={() => deleteTag(t)} />}</For>
       </div>
     </div>

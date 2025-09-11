@@ -12,6 +12,7 @@ import Loading from "../views/Loading";
 import LogSessionNav from "../views/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
 import SectionHeader from "../views/SectionHeader";
+import { ContainerIcon } from "lucide-solid";
 
 type SearchParams = {
   date: string;
@@ -89,84 +90,101 @@ const LogSession: Component = () => {
 
   return (
     <>
-      <Container>
-        <SectionHeader>
-          <div class="flex flex-row justify-between">
-            <h1 class="text-xl font-bold">Log Session</h1>
-            <Input
-              type="date"
-              class="rounded-md bg-cambridge-blue-800 px-2 py-1"
-              value={searchParams.date}
-              onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
-            />
-          </div>
-        </SectionHeader>
+      <SectionHeader>
+        <div class="flex flex-row justify-between">
+          <h1 class="text-xl font-bold">Log Session</h1>
+          <Input
+            type="date"
+            class="rounded-md bg-cambridge-blue-800 px-2 py-1"
+            value={searchParams.date}
+            onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
+          />
+        </div>
+      </SectionHeader>
 
-        <Show when={!loading()} fallback={<Loading />}>
-          <Show
-            when={!!session.session}
-            fallback={
-              <>
-                <p>No session yet for this date</p>
-                <Button onClick={() => createSession()}>Create Session</Button>
-              </>
-            }
-          >
-            <Tabs aria-label="Log session navigation" class="w-full">
-              <LogSessionNav />
+      <Show when={!loading()} fallback={<Loading />}>
+        <Show
+          when={!!session.session}
+          fallback={
+            <div class="w-full flex flex-col justify-start items-center">
+              <p class="mt-2">No session yet for this date</p>
+              <Button class="mt-4" onClick={() => createSession()}>
+                Create Session
+              </Button>
+            </div>
+          }
+        >
+          <Tabs aria-label="Log session navigation" class="w-full">
+            <LogSessionNav />
 
-              <Tabs.Content value="exercises">
-                <div class="m-10">
-                  <UserSessionExerciseList
-                    sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
-                    sessionID={session.session!.id}
+            <Tabs.Content value="exercises">
+              <Container>
+                <h2>Exercises</h2>
+                <UserSessionExerciseList
+                  sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
+                  sessionID={session.session!.id}
+                />
+              </Container>
+            </Tabs.Content>
+
+            <Tabs.Content value="meals-sleep">
+              <Container>
+                <h2>Meals</h2>
+                <MealList
+                  meals={session.session?.expand?.meals_via_userSession ?? []}
+                  sessionID={session.session!.id}
+                />
+
+                <div class="mt-6 space-y-3">
+                  <h2>Sleep Quality</h2>
+                  <DataSleepQualitySelector
+                    value={session.session?.sleepQuality ?? ""}
+                    onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
+                    saveFunc={(v: string) => sessionUpdate("sleepQuality", v)}
                   />
                 </div>
-              </Tabs.Content>
+              </Container>
+            </Tabs.Content>
 
-              <Tabs.Content value="meals-sleep">
-                <div class="m-10">
-                  <div>
-                    <p>rate your sleep quality: </p>
-                    <DataSleepQualitySelector
-                      value={session.session?.sleepQuality ?? ""}
-                      onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
-                      saveFunc={(v: string) => sessionUpdate("sleepQuality", v)}
-                    />
-                  </div>
-                  <MealList
-                    meals={session.session?.expand?.meals_via_userSession ?? []}
-                    sessionID={session.session!.id}
-                  />
-                </div>
-              </Tabs.Content>
+            <Tabs.Content value="settings">
+              <Container class="space-y-2">
+                <h2 class="mb-4">Session Settings</h2>
 
-              <Tabs.Content value="settings">
-                <div class="m-10 space-y-2">
+                <div>
+                  <h3>Session name</h3>
                   <DataInput
-                    label="Session Name"
-                    // TODO below doesn't save to db, bad design
                     value={session.session?.name ?? "Workout"}
                     onValueChange={(v) => setSession("session", "name", v as string)}
                     type="text"
                     saveFunc={(v) => sessionUpdate("name", v)}
                   />
+                </div>
 
-                  <DataInput
-                    label="your weight this day:"
-                    type="number"
-                    value={session.session?.userWeight ?? user.weight}
-                    onValueChange={(v) => setSession("session", "userWeight", Number(v))}
-                    saveFunc={(v) => updateWeight(v as number)}
-                  />
+                <div class="flex flex-row items-center">
+                  <h3 class="mr-2">Your weight this day</h3>
+                  <div class="border-2 border-ash-gray-400 rounded-sm flex flex-row p-1">
+                    <DataInput
+                      type="number"
+                      value={session.session?.userWeight ?? user.weight}
+                      onValueChange={(v) => setSession("session", "userWeight", Number(v))}
+                      saveFunc={(v) => updateWeight(v as number)}
+                    />
+                    <p class="ml-1">kg</p>
+                  </div>
+                </div>
 
+                <div>
+                  <h3>Notes</h3>
                   <DataTextArea
-                    label="Notes"
+                    class=""
                     value={session.session?.notes ?? ""}
                     onValueChange={(v) => setSession("session", "notes", v)}
                     saveFunc={(v: string) => sessionUpdate("notes", v)}
                   />
+                </div>
 
+                <div>
+                  <h3>Tags</h3>
                   <TagArea
                     tags={session.session?.expand?.tags ?? []}
                     setTags={(tags) => setSession("session", "expand", "tags", tags)}
@@ -174,11 +192,11 @@ const LogSession: Component = () => {
                     recordID={session.session!.id}
                   />
                 </div>
-              </Tabs.Content>
-            </Tabs>
-          </Show>
+              </Container>
+            </Tabs.Content>
+          </Tabs>
         </Show>
-      </Container>
+      </Show>
     </>
   );
 };

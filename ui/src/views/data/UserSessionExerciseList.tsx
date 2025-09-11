@@ -404,23 +404,8 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   });
 
   return (
-    <>
+    <div class="flex flex-col items-center">
       <Table>
-        <TableHeader>
-          <For each={table.getHeaderGroups()}>
-            {(headerGroup) => (
-              <Row>
-                <For each={headerGroup.headers}>
-                  {(header) => (
-                    <TableHeaderCell>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHeaderCell>
-                  )}
-                </For>
-              </Row>
-            )}
-          </For>
-        </TableHeader>
         <TableBody>
           <For each={table.getRowModel().rows}>
             {(row) => (
@@ -465,6 +450,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           addSessionExercise={addSessionExercise}
         />
       </Show>
-    </>
+    </div>
   );
 };

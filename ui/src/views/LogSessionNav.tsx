@@ -6,7 +6,7 @@ import Settings from "lucide-solid/icons/settings";
 
 export const LogSessionNav: Component = () => {
   return (
-    <div class="sm:px-[15vw] px-4 border-b bg-white">
+    <div class="sm:px-[15vw] px-4 border-b">
       <Tabs.List class="relative flex justify-between">
         <TabTrigger value="exercises" label="Exercises">
           <Dumbbell size={30} />
@@ -17,7 +17,7 @@ export const LogSessionNav: Component = () => {
         <TabTrigger value="settings" label="Settings">
           <Settings size={30} />
         </TabTrigger>
-        <Tabs.Indicator class="absolute bottom-0 h-0.5 bg-blue-500 transition-all duration-250" />
+        <Tabs.Indicator class="absolute bottom-0 h-0.5 bg-ash-gray-200 transition-all duration-250" />
       </Tabs.List>
     </div>
   );
@@ -32,7 +32,7 @@ interface TabTriggerProps {
 
 const TabTrigger: ParentComponent<TabTriggerProps> = (props) => {
   return (
-    <Tabs.Trigger value={props.value} class="flex flex-col items-center p-2 hover:bg-ash-gray-600 w-20">
+    <Tabs.Trigger value={props.value} class={`flex flex-col items-center px-2 py-4 w-20 cursor-pointer`}>
       {props.children}
       <p class="hidden sm:flex">{props.label}</p>
     </Tabs.Trigger>

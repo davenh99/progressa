@@ -7,15 +7,19 @@ import SectionHeader from "../views/SectionHeader";
 
 const Sessions: Component = () => {
   return (
-    <Container>
+    <>
       <SectionHeader>
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-start">
           <h1 class="text-xl font-bold">Your Workout Sessions</h1>
-          <Button href="/log">Log workout</Button>
+          <Button href="/log" class="whitespace-nowrap ml-4">
+            Log workout
+          </Button>
         </div>
       </SectionHeader>
-      <UserSessionList />
-    </Container>
+      <Container>
+        <UserSessionList />
+      </Container>
+    </>
   );
 };
 
