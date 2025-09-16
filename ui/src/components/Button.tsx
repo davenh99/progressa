@@ -11,7 +11,7 @@ interface Props {
 export const Button: ParentComponent<Props> = (props) => {
   const [local, others] = splitProps(props, ["children", "href", "onClick", "class"]);
 
-  const classes = `rounded-md bg-forest-green-800 px-3 py-1.5 font-bold ${local.class ?? ""}`;
+  const classes = `rounded-lg bg-forest-green-800 px-3 py-1.5 font-bold ${local.class ?? ""}`;
 
   return (
     <Show

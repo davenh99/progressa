@@ -1,4 +1,4 @@
-import { createSignal, createEffect, ParentComponent, For } from "solid-js";
+import { ParentComponent, For } from "solid-js";
 import { SleepQuality } from "../../Types";
 import { debounce } from "../methods/debounce";
 

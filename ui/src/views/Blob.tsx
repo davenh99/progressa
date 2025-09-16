@@ -5,7 +5,7 @@ interface Props {
 }
 
 const Blob: ParentComponent<Props> = (props) => {
-  return <div class={`${props.class ?? ""} rounded-2xl p-2 border-2`}>{props.children}</div>;
+  return <div class={`${props.class ?? ""} rounded-2xl p-2 bg-charcoal-900`}>{props.children}</div>;
 };
 
 export default Blob;

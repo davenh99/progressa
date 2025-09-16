@@ -2,9 +2,10 @@ import { Component, createSignal, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import { Button, DataInput, DataNumberInput } from "../components";
+import { Button, DataInput, DataNumberInput, Switch } from "../components";
 import Container from "../views/Container";
 import SectionHeader from "../views/SectionHeader";
+import Blob from "../views/Blob";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
@@ -17,8 +18,8 @@ const Profile: Component = () => {
       <SectionHeader>
         <h1 class="text-2xl font-bold">Profile</h1>
       </SectionHeader>
-      <Container>
-        <div class="flex flex-col">
+      <Container class="space-y-4">
+        <Blob class="flex flex-col">
           <h2 class="text-xl font-semibold">{user.name}</h2>
           <div class="flex flex-col space-y-2 mt-2">
             <p>Email: {user.email}</p>
@@ -53,10 +54,16 @@ const Profile: Component = () => {
               </Show>
             </div>
           </div>
-          <Button onClick={logout} class="self-end mt-5 bg-red-200">
+          <Button onClick={logout} class="self-end mt-5 bg-gray-600 text-red-500">
             log out
           </Button>
-        </div>
+        </Blob>
+        <Blob class="space-y-4">
+          <h2>Settings</h2>
+          <Switch label="Use RPE" />
+          <Switch label="Use Device Dark Mode" />
+          <Switch label="Dark mode on" />
+        </Blob>
       </Container>
     </>
   );

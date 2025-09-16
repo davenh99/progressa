@@ -130,7 +130,7 @@ const LogSession: Component = () => {
             </Tabs.Content>
 
             <Tabs.Content value="meals-sleep">
-              <Container>
+              <Container class="space-y-4">
                 <Blob>
                   <h2>Meals</h2>
                   <MealList
@@ -139,7 +139,7 @@ const LogSession: Component = () => {
                   />
                 </Blob>
 
-                <Blob class="mt-6 space-y-3">
+                <Blob class="space-y-3">
                   <h2>Sleep Quality</h2>
                   <DataSleepQualitySelector
                     value={session.session?.sleepQuality}
