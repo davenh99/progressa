@@ -5,16 +5,13 @@ import { debounce } from "../methods/debounce";
 
 interface ExtraProps {
   label?: string;
-  variant?: "bordered" | "none";
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
-export const Input: ParentComponent<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "variant"]);
-
-  const style = local.variant === "bordered" ? "border-2 border-ash-gray-400" : "";
+export const NumberInput: ParentComponent<InputProps> = (props) => {
+  const [local, others] = splitProps(props, ["label", "class"]);
 
   return (
     <TextField class="flex flex-row space-x-1">
@@ -22,7 +19,8 @@ export const Input: ParentComponent<InputProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${style} input outline-none w-full rounded-sm px-2 py-1 ${local.class ?? ""}`}
+        type="number"
+        class={`input outline-none w-[2rem] text-right ${local.class ?? ""}`}
         {...others}
       />
     </TextField>
@@ -30,20 +28,23 @@ export const Input: ParentComponent<InputProps> = (props) => {
 };
 
 interface DataProps extends InputProps {
+  value: number | string;
   onValueChange: (v: number | string) => void;
   saveFunc: (v: number | string) => Promise<any>;
 }
 
-export const DataInput: ParentComponent<DataProps> = (props) => {
+export const DataNumberInput: ParentComponent<DataProps> = (props) => {
   return (
-    <Input
+    <NumberInput
+      value={props.value}
       onInput={(e) => {
-        props.onValueChange(e.currentTarget.value);
-        debounce(props.saveFunc)(e.currentTarget.value);
+        props.onValueChange(Number(e.currentTarget.value));
+        debounce(props.saveFunc)(Number(e.currentTarget.value));
       }}
-      {...props}
+      label={props.label}
+      type={props.type}
     />
   );
 };
 
-export default Input;
+export default NumberInput;

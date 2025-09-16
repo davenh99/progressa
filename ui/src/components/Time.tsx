@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal } from "solid-js";
-import Input from "./Input";
+import NumberInput from "./NumberInput";
 
 interface Props {
   label?: string;
@@ -32,8 +32,7 @@ export const DataTime: Component<Props> = (props) => {
       <p>{props.label || ""}</p>
       <div class="flex items-center gap-2">
         <div class="flex flex-col items-center">
-          <Input
-            type="number"
+          <NumberInput
             value={minutes()}
             onInput={(e) => {
               const raw = parseInt(e.currentTarget.value) || 0;
@@ -49,8 +48,7 @@ export const DataTime: Component<Props> = (props) => {
           <span class="text-xs text-gray-500">min</span>
         </div>
         <div class="flex flex-col items-center">
-          <Input
-            type="number"
+          <NumberInput
             value={seconds()}
             onInput={(e) => {
               const raw = parseInt(e.currentTarget.value) || 0;

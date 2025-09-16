@@ -4,6 +4,7 @@ export * from "./Tag";
 export * from "./Checkbox";
 export * from "./Slider";
 export * from "./Input";
+export * from "./NumberInput";
 export * from "./TextArea";
 export * from "./MeasurementValueSelect";
 export * from "./SleepQualitySelect";

@@ -13,6 +13,8 @@ import LogSessionNav from "../views/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
 import SectionHeader from "../views/SectionHeader";
 import { ContainerIcon } from "lucide-solid";
+import { DataNumberInput } from "../components/NumberInput";
+import Blob from "../views/Blob";
 
 type SearchParams = {
   date: string;
@@ -129,20 +131,22 @@ const LogSession: Component = () => {
 
             <Tabs.Content value="meals-sleep">
               <Container>
-                <h2>Meals</h2>
-                <MealList
-                  meals={session.session?.expand?.meals_via_userSession ?? []}
-                  sessionID={session.session!.id}
-                />
+                <Blob>
+                  <h2>Meals</h2>
+                  <MealList
+                    meals={session.session?.expand?.meals_via_userSession ?? []}
+                    sessionID={session.session!.id}
+                  />
+                </Blob>
 
-                <div class="mt-6 space-y-3">
+                <Blob class="mt-6 space-y-3">
                   <h2>Sleep Quality</h2>
                   <DataSleepQualitySelector
-                    value={session.session?.sleepQuality ?? ""}
+                    value={session.session?.sleepQuality}
                     onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
                     saveFunc={(v: string) => sessionUpdate("sleepQuality", v)}
                   />
-                </div>
+                </Blob>
               </Container>
             </Tabs.Content>
 
@@ -153,6 +157,7 @@ const LogSession: Component = () => {
                 <div>
                   <h3>Session name</h3>
                   <DataInput
+                    variant="bordered"
                     value={session.session?.name ?? "Workout"}
                     onValueChange={(v) => setSession("session", "name", v as string)}
                     type="text"
@@ -163,8 +168,7 @@ const LogSession: Component = () => {
                 <div class="flex flex-row items-center">
                   <h3 class="mr-2">Your weight this day</h3>
                   <div class="border-2 border-ash-gray-400 rounded-sm flex flex-row p-1">
-                    <DataInput
-                      type="number"
+                    <DataNumberInput
                       value={session.session?.userWeight ?? user.weight}
                       onValueChange={(v) => setSession("session", "userWeight", Number(v))}
                       saveFunc={(v) => updateWeight(v as number)}

@@ -2,7 +2,7 @@ import { Component, createSignal, Show } from "solid-js";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import { Button, DataInput } from "../components";
+import { Button, DataInput, DataNumberInput } from "../components";
 import Container from "../views/Container";
 import SectionHeader from "../views/SectionHeader";
 
@@ -23,21 +23,19 @@ const Profile: Component = () => {
           <div class="flex flex-col space-y-2 mt-2">
             <p>Email: {user.email}</p>
             <div class="flex flex-row">
-              <DataInput
+              <DataNumberInput
                 label="Height:"
                 value={height()}
                 onValueChange={(v) => setHeight(Number(v))}
-                type="number"
                 saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
               />
               <p>cm</p>
             </div>
             <div class="flex flex-row">
-              <DataInput
+              <DataNumberInput
                 label="Weight:"
                 value={weight()}
                 onValueChange={(v) => setWeight(Number(v))}
-                type="number"
                 saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
               />
               <p>kg</p>

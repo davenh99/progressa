@@ -6,7 +6,7 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 
 import { Meal } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import { Button, DataInput } from "../../components";
+import { Button, DataInput, DataNumberInput } from "../../components";
 import CopyMealModal from "../CopyMealModal";
 import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/userSessionMealMethods";
@@ -138,8 +138,7 @@ export const MealList: Component<Props> = (props) => {
       accessorKey: "meal.kj",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
+          <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "kj", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "kj", v)}
@@ -153,8 +152,7 @@ export const MealList: Component<Props> = (props) => {
       accessorKey: "meal.gramsProtein",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
+          <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsProtein", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsProtein", v)}
@@ -168,8 +166,7 @@ export const MealList: Component<Props> = (props) => {
       accessorKey: "meal.gramsCarbohydrate",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
+          <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) =>
               setMealRows("rows", ctx.row.index, "meal", "gramsCarbohydrate", v as number)
@@ -185,8 +182,7 @@ export const MealList: Component<Props> = (props) => {
       accessorKey: "meal.gramsFat",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
+          <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsFat", v as number)}
             saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsFat", v)}

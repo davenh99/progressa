@@ -8,6 +8,14 @@ interface EmojiOption {
   value: SleepQuality;
 }
 
+const sleepValueLabels: { [key in SleepQuality]: string } = {
+  terrible: "Very Poor",
+  poor: "Poor",
+  fair: "Fair",
+  good: "Good",
+  great: "Excellent",
+};
+
 const sleepOptions: EmojiOption[] = [
   { emoji: "😞", label: "Very Poor", value: "terrible" },
   { emoji: "😕", label: "Poor", value: "poor" },
@@ -17,13 +25,13 @@ const sleepOptions: EmojiOption[] = [
 ];
 
 interface Props {
-  value?: string;
+  value?: SleepQuality;
   onChange: (v: string) => void;
 }
 
 export const SleepQualitySelector: ParentComponent<Props> = (props) => {
   return (
-    <div class="flex gap-3">
+    <div class="flex gap-3 flex-row items-center">
       <For each={sleepOptions}>
         {(opt) => (
           <button
@@ -38,12 +46,13 @@ export const SleepQualitySelector: ParentComponent<Props> = (props) => {
           </button>
         )}
       </For>
+      <p class="ml-2 font-bold">{props.value ? sleepValueLabels[props.value] : ""}</p>
     </div>
   );
 };
 
 interface DataProps {
-  value: string;
+  value?: SleepQuality;
   onValueChange: (v: string) => void;
   saveFunc: (v: string) => Promise<any>;
   label?: string;

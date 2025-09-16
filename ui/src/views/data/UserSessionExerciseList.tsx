@@ -8,7 +8,15 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 
 import { useAuthPB } from "../../config/pocketbase";
 import { UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
-import { Button, DataInput, DataSlider, DataSelect, IconButton, DataTime } from "../../components";
+import {
+  Button,
+  DataInput,
+  DataSlider,
+  DataSelect,
+  IconButton,
+  DataTime,
+  DataNumberInput,
+} from "../../components";
 import {
   DraggableRow,
   Row,
@@ -244,8 +252,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
               }
               fallback={
                 <div class="flex flex-row space-x-1">
-                  <DataInput
-                    type="number"
+                  <DataNumberInput
                     value={ctx.row.original.sessionExercise.measurementNumeric || 0}
                     onValueChange={(v) =>
                       setExerciseRows(
