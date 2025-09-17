@@ -9,7 +9,6 @@ import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/eleme
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import invariant from "tiny-invariant";
 import { flexRender, type Row } from "@tanstack/solid-table";
-import Grip from "lucide-solid/icons/grip-vertical";
 import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 
@@ -29,7 +28,6 @@ interface DraggableRowProps {
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
-  let dragHandleRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
   const { updateRecord } = useAuthPB();
@@ -86,13 +84,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
 
   createEffect(() => {
     const element = ref;
-    const dragHandle = dragHandleRef;
     invariant(element);
-    invariant(dragHandle);
 
     draggable({
       element,
-      dragHandle,
       getInitialData() {
         return {
           id: props.row.original.meal.id,
@@ -131,22 +126,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       </Show>
       <div
         ref={ref}
-        class={`flex flex-col p-1 ${
+        class={`flex flex-col p-1 cursor-grab active:cursor-grabbing ${
           dragging() === "dragging" ? "opacity-40" : ""
-        } bg-ash-gray-800 rounded-md`}
+        } rounded-md`}
       >
         <div class="flex w-full">
           <For each={props.row.getVisibleCells()}>
             {(cell) => (
-              <div class="p-1 flex-1">
-                {cell.column.id === "handle" ? (
-                  <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
-                    <Grip />
-                  </div>
-                ) : (
-                  flexRender(cell.column.columnDef.cell, cell.getContext())
-                )}
-              </div>
+              <div class="p-1 flex-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
             )}
           </For>
           <Show

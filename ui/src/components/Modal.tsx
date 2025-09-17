@@ -15,13 +15,15 @@ export const Modal: ParentComponent<Props> = (props) => {
         onClick={() => props.setModalVisible(false)}
       >
         <div
-          class="bg-white rounded-xl shadow-lg p-6 w-[35vw] max-h-[60vh]"
+          class="bg-white rounded-xl shadow-lg p-6 w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh]"
           onClick={(e) => e.stopPropagation()}
         >
           {props.children}
-          <Button onClick={() => props.setModalVisible(false)} class="mt-2">
-            Cancel
-          </Button>
+          <div class="w-full flex justify-end">
+            <Button onClick={() => props.setModalVisible(false)} class="mt-2">
+              Cancel
+            </Button>
+          </div>
         </div>
       </div>
     </Portal>

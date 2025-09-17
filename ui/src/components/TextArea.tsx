@@ -1,4 +1,4 @@
-import { ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
+import { createEffect, on, ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
 import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
@@ -12,6 +12,20 @@ type TextAreaProps<T extends ValidComponent = "input"> = ExtraProps &
 
 export const TextArea: ParentComponent<TextAreaProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class"]);
+  let textareaRef: HTMLTextAreaElement | undefined;
+
+  const autoResize = () => {
+    if (!textareaRef) return;
+    textareaRef.style.height = "auto";
+    textareaRef.style.height = `${textareaRef.scrollHeight}px`;
+  };
+
+  createEffect(
+    on(
+      () => others.value,
+      () => autoResize()
+    )
+  );
 
   return (
     <TextField>
@@ -19,6 +33,7 @@ export const TextArea: ParentComponent<TextAreaProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.TextArea
+        ref={textareaRef}
         class={`${
           local.class ?? ""
         } w-full resize-none border-2 border-ash-gray-400 rounded-sm overflow-hidden`}

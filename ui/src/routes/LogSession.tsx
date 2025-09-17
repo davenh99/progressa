@@ -180,7 +180,6 @@ const LogSession: Component = () => {
                 <div>
                   <h3>Notes</h3>
                   <DataTextArea
-                    class=""
                     value={session.session?.notes ?? ""}
                     onValueChange={(v) => setSession("session", "notes", v)}
                     saveFunc={(v: string) => sessionUpdate("notes", v)}

@@ -120,7 +120,6 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const columns = createMemo<ColumnDef<MealRow>[]>(() => [
-    { header: "", id: "handle" },
     {
       header: "meal",
       accessorKey: "name",
@@ -236,36 +235,40 @@ export const MealList: Component<Props> = (props) => {
 
   return (
     <div class="mt-3">
-      <div>
-        <For each={table.getHeaderGroups()}>
-          {(headerGroup) => (
-            <div class="flex">
-              <For each={headerGroup.headers}>
-                {(header) => (
-                  <div class="text-left p-3 flex-1">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </div>
-                )}
-              </For>
-            </div>
-          )}
-        </For>
+      <div class="bg-white/25 rounded-lg">
+        <div>
+          <For each={table.getHeaderGroups()}>
+            {(headerGroup) => (
+              <div class="flex">
+                <For each={headerGroup.headers}>
+                  {(header) => (
+                    <div class="text-left p-3 flex-1">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </div>
+                  )}
+                </For>
+              </div>
+            )}
+          </For>
+        </div>
+        <div class="">
+          <For each={table.getRowModel().rows}>
+            {(row) => (
+              <DraggableRow
+                row={row}
+                saveRow={saveRow}
+                expandAtInd={expandAtInd}
+                collapse={collapse}
+                setMealRows={setMealRows}
+              />
+            )}
+          </For>
+        </div>
       </div>
-      <div>
-        <For each={table.getRowModel().rows}>
-          {(row) => (
-            <DraggableRow
-              row={row}
-              saveRow={saveRow}
-              expandAtInd={expandAtInd}
-              collapse={collapse}
-              setMealRows={setMealRows}
-            />
-          )}
-        </For>
+      <div class="flex flex-row justify-end space-x-3 mt-4">
+        <Button onClick={() => addMeal()}>Add Meal</Button>
+        <Button onClick={() => setShowCopyMeal(true)}>Copy Meal</Button>
       </div>
-      <Button onClick={() => addMeal()}>Add Meal</Button>
-      <Button onClick={() => setShowCopyMeal(true)}>Copy Meal</Button>
       <Show when={showCopyMeal()}>
         <CopyMealModal setModalVisible={(v) => setShowCopyMeal(v)} addMeal={addMeal} />
       </Show>

@@ -58,12 +58,12 @@ const Profile: Component = () => {
             log out
           </Button>
         </Blob>
-        <Blob class="space-y-4">
+        {/* <Blob class="space-y-4">
           <h2>Settings</h2>
           <Switch label="Use RPE" />
           <Switch label="Use Device Dark Mode" />
           <Switch label="Dark mode on" />
-        </Blob>
+        </Blob> */}
       </Container>
     </>
   );

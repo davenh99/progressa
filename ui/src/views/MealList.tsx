@@ -51,7 +51,7 @@ export const MealList: Component<Props> = (props) => {
   const getData = async () => {
     try {
       const meals = await pb.collection<Meal>("meals").getFullList({
-        filter: `userSession.user = '${user.id}'`,
+        filter: `userSession.user = '${user.id}' && name != ''`,
         expand: "measurementType, exerciseVariations_via_exercise",
         sort: "name",
       });
@@ -71,25 +71,14 @@ export const MealList: Component<Props> = (props) => {
       <div class="bg-base-100 rounded-lg shadow px-6 py-3">
         <div class="overflow-x-auto">
           <table class="table w-full">
-            <thead class="sticky top-0 bg-base-100 z-10">
-              <For each={table.getHeaderGroups()}>
-                {(headerGroup) => (
-                  <tr>
-                    <For each={headerGroup.headers}>
-                      {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
-                    </For>
-                  </tr>
-                )}
-              </For>
-            </thead>
+            <Input
+              type="text"
+              placeholder="Search Past Meals"
+              class="p-1"
+              value={nameFilter()}
+              onInput={(e) => setNameFilter(e.currentTarget.value)}
+            />
           </table>
-          <Input
-            type="text"
-            placeholder="Search Past Meals"
-            class="p-1"
-            value={nameFilter()}
-            onInput={(e) => setNameFilter(e.currentTarget.value)}
-          />
 
           <div class="max-h-[40vh] overflow-y-auto">
             <table class="table w-full">
