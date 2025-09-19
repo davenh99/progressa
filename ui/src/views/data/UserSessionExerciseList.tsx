@@ -1,5 +1,5 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, SetStoreFunction } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Trash from "lucide-solid/icons/trash-2";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
@@ -7,7 +7,7 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
+import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
 import {
   Button,
   DataInput,
@@ -17,47 +17,35 @@ import {
   DataTime,
   DataNumberInput,
 } from "../../components";
-import {
-  DraggableRow,
-  Row,
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderCell,
-} from "./UserSessionExerciseTable";
+import { DraggableRow, Table, TableBody } from "./UserSessionExerciseTable";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import ExerciseSelectModal from "../ExerciseSelectModal";
 import { USER_SESSION_EXERCISE_EXPAND } from "../../config/constants";
 
-export interface SessionExerciseRow {
-  sessionExercise: UserSessionExercise;
-  expanded: boolean;
-}
-
 interface Props {
   sessionExercises: UserSessionExercise[];
   sessionID: string;
+  setSession: SetStoreFunction<{
+    session: UserSession | null;
+  }>;
 }
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
-  const [exerciseRows, setExerciseRows] = createStore<{ rows: SessionExerciseRow[] }>({
-    rows: props.sessionExercises.map((sessionExercise) => ({ sessionExercise, expanded: false })),
-  });
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const { pb, user, updateRecord } = useAuthPB();
 
-  const getSupersetParent = (index: number, data: SessionExerciseRow[]): UserSessionExercise => {
-    if (!data[index].sessionExercise.supersetParent) {
-      return data[index].sessionExercise;
+  const getSupersetParent = (index: number, data: UserSessionExercise[]): UserSessionExercise => {
+    if (!data[index].supersetParent) {
+      return data[index];
     } else {
       for (const row of data.slice(0, index + 1).reverse()) {
-        if (row.sessionExercise.id === data[index].sessionExercise.supersetParent) {
-          return row.sessionExercise;
+        if (row.id === data[index].supersetParent) {
+          return row;
         }
       }
     }
     // we'll return this is we can't find a parent, although this would mean there's a big problem...
-    return data[index].sessionExercise;
+    return data[index];
   };
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {
@@ -69,19 +57,19 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   };
 
   const deleteRows = async (indices: number[]) => {
-    const newRows = exerciseRows.rows.filter((_, ind) => !indices.includes(ind));
+    const newRows = props.sessionExercises.filter((_, ind) => !indices.includes(ind));
 
     try {
       const delPromises = indices.map((index) =>
-        pb.collection("userSessionExercises").delete(exerciseRows.rows[index].sessionExercise.id)
+        pb.collection("userSessionExercises").delete(props.sessionExercises[index].id)
       );
-      setExerciseRows("rows", newRows);
+      props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
       await Promise.all(delPromises);
       await updateRecord(
         "userSessions",
         props.sessionID,
         "itemsOrder",
-        newRows.map((r) => r.sessionExercise.id)
+        newRows.map((r) => r.id)
       );
     } catch (e) {
       console.log(e);
@@ -90,50 +78,49 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const reorderRows = (draggedItemsOldInd: number, draggedItemsNewInd: number, count: number) => {
     // shuffle array
-    const newRows = [...exerciseRows.rows];
+    const newRows = [...props.sessionExercises];
     const draggedItems = newRows.splice(draggedItemsOldInd, count);
 
     const adjustedNewIndex =
       draggedItemsNewInd > draggedItemsOldInd ? draggedItemsNewInd - count : draggedItemsNewInd;
     newRows.splice(adjustedNewIndex, 0, ...draggedItems);
 
-    setExerciseRows("rows", newRows);
+    props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
 
     // send the updated list to 'itemsOrder'
     updateRecord(
       "userSessions",
       props.sessionID,
       "itemsOrder",
-      newRows.map((r) => r.sessionExercise.id)
+      newRows.map((r) => r.id)
     ).catch(console.error);
   };
 
-  const buildCreateData = (row: SessionExerciseRow, supersetParent?: string) => ({
+  const buildCreateData = (row: UserSessionExercise, supersetParent?: string) => ({
     user: user.id,
-    exercise: row.sessionExercise.exercise,
-    userSession: row.sessionExercise.userSession,
-    variation: row.sessionExercise.variation,
-    perceivedEffort: row.sessionExercise.perceivedEffort,
-    addedWeight: row.sessionExercise.addedWeight,
-    restAfter: row.sessionExercise.restAfter,
-    isWarmup: row.sessionExercise.isWarmup,
-    measurementNumeric: row.sessionExercise.measurementNumeric,
-    measurementValue: row.sessionExercise.measurementValue,
+    exercise: row.exercise,
+    userSession: row.userSession,
+    variation: row.variation,
+    perceivedEffort: row.perceivedEffort,
+    addedWeight: row.addedWeight,
+    restAfter: row.restAfter,
+    isWarmup: row.isWarmup,
+    measurementNumeric: row.measurementNumeric,
+    measurementValue: row.measurementValue,
     ...(supersetParent ? { supersetParent } : {}),
   });
 
   const insertRowsAndSync = async (index: number, records: UserSessionExercise[]) => {
-    const newRows = [...exerciseRows.rows];
-    const newRowsToInsert = records.map((record) => ({ sessionExercise: record, expanded: false }));
+    const newRows = [...props.sessionExercises];
+    newRows.splice(index, 0, ...records);
 
-    newRows.splice(index, 0, ...newRowsToInsert);
-    setExerciseRows("rows", newRows);
+    props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
 
     await updateRecord(
       "userSessions",
       props.sessionID,
       "itemsOrder",
-      newRows.map((r) => r.sessionExercise.id)
+      newRows.map((r) => r.id)
     );
   };
 
@@ -153,14 +140,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
       const parentRecord = await pb
         .collection<UserSessionExercise>("userSessionExercises")
-        .create(buildCreateData(exerciseRows.rows[duplicateInds[0]]), {
+        .create(buildCreateData(props.sessionExercises[duplicateInds[0]]), {
           expand: USER_SESSION_EXERCISE_EXPAND,
         });
 
       const childPromises = duplicateInds.slice(1).map((ind) =>
         pb
           .collection<UserSessionExercise>("userSessionExercises")
-          .create(buildCreateData(exerciseRows.rows[ind], parentRecord.id), {
+          .create(buildCreateData(props.sessionExercises[ind], parentRecord.id), {
             expand: USER_SESSION_EXERCISE_EXPAND,
           })
       );
@@ -181,31 +168,20 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       perceivedEffort: 70,
     };
 
-    addRowsAtIndex(exerciseRows.rows.length, undefined, data);
+    addRowsAtIndex(props.sessionExercises.length, undefined, data);
     setShowCreateSessionExercise(false);
   };
 
-  const expandAtInd = (index: number) => {
-    setExerciseRows("rows", (_, i) => i === index, "expanded", true);
-  };
-
-  const collapse = () => {
-    setExerciseRows("rows", (r) => r.expanded, "expanded", false);
-  };
-
-  const columns = createMemo<ColumnDef<SessionExerciseRow>[]>(() => [
+  const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
     {
       header: "",
       id: "handle",
     },
     {
-      accessorKey: "sessionExercise.isWarmup",
+      accessorKey: "isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
-        <Show
-          when={!ctx.row.original.sessionExercise.supersetParent}
-          fallback={<p class="italic">dropset</p>}
-        >
+        <Show when={!ctx.row.original.supersetParent} fallback={<p class="italic">dropset</p>}>
           <Show when={ctx.getValue() as boolean} fallback={<p>{ctx.row.index + 1}</p>}>
             <p>W</p>
           </Show>
@@ -214,70 +190,75 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     {
       accessorFn: (row) =>
-        row.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric
-          ? "sessionExercise.measurementNumeric"
-          : "sessionExercise.measurementValue",
+        row.expand?.exercise?.expand?.defaultMeasurementType?.numeric
+          ? "measurementNumeric"
+          : "measurementValue",
       header: "",
       id: "measurement",
       cell: (ctx) => {
         return (
           <Show
-            when={ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
+            when={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
             fallback={
               <DataSelect
                 values={
-                  ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType?.expand
+                  ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
                     ?.measurementValues_via_measurementType ?? []
                 }
                 // TODO maybe we don't need to switch between null and undefined here?
-                value={ctx.row.original.sessionExercise.expand?.measurementValue ?? null}
+                value={ctx.row.original.expand?.measurementValue ?? null}
                 onValueChange={(v) =>
-                  setExerciseRows(
-                    "rows",
+                  props.setSession(
+                    "session",
+                    "expand",
+                    "userSessionExercises_via_userSession",
                     ctx.row.index,
-                    "sessionExercise",
                     "expand",
                     "measurementValue",
                     v ?? undefined
                   )
                 }
-                saveFunc={(v: string) => saveRow(ctx.row.original.sessionExercise.id, "measurementValue", v)}
+                saveFunc={(v: string) => saveRow(ctx.row.original.id, "measurementValue", v)}
               />
             }
           >
             <Show
-              when={
-                ctx.row.original.sessionExercise.expand?.exercise?.defaultMeasurementType ===
-                "8ldlgtjjvy3ircl"
-              }
+              when={ctx.row.original.expand?.exercise?.defaultMeasurementType === "8ldlgtjjvy3ircl"}
               fallback={
                 <div class="flex flex-row space-x-1">
                   <DataNumberInput
-                    value={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                    value={ctx.row.original.measurementNumeric || 0}
                     onValueChange={(v) =>
-                      setExerciseRows(
-                        "rows",
+                      props.setSession(
+                        "session",
+                        "expand",
+                        "userSessionExercises_via_userSession",
                         ctx.row.index,
-                        "sessionExercise",
                         "measurementNumeric",
                         v as number
                       )
                     }
-                    saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
+                    saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
                   />
                   <p>
-                    {ctx.row.original.sessionExercise.expand?.exercise?.expand?.defaultMeasurementType
-                      ?.displayName ?? ""}
+                    {ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? ""}
                   </p>
                 </div>
               }
             >
               <DataTime
-                value={ctx.row.original.sessionExercise.measurementNumeric || 0}
+                value={ctx.row.original.measurementNumeric || 0}
                 onValueChange={(v) =>
-                  setExerciseRows("rows", ctx.row.index, "sessionExercise", "measurementNumeric", v)
+                  props.setSession(
+                    "session",
+                    "expand",
+                    "userSessionExercises_via_userSession",
+                    ctx.row.index,
+                    "measurementNumeric",
+                    v
+                  )
                 }
-                saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "measurementNumeric", v)}
+                saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
               />
             </Show>
           </Show>
@@ -285,7 +266,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       },
     },
     {
-      accessorKey: "sessionExercise.addedWeight",
+      accessorKey: "addedWeight",
       header: "",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
@@ -293,24 +274,38 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             type="number"
             value={ctx.getValue() as number}
             onValueChange={(v) =>
-              setExerciseRows("rows", ctx.row.index, "sessionExercise", "addedWeight", v as number)
+              props.setSession(
+                "session",
+                "expand",
+                "userSessionExercises_via_userSession",
+                ctx.row.index,
+                "addedWeight",
+                v as number
+              )
             }
-            saveFunc={(v) => saveRow(ctx.row.original.sessionExercise.id, "addedWeight", v)}
+            saveFunc={(v) => saveRow(ctx.row.original.id, "addedWeight", v)}
           />
           <p>kg</p>
         </div>
       ),
     },
     {
-      accessorKey: "sessionExercise.perceivedEffort",
+      accessorKey: "perceivedEffort",
       header: "RPE",
       cell: (ctx) => (
         <DataSlider
           value={ctx.getValue() as number}
           onValueChange={(v) =>
-            setExerciseRows("rows", ctx.row.index, "sessionExercise", "perceivedEffort", v as number)
+            props.setSession(
+              "session",
+              "expand",
+              "userSessionExercises_via_userSession",
+              ctx.row.index,
+              "perceivedEffort",
+              v as number
+            )
           }
-          saveFunc={(v: number) => saveRow(ctx.row.original.sessionExercise.id, "perceivedEffort", v)}
+          saveFunc={(v: number) => saveRow(ctx.row.original.id, "perceivedEffort", v)}
         />
       ),
     },
@@ -318,11 +313,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "",
       id: "add-dropset",
       cell: (ctx) => (
-        <Show when={!ctx.row.original.sessionExercise.supersetParent}>
+        <Show when={!ctx.row.original.supersetParent}>
           <Button
-            onClick={() =>
-              addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original.sessionExercise))
-            }
+            onClick={() => addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original))}
           >
             + dropset
           </Button>
@@ -334,7 +327,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       id: "duplicate",
       cell: (ctx) => (
         <IconButton
-          onClick={() => addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, exerciseRows.rows))}
+          onClick={() =>
+            addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, props.sessionExercises))
+          }
         >
           <Copy />
         </IconButton>
@@ -344,7 +339,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       header: "",
       id: "delete",
       cell: (ctx) => (
-        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, exerciseRows.rows))}>
+        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, props.sessionExercises))}>
           <Trash />
         </IconButton>
       ),
@@ -353,11 +348,11 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const table = createSolidTable({
     get data() {
-      return exerciseRows.rows;
+      return props.sessionExercises;
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.sessionExercise.id, // required because row indexes will change
+    getRowId: (row) => row.id, // required because row indexes will change
   });
 
   createEffect(() => {
@@ -389,24 +384,13 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
         let inds = [];
         if (sourceData.isGroup as boolean) {
-          inds = getGroupInds(sourceData.ind as number, exerciseRows.rows);
+          inds = getGroupInds(sourceData.ind as number, props.sessionExercises);
         } else {
-          inds = getSupersetInds(sourceData.ind as number, exerciseRows.rows);
+          inds = getSupersetInds(sourceData.ind as number, props.sessionExercises);
         }
 
         reorderRows(sourceData.ind as number, newInd, inds.length);
       },
-    });
-  });
-
-  // in case the base data changes, refresh
-  // TODO investigate if this is necessary
-  createEffect(() => {
-    setExerciseRows({
-      rows: props.sessionExercises.map((sessionExercise) => ({
-        sessionExercise,
-        expanded: false,
-      })),
     });
   });
 
@@ -421,28 +405,22 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                 saveRow={saveRow}
                 firstOfGroup={
                   row.index === 0 ||
-                  row.original.sessionExercise.exercise !==
-                    exerciseRows.rows[row.index - 1].sessionExercise.exercise ||
-                  row.original.sessionExercise.variation !==
-                    exerciseRows.rows[row.index - 1].sessionExercise.variation
+                  row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
+                  row.original.variation !== props.sessionExercises[row.index - 1].variation
                 }
                 lastOfGroup={
-                  row.index === exerciseRows.rows.length - 1 ||
-                  row.original.sessionExercise.exercise !==
-                    exerciseRows.rows[row.index + 1].sessionExercise.exercise ||
-                  row.original.sessionExercise.variation !==
-                    exerciseRows.rows[row.index + 1].sessionExercise.variation
+                  row.index === props.sessionExercises.length - 1 ||
+                  row.original.exercise !== props.sessionExercises[row.index + 1].exercise ||
+                  row.original.variation !== props.sessionExercises[row.index + 1].variation
                 }
-                firstOfSuperset={!row.original.sessionExercise.supersetParent}
+                firstOfSuperset={!row.original.supersetParent}
                 lastOfSuperset={
-                  row.index === exerciseRows.rows.length - 1 ||
-                  !exerciseRows.rows[row.index + 1].sessionExercise.supersetParent
+                  row.index === props.sessionExercises.length - 1 ||
+                  !props.sessionExercises[row.index + 1].supersetParent
                 }
-                getGroupInds={() => getGroupInds(row.index, exerciseRows.rows)}
-                expandAtInd={expandAtInd}
-                collapse={collapse}
-                setExerciseRows={setExerciseRows}
-                getSupersetParent={(i: number) => getSupersetParent(i, exerciseRows.rows)}
+                getGroupInds={() => getGroupInds(row.index, props.sessionExercises)}
+                setSession={props.setSession}
+                getSupersetParent={(i: number) => getSupersetParent(i, props.sessionExercises)}
               />
             )}
           </For>

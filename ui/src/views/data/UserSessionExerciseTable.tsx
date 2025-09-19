@@ -13,9 +13,8 @@ import Grip from "lucide-solid/icons/grip-vertical";
 import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 
-import { SessionExerciseRow } from ".";
 import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
-import { DraggingState, UserSessionExercise } from "../../../Types";
+import { DraggingState, UserSession, UserSessionExercise } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
 
@@ -27,26 +26,18 @@ export const TableBody: ParentComponent = (props) => {
   return <div>{props.children}</div>;
 };
 
-export const TableHeader: ParentComponent = (props) => {
-  return <div>{props.children}</div>;
-};
-
-export const Row: ParentComponent = (props) => {
-  return <div class="flex">{props.children}</div>;
-};
-
 interface DraggableRowProps {
-  row: RowType<SessionExerciseRow>;
+  row: RowType<UserSessionExercise>;
   firstOfGroup: boolean;
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
-  expandAtInd: (index: number) => void;
-  collapse: () => void;
-  setExerciseRows: SetStoreFunction<{ rows: SessionExerciseRow[] }>;
   getSupersetParent: (index: number) => UserSessionExercise;
+  setSession: SetStoreFunction<{
+    session: UserSession | null;
+  }>;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -87,7 +78,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         if (props.lastOfSuperset) allowedEdges.push("bottom");
 
         return attachClosestEdge(
-          { id: props.row.original.sessionExercise.id, ind: props.row.index, isUserSessionExerciseRow: true },
+          { id: props.row.original.id, ind: props.row.index, isUserSessionExerciseRow: true },
           { element, input, allowedEdges }
         );
       },
@@ -127,7 +118,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       dragHandle,
       getInitialData() {
         return {
-          id: props.row.original.sessionExercise.id,
+          id: props.row.original.id,
           ind: props.row.index,
           isUserSessionExerciseRow: true,
         };
@@ -140,7 +131,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           }),
           render({ container }) {
             const preview = document.createElement("div");
-            preview.textContent = `${props.row.original.sessionExercise.expand?.exercise?.name} (${
+            preview.textContent = `${props.row.original.expand?.exercise?.name} (${
               props.firstOfSuperset && !props.lastOfSuperset ? "superset" : "1x set"
             })`;
             preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
@@ -173,7 +164,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       dragHandle,
       getInitialData() {
         return {
-          id: props.row.original.sessionExercise.id,
+          id: props.row.original.id,
           ind: props.row.index,
           isUserSessionExerciseRow: true,
           isGroup: true,
@@ -188,7 +179,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           }),
           render({ container }) {
             const preview = document.createElement("div");
-            preview.textContent = `${props.row.original.sessionExercise.expand?.exercise?.name} (${groupInds.length}x sets)`;
+            preview.textContent = `${props.row.original.expand?.exercise?.name} (${groupInds.length}x sets)`;
             preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
             container.appendChild(preview);
           },
@@ -210,16 +201,16 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         ref={groupRef}
         class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${props.row.original.sessionExercise.supersetParent ? "" : "pt-1"}`}
+        } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
           <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
             <Grip />
           </div>
           <p>
-            {props.row.original.sessionExercise.expand?.variation?.name
-              ? `${props.row.original.sessionExercise.expand?.exercise?.name} (${props.row.original.sessionExercise.expand?.variation?.name})`
-              : props.row.original.sessionExercise.expand?.exercise?.name}
+            {props.row.original.expand?.variation?.name
+              ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
+              : props.row.original.expand?.exercise?.name}
           </p>
         </Show>
         <Show when={dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfSuperset}>
@@ -251,54 +242,34 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 flex flex-row">
                 <DataTime
                   label="Rest: "
-                  value={props.row.original.sessionExercise.restAfter}
+                  value={props.row.original.restAfter}
                   onValueChange={(v) =>
-                    props.setExerciseRows("rows", props.row.index, "sessionExercise", "restAfter", v)
+                    props.setSession(
+                      "session",
+                      "expand",
+                      "userSessionExercises_via_userSession",
+                      props.row.index,
+                      "restAfter",
+                      v
+                    )
                   }
-                  saveFunc={(v: number) =>
-                    props.saveRow(props.row.original.sessionExercise.id, "restAfter", v)
-                  }
+                  saveFunc={(v: number) => props.saveRow(props.row.original.id, "restAfter", v)}
                 />
               </div>
-              <div>
-                <Show when={props.lastOfSuperset}>
-                  <Show
-                    when={props.row.original.expanded}
-                    fallback={
-                      <IconButton onClick={() => props.expandAtInd(props.row.index)}>
-                        <Down />
-                      </IconButton>
-                    }
-                  >
-                    <IconButton onClick={props.collapse}>
-                      <Up />
-                    </IconButton>
-                  </Show>
-                </Show>
-              </div>
             </div>
-            <Show when={props.row.original.expanded}>
+            {/* <Show when={props.row.original}>
               <DataTextArea
                 label="Notes"
                 value={props.getSupersetParent(props.row.index).notes}
                 onValueChange={(notes) => {
-                  const recordID =
-                    props.row.original.sessionExercise.supersetParent ||
-                    props.row.original.sessionExercise.id;
+                  const recordID = props.row.original.supersetParent || props.row.original.id;
 
-                  props.setExerciseRows(
-                    "rows",
-                    (r) => r.sessionExercise.id === recordID,
-                    "sessionExercise",
-                    "notes",
-                    notes
-                  );
+                  props.setExerciseRows("rows", (r) => r.id === recordID, "sessionExercise", "notes", notes);
                 }}
                 saveFunc={(v: string) =>
                   updateRecord(
                     "userSessionExercises",
-                    props.row.original.sessionExercise.supersetParent ||
-                      props.row.original.sessionExercise.id,
+                    props.row.original.supersetParent || props.row.original.id,
                     "notes",
                     v
                   )
@@ -308,9 +279,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               <TagArea
                 tags={props.getSupersetParent(props.row.index).expand?.tags ?? []}
                 setTags={(tags) => {
-                  const recordID =
-                    props.row.original.sessionExercise.supersetParent ||
-                    props.row.original.sessionExercise.id;
+                  const recordID = props.row.original.supersetParent || props.row.original.id;
 
                   props.setExerciseRows(
                     "rows",
@@ -322,11 +291,9 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                   );
                 }}
                 modelName="userSessionExercises"
-                recordID={
-                  props.row.original.sessionExercise.supersetParent || props.row.original.sessionExercise.id
-                }
+                recordID={props.row.original.supersetParent || props.row.original.id}
               />
-            </Show>
+            </Show> */}
           </Show>
         </div>
         <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>
@@ -339,8 +306,4 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
 
 export const Cell: ParentComponent = (props) => {
   return <div class={`p-1 flex-1`}>{props.children}</div>;
-};
-
-export const TableHeaderCell: ParentComponent = (props) => {
-  return <div class="text-left p-3 flex-1">{props.children}</div>;
 };
