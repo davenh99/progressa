@@ -125,6 +125,7 @@ const LogSession: Component = () => {
                 <UserSessionExerciseList
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
                   sessionID={session.session!.id}
+                  setSession={setSession}
                 />
               </Container>
             </Tabs.Content>
