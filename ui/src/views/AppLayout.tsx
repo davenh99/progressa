@@ -9,57 +9,71 @@ export const AppLayout: ParentComponent = (props) => {
 
   const isLogActive = () => location.pathname.startsWith("/log");
 
+  const isActive = (path: string) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
+
+  const linkClasses = (path: string) =>
+    `flex flex-row space-x-2 mx-4 hover:text-gray-300 ${
+      isActive(path) ? "text-cambridge-blue-700" : "text-white"
+    }`;
+
+  const iconClasses = (path: string) => (isActive(path) ? "text-cambridge-blue-700" : "text-white");
+
   return (
-    <div class="flex h-screen">
+    <div class="flex h-screen bg-white bg-radial from-cambridge-blue-500/25 to-transparent">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-gray-900 text-white py-4 space-y-6">
-        <A href="/" class="hover:text-gray-300 flex flex-row space-x-2 mx-4">
-          <ClipboardList size={24} />
+        <A href="/" class={linkClasses("/")}>
+          <ClipboardList size={24} class={iconClasses("/")} />
           <p>History</p>
         </A>
         <A
           href="/log"
-          class="hover:text-gray-300 flex flex-row space-x-2 mx-4"
+          class={linkClasses("/log")}
           onClick={(e) => {
             if (isLogActive()) {
               e.preventDefault();
             }
           }}
         >
-          <Log size={24} />
+          <Log size={24} class={iconClasses("/log")} />
           <p>Log</p>
         </A>
-        <A href="/profile" class="hover:text-gray-300 flex flex-row space-x-2 mx-4">
-          <User size={24} />
+        <A href="/profile" class={linkClasses("/profile")}>
+          <User size={24} class={iconClasses("/profile")} />
           <p>Profile</p>
         </A>
       </nav>
 
       {/* Main content */}
-      <main class="flex-1 overflow-y-auto bg-gray-100">{props.children}</main>
+      <main class="flex-1 flex flex-col overflow-hidden">{props.children}</main>
 
       {/* Bottom nav (mobile global nav) */}
-      <nav
-        class={`sm:hidden fixed bottom-0 left-0 right-0 bg-charcoal-400/90 text-white flex justify-around
-          py-4 my-3 mx-5 rounded-full backdrop-blur-xs`}
-      >
-        <A href="/" class="flex flex-col items-center">
-          <ClipboardList size={30} />
-        </A>
-        <A
-          href="/log"
-          class="flex flex-col items-center"
-          onClick={(e) => {
-            if (isLogActive()) {
-              e.preventDefault();
-            }
-          }}
+      <nav class={`sm:hidden fixed bottom-0 left-0 right-0 flex justify-center`}>
+        <div
+          class={`bg-charcoal-400/80 text-white flex justify-between
+          py-2.5 px-5 my-3 space-x-[12vw] rounded-full backdrop-blur-xs`}
         >
-          <Log size={30} />
-        </A>
-        <A href="/profile" class="flex flex-col items-center">
-          <User size={30} />
-        </A>
+          <A href="/" class="flex flex-col items-center">
+            <ClipboardList size={30} class={iconClasses("/")} />
+          </A>
+          <A
+            href="/log"
+            class="flex flex-col items-center"
+            onClick={(e) => {
+              if (isLogActive()) {
+                e.preventDefault();
+              }
+            }}
+          >
+            <Log size={30} class={iconClasses("/log")} />
+          </A>
+          <A href="/profile" class="flex flex-col items-center">
+            <User size={30} class={iconClasses("/profile")} />
+          </A>
+        </div>
       </nav>
     </div>
   );

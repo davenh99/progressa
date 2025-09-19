@@ -6,7 +6,7 @@ import { useSearchParams } from "@solidjs/router";
 import { useAuthPB } from "../config/pocketbase";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector, Button } from "../components";
 import Container from "../views/Container";
-import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
+import type { Meal, SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import LogSessionNav from "../views/LogSessionNav";
@@ -120,7 +120,7 @@ const LogSession: Component = () => {
             <LogSessionNav />
 
             <Tabs.Content value="exercises">
-              <Container>
+              <Container class="overflow-x-hidden">
                 <h2>Exercises</h2>
                 <UserSessionExerciseList
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
@@ -136,6 +136,7 @@ const LogSession: Component = () => {
                   <MealList
                     meals={session.session?.expand?.meals_via_userSession ?? []}
                     sessionID={session.session!.id}
+                    setSession={setSession}
                   />
                 </Blob>
 

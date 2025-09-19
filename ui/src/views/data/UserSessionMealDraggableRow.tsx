@@ -13,17 +13,16 @@ import Down from "lucide-solid/icons/chevron-down";
 import Up from "lucide-solid/icons/chevron-up";
 
 import { DataTextArea, IconButton, TagArea } from "../../components";
-import { DraggingState, Tag } from "../../../Types";
+import { DraggingState, Meal, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import { MealRow } from "./UserSessionMealList";
 import { SetStoreFunction } from "solid-js/store";
 
 interface DraggableRowProps {
-  row: Row<MealRow>;
+  row: Row<Meal>;
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
-  expandAtInd: (index: number) => void;
-  collapse: () => void;
-  setMealRows: SetStoreFunction<{ rows: MealRow[] }>;
+  setSession: SetStoreFunction<{
+    session: UserSession | null;
+  }>;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -55,7 +54,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       },
       getData({ input }) {
         return attachClosestEdge(
-          { id: props.row.original.meal.id, ind: props.row.index, isMealRow: true },
+          { id: props.row.original.id, ind: props.row.index, isMealRow: true },
           { element, input, allowedEdges: ["top", "bottom"] }
         );
       },
@@ -90,7 +89,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       element,
       getInitialData() {
         return {
-          id: props.row.original.meal.id,
+          id: props.row.original.id,
           ind: props.row.index,
           isMealRow: true,
         };
@@ -103,7 +102,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           }),
           render({ container }) {
             const preview = document.createElement("div");
-            preview.textContent = props.row.original.meal.name;
+            preview.textContent = props.row.original.name;
             preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
             container.appendChild(preview);
           },
@@ -136,20 +135,8 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               <div class="p-1 flex-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
             )}
           </For>
-          <Show
-            when={props.row.original.expanded}
-            fallback={
-              <IconButton onClick={() => props.expandAtInd(props.row.index)}>
-                <Down />
-              </IconButton>
-            }
-          >
-            <IconButton onClick={props.collapse}>
-              <Up />
-            </IconButton>
-          </Show>
         </div>
-        <Show when={props.row.original.expanded}>
+        {/* <Show when={props.row.original.expanded}>
           <DataTextArea
             label="Description"
             value={props.row.original.meal.description}
@@ -163,7 +150,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             modelName="meals"
             recordID={props.row.original.meal.id}
           />
-        </Show>
+        </Show> */}
       </div>
       <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
         <div class={`h-1 bg-blue-400 rounded-full relative`}></div>

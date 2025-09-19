@@ -1,31 +1,26 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
-import { createStore } from "solid-js/store";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 
-import { Meal } from "../../../Types";
+import { Meal, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, DataInput, DataNumberInput } from "../../components";
 import CopyMealModal from "../CopyMealModal";
 import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/userSessionMealMethods";
 import { DraggableRow } from "./UserSessionMealDraggableRow";
-
-export interface MealRow {
-  meal: Meal;
-  expanded: boolean;
-}
+import { SetStoreFunction } from "solid-js/store";
 
 interface Props {
   meals: Meal[];
   sessionID: string;
+  setSession: SetStoreFunction<{
+    session: UserSession | null;
+  }>;
 }
 
 export const MealList: Component<Props> = (props) => {
-  const [mealRows, setMealRows] = createStore<{ rows: MealRow[] }>({
-    rows: props.meals.map((meal) => ({ meal, expanded: false })),
-  });
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
   const { pb, updateRecord } = useAuthPB();
 
@@ -38,17 +33,17 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const deleteRow = async (index: number) => {
-    const newRows = mealRows.rows.filter((_, ind) => ind !== index);
+    const newMeals = props.meals.filter((_, ind) => ind !== index);
 
     try {
-      setMealRows("rows", newRows);
-      await pb.collection("userSessionExercises").delete(mealRows.rows[index].meal.id);
+      props.setSession("session", "expand", "meals_via_userSession", newMeals);
+      await pb.collection("userSessionExercises").delete(props.meals[index].id);
 
       await updateRecord(
         "userSessions",
         props.sessionID,
         "mealsOrder",
-        newRows.map((r) => r.meal.id)
+        newMeals.map((r) => r.id)
       );
     } catch (e) {
       console.log(e);
@@ -56,35 +51,34 @@ export const MealList: Component<Props> = (props) => {
   };
 
   const reorderRows = (draggedItemOldInd: number, draggedItemNewInd: number) => {
-    // shuffle array
-    const newRows = [...mealRows.rows];
-    const draggedItem = newRows.splice(draggedItemOldInd, 1);
+    const newMeals = [...props.meals];
+    const draggedItem = newMeals.splice(draggedItemOldInd, 1);
 
     const adjustedNewIndex =
       draggedItemNewInd > draggedItemOldInd ? draggedItemNewInd - 1 : draggedItemNewInd;
-    newRows.splice(adjustedNewIndex, 0, ...draggedItem);
+    newMeals.splice(adjustedNewIndex, 0, ...draggedItem);
 
-    setMealRows("rows", newRows);
+    props.setSession("session", "expand", "meals_via_userSession", newMeals);
 
     updateRecord(
       "userSessions",
       props.sessionID,
       "mealsOrder",
-      newRows.map((r) => r.meal.id)
+      newMeals.map((r) => r.id)
     ).catch(console.error);
   };
 
   const insertRowAndSync = async (index: number, record: Meal) => {
-    const newRows = [...mealRows.rows];
+    const newMeals = [...props.meals];
 
-    newRows.splice(index, 0, { meal: record, expanded: false });
-    setMealRows("rows", newRows);
+    newMeals.splice(index, 0, record);
+    props.setSession("session", "expand", "meals_via_userSession", newMeals);
 
     await updateRecord(
       "userSessions",
       props.sessionID,
       "mealsOrder",
-      newRows.map((r) => r.meal.id)
+      newMeals.map((r) => r.id)
     );
   };
 
@@ -98,7 +92,7 @@ export const MealList: Component<Props> = (props) => {
     } else if (duplicateInd !== undefined) {
       const record = await pb
         .collection<Meal>("meals")
-        .create(extractMealData(mealRows.rows[duplicateInd].meal), { expand: USER_SESSION_MEAL_EXPAND });
+        .create(extractMealData(props.meals[duplicateInd]), { expand: USER_SESSION_MEAL_EXPAND });
 
       await insertRowAndSync(index + 1, record);
     }
@@ -107,40 +101,36 @@ export const MealList: Component<Props> = (props) => {
   const addMeal = async (mealToCopy?: Meal) => {
     const data = mealToCopy ? extractMealData(mealToCopy) : { userSession: props.sessionID };
 
-    addRowAtIndex(mealRows.rows.length, undefined, data);
+    addRowAtIndex(props.meals.length, undefined, data);
     setShowCopyMeal(false);
   };
 
-  const expandAtInd = (index: number) => {
-    setMealRows("rows", (_, i) => i === index, "expanded", true);
-  };
-
-  const collapse = () => {
-    setMealRows("rows", (r) => r.expanded, "expanded", false);
-  };
-
-  const columns = createMemo<ColumnDef<MealRow>[]>(() => [
+  const columns = createMemo<ColumnDef<Meal>[]>(() => [
     {
-      header: "meal",
+      header: "",
       accessorKey: "name",
       cell: (ctx) => (
         <DataInput
           type="text"
-          value={ctx.row.original.meal.name}
-          onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "name", v as string)}
-          saveFunc={(v) => saveRow(ctx.row.original.meal.id, "name", v)}
+          value={ctx.getValue() as string}
+          onValueChange={(v) =>
+            props.setSession("session", "expand", "meals_via_userSession", ctx.row.index, "name", v as string)
+          }
+          saveFunc={(v) => saveRow(ctx.row.original.id, "name", v)}
         />
       ),
     },
     {
-      header: "kj",
-      accessorKey: "meal.kj",
+      header: "energy",
+      accessorKey: "kj",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
           <DataNumberInput
             value={ctx.getValue() as number}
-            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "kj", v as number)}
-            saveFunc={(v) => saveRow(ctx.row.original.meal.id, "kj", v)}
+            onValueChange={(v) =>
+              props.setSession("session", "expand", "meals_via_userSession", ctx.row.index, "kj", v as number)
+            }
+            saveFunc={(v) => saveRow(ctx.row.original.id, "kj", v)}
           />
           <p>kj</p>
         </div>
@@ -148,57 +138,66 @@ export const MealList: Component<Props> = (props) => {
     },
     {
       header: "protein",
-      accessorKey: "meal.gramsProtein",
-      cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
-          <DataNumberInput
-            value={ctx.getValue() as number}
-            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsProtein", v as number)}
-            saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsProtein", v)}
-          />
-          <p>g</p>
-        </div>
-      ),
-    },
-    {
-      header: "carbs",
-      accessorKey: "meal.gramsCarbohydrate",
+      accessorKey: "gramsProtein",
       cell: (ctx) => (
         <div class="flex flex-row space-x-1">
           <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) =>
-              setMealRows("rows", ctx.row.index, "meal", "gramsCarbohydrate", v as number)
+              props.setSession(
+                "session",
+                "expand",
+                "meals_via_userSession",
+                ctx.row.index,
+                "gramsProtein",
+                v as number
+              )
             }
-            saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsCarbohydrate", v)}
+            saveFunc={(v) => saveRow(ctx.row.original.id, "gramsProtein", v)}
           />
           <p>g</p>
         </div>
       ),
     },
-    {
-      header: "fat",
-      accessorKey: "meal.gramsFat",
-      cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
-          <DataNumberInput
-            value={ctx.getValue() as number}
-            onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsFat", v as number)}
-            saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsFat", v)}
-          />
-          <p>g</p>
-        </div>
-      ),
-    },
+    // {
+    //   header: "carbs",
+    //   accessorKey: "meal.gramsCarbohydrate",
+    //   cell: (ctx) => (
+    //     <div class="flex flex-row space-x-1">
+    //       <DataNumberInput
+    //         value={ctx.getValue() as number}
+    //         onValueChange={(v) =>
+    //           setMealRows("rows", ctx.row.index, "meal", "gramsCarbohydrate", v as number)
+    //         }
+    //         saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsCarbohydrate", v)}
+    //       />
+    //       <p>g</p>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   header: "fat",
+    //   accessorKey: "meal.gramsFat",
+    //   cell: (ctx) => (
+    //     <div class="flex flex-row space-x-1">
+    //       <DataNumberInput
+    //         value={ctx.getValue() as number}
+    //         onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsFat", v as number)}
+    //         saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsFat", v)}
+    //       />
+    //       <p>g</p>
+    //     </div>
+    //   ),
+    // },
   ]);
 
   const table = createSolidTable({
     get data() {
-      return mealRows.rows;
+      return props.meals;
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.meal.id, // required because row indexes will change
+    getRowId: (row) => row.id, // required because row indexes will change
   });
 
   createEffect(() => {
@@ -253,15 +252,7 @@ export const MealList: Component<Props> = (props) => {
         </div>
         <div class="">
           <For each={table.getRowModel().rows}>
-            {(row) => (
-              <DraggableRow
-                row={row}
-                saveRow={saveRow}
-                expandAtInd={expandAtInd}
-                collapse={collapse}
-                setMealRows={setMealRows}
-              />
-            )}
+            {(row) => <DraggableRow row={row} saveRow={saveRow} setSession={props.setSession} />}
           </For>
         </div>
       </div>

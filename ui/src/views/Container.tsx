@@ -5,7 +5,7 @@ interface Props {
 }
 
 const Container: ParentComponent<Props> = (props) => {
-  return <div class={`${props.class ?? ""} px-[3vw] py-4 overflow-y-scroll`}>{props.children}</div>;
+  return <div class={`px-[3vw] flex-1 py-4 overflow-y-auto ${props.class ?? ""}`}>{props.children}</div>;
 };
 
 export default Container;
