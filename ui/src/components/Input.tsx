@@ -6,15 +6,17 @@ import { debounce } from "../methods/debounce";
 interface ExtraProps {
   label?: string;
   variant?: "bordered" | "none";
+  noPadding?: boolean;
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
 export const Input: ParentComponent<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "variant"]);
+  const [local, others] = splitProps(props, ["label", "class", "variant", "noPadding"]);
 
   const style = local.variant === "bordered" ? "border-2 border-ash-gray-400" : "";
+  const padding = local.noPadding ? "" : "px-2 py-1";
 
   return (
     <TextField class="flex flex-row space-x-1">
@@ -22,7 +24,7 @@ export const Input: ParentComponent<InputProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${style} input outline-none w-full rounded-sm px-2 py-1 ${local.class ?? ""}`}
+        class={`${style} ${padding} input outline-none w-full rounded-sm ${local.class ?? ""}`}
         {...others}
       />
     </TextField>

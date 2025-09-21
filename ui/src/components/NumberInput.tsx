@@ -20,7 +20,7 @@ export const NumberInput: ParentComponent<InputProps> = (props) => {
       </Show>
       <TextField.Input
         type="number"
-        class={`input outline-none w-[2rem] text-right ${local.class ?? ""}`}
+        class={`input outline-none w-[2.5rem] text-right ${local.class ?? ""}`}
         {...others}
       />
     </TextField>

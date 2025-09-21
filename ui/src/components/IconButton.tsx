@@ -6,7 +6,11 @@ interface Props {
 }
 
 export const IconButton: ParentComponent<Props> = (props) => {
-  return <KobalteButton onClick={props.onClick}>{props.children}</KobalteButton>;
+  return (
+    <KobalteButton class="active:opacity-80" onClick={props.onClick}>
+      {props.children}
+    </KobalteButton>
+  );
 };
 
 export default IconButton;

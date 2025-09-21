@@ -15,14 +15,15 @@ export const AppLayout: ParentComponent = (props) => {
   };
 
   const linkClasses = (path: string) =>
-    `flex flex-row space-x-2 mx-4 hover:text-gray-300 ${
+    `flex flex-row space-x-2 mx-4 hover:text-gray-300 active:opacity-80 ${
       isActive(path) ? "text-cambridge-blue-700" : "text-white"
     }`;
 
-  const iconClasses = (path: string) => (isActive(path) ? "text-cambridge-blue-700" : "text-white");
+  const iconClasses = (path: string) =>
+    `active:opacity-80 ${isActive(path) ? "text-cambridge-blue-700" : "text-white"}`;
 
   return (
-    <div class="flex h-screen bg-white bg-radial from-cambridge-blue-500/25 to-transparent">
+    <div class="flex h-screen bg-white bg-radial from-forest-green-500/50 to-transparent">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-gray-900 text-white py-4 space-y-6">
         <A href="/" class={linkClasses("/")}>

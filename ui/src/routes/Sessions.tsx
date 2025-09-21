@@ -11,12 +11,12 @@ const Sessions: Component = () => {
       <SectionHeader>
         <div class="flex justify-between items-start">
           <h1 class="text-xl font-bold">Your Workout Sessions</h1>
-          <Button href="/log" class="whitespace-nowrap ml-4">
+          <Button href="/log" class="whitespace-nowrap ml-4 text-black">
             Log workout
           </Button>
         </div>
       </SectionHeader>
-      <Container>
+      <Container noPadding>
         <UserSessionList />
       </Container>
     </>

@@ -52,7 +52,6 @@ export const MealList: Component<Props> = (props) => {
     try {
       const meals = await pb.collection<Meal>("meals").getFullList({
         filter: `userSession.user = '${user.id}' && name != ''`,
-        expand: "measurementType, exerciseVariations_via_exercise",
         sort: "name",
       });
 

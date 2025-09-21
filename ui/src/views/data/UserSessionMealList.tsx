@@ -2,10 +2,11 @@ import { Component, createEffect, createMemo, createSignal, For, Show } from "so
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { Meal, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import { Button, DataInput, DataNumberInput } from "../../components";
+import { Button, DataInput, DataNumberInput, IconButton } from "../../components";
 import CopyMealModal from "../CopyMealModal";
 import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/userSessionMealMethods";
@@ -112,6 +113,7 @@ export const MealList: Component<Props> = (props) => {
       cell: (ctx) => (
         <DataInput
           type="text"
+          noPadding
           value={ctx.getValue() as string}
           onValueChange={(v) =>
             props.setSession("session", "expand", "meals_via_userSession", ctx.row.index, "name", v as string)
@@ -124,7 +126,7 @@ export const MealList: Component<Props> = (props) => {
       header: "energy",
       accessorKey: "kj",
       cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
+        <div class="flex flex-row justify-end space-x-1">
           <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) =>
@@ -140,7 +142,7 @@ export const MealList: Component<Props> = (props) => {
       header: "protein",
       accessorKey: "gramsProtein",
       cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
+        <div class="flex flex-row justify-end space-x-1">
           <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) =>
@@ -159,36 +161,15 @@ export const MealList: Component<Props> = (props) => {
         </div>
       ),
     },
-    // {
-    //   header: "carbs",
-    //   accessorKey: "meal.gramsCarbohydrate",
-    //   cell: (ctx) => (
-    //     <div class="flex flex-row space-x-1">
-    //       <DataNumberInput
-    //         value={ctx.getValue() as number}
-    //         onValueChange={(v) =>
-    //           setMealRows("rows", ctx.row.index, "meal", "gramsCarbohydrate", v as number)
-    //         }
-    //         saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsCarbohydrate", v)}
-    //       />
-    //       <p>g</p>
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   header: "fat",
-    //   accessorKey: "meal.gramsFat",
-    //   cell: (ctx) => (
-    //     <div class="flex flex-row space-x-1">
-    //       <DataNumberInput
-    //         value={ctx.getValue() as number}
-    //         onValueChange={(v) => setMealRows("rows", ctx.row.index, "meal", "gramsFat", v as number)}
-    //         saveFunc={(v) => saveRow(ctx.row.original.meal.id, "gramsFat", v)}
-    //       />
-    //       <p>g</p>
-    //     </div>
-    //   ),
-    // },
+    {
+      header: "",
+      id: "more",
+      cell: () => (
+        <IconButton onClick={() => {}}>
+          <Ellipsis />
+        </IconButton>
+      ),
+    },
   ]);
 
   const table = createSolidTable({
@@ -235,28 +216,36 @@ export const MealList: Component<Props> = (props) => {
   return (
     <div class="mt-3">
       <div class="bg-white/25 rounded-lg">
-        <div>
+        <Show when={table.getRowModel().rows.length}>
           <For each={table.getHeaderGroups()}>
             {(headerGroup) => (
               <div class="flex">
                 <For each={headerGroup.headers}>
-                  {(header) => (
-                    <div class="text-left p-3 flex-1">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </div>
-                  )}
+                  {(header) => {
+                    let classes = `text-right p-2 ${
+                      header.column.id === "name"
+                        ? "flex-6"
+                        : header.column.id === "more"
+                        ? "flex-1"
+                        : "flex-2"
+                    }`;
+
+                    return (
+                      <div class={classes}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </div>
+                    );
+                  }}
                 </For>
               </div>
             )}
           </For>
-        </div>
-        <div class="">
-          <For each={table.getRowModel().rows}>
-            {(row) => <DraggableRow row={row} saveRow={saveRow} setSession={props.setSession} />}
-          </For>
-        </div>
+        </Show>
+        <For each={table.getRowModel().rows}>
+          {(row) => <DraggableRow row={row} saveRow={saveRow} setSession={props.setSession} />}
+        </For>
       </div>
-      <div class="flex flex-row justify-end space-x-3 mt-4">
+      <div class="flex flex-row justify-center space-x-3 mt-4">
         <Button onClick={() => addMeal()}>Add Meal</Button>
         <Button onClick={() => setShowCopyMeal(true)}>Copy Meal</Button>
       </div>

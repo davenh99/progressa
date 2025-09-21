@@ -65,7 +65,8 @@ export const UserSessionList: Component = (props) => {
           {(row) => (
             <A
               href={`/log?date=${row.original.userDay}`}
-              class="hover:bg-ash-gray-800 flex flex-row w-full justify-between py-2 border-b-2 border-ash-gray-800"
+              class={`bg-dark-slate-gray-500 text-white hover:bg-ash-gray-800 flex flex-row w-full
+                justify-between py-2 border-b-2 border-ash-gray-800`}
             >
               <For each={row.getVisibleCells()}>
                 {(cell) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>}

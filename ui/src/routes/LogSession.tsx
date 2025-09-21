@@ -97,7 +97,7 @@ const LogSession: Component = () => {
           <h1 class="text-xl font-bold">Log Session</h1>
           <Input
             type="date"
-            class="rounded-md bg-cambridge-blue-800 px-2 py-1"
+            class="rounded-md bg-cambridge-blue-800 px-2 py-1 text-black"
             value={searchParams.date}
             onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
           />
@@ -116,11 +116,11 @@ const LogSession: Component = () => {
             </div>
           }
         >
-          <Tabs aria-label="Log session navigation" class="w-full">
+          <Tabs class="w-full flex-1 flex flex-col overflow-hidden">
             <LogSessionNav />
 
-            <Tabs.Content value="exercises">
-              <Container class="overflow-x-hidden">
+            <Tabs.Content value="exercises" class="flex flex-1 overflow-hidden">
+              <Container class="pb-30">
                 <h2>Exercises</h2>
                 <UserSessionExerciseList
                   sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
@@ -131,7 +131,7 @@ const LogSession: Component = () => {
             </Tabs.Content>
 
             <Tabs.Content value="meals-sleep">
-              <Container class="space-y-4">
+              <Container class="space-y-4 pb-30">
                 <Blob>
                   <h2>Meals</h2>
                   <MealList
@@ -153,7 +153,7 @@ const LogSession: Component = () => {
             </Tabs.Content>
 
             <Tabs.Content value="settings">
-              <Container class="space-y-2">
+              <Container class="space-y-2 pb-30">
                 <h2 class="mb-4">Session Settings</h2>
 
                 <div>

@@ -1,12 +1,11 @@
 import { UserSessionExercise } from "../../Types";
-import { SessionExerciseRow } from "../views/data";
 
-export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
+export const getSupersetInds = (index: number, data: UserSessionExercise[]) => {
   const inds = [index];
-  const sessionExerciseId = data[index].sessionExercise.id;
+  const sessionExerciseId = data[index].id;
 
   for (const [i, d] of data.entries()) {
-    if (d.sessionExercise.supersetParent && d.sessionExercise.supersetParent === sessionExerciseId) {
+    if (d.supersetParent && d.supersetParent === sessionExerciseId) {
       inds.push(i);
     }
   }
@@ -14,12 +13,12 @@ export const getSupersetInds = (index: number, data: SessionExerciseRow[]) => {
   return inds;
 };
 
-export const getGroupInds = (index: number, data: SessionExerciseRow[]) => {
+export const getGroupInds = (index: number, data: UserSessionExercise[]) => {
   const inds = [];
-  const exerciseId = data[index].sessionExercise.exercise;
+  const exerciseId = data[index].exercise;
 
   for (const [i, d] of data.slice(index).entries()) {
-    if (d.sessionExercise.exercise === exerciseId) {
+    if (d.exercise === exerciseId) {
       inds.push(i + index);
     } else {
       break;

@@ -131,9 +131,13 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       >
         <div class="flex w-full">
           <For each={props.row.getVisibleCells()}>
-            {(cell) => (
-              <div class="p-1 flex-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
-            )}
+            {(cell) => {
+              let classes = `px-2 ${
+                cell.column.id === "name" ? "flex-6" : cell.column.id === "more" ? "flex-1" : "flex-2"
+              }`;
+
+              return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
+            }}
           </For>
         </div>
         {/* <Show when={props.row.original.expanded}>
