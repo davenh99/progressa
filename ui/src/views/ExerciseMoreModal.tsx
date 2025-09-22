@@ -1,6 +1,5 @@
 import { Component } from "solid-js";
 
-import { MealList } from "./MealList";
 import { Meal } from "../../Types";
 import { Modal } from "../components";
 
@@ -12,8 +11,7 @@ interface Props {
 export const ExerciseMoreModal: Component<Props> = (props) => {
   return (
     <Modal setModalVisible={props.setModalVisible}>
-      <p class="pb-2">Select Meal</p>
-      <MealList onClick={(meal: Meal) => props.addMeal(meal)} />
+      <h2 class="pb-2">Exercise Options</h2>
     </Modal>
   );
 };

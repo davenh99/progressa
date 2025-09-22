@@ -12,7 +12,7 @@ interface Props {
 export const CopyMealModal: Component<Props> = (props) => {
   return (
     <Modal setModalVisible={props.setModalVisible}>
-      <p class="pb-2">Select Meal</p>
+      <h2 class="pb-2">Select Meal</h2>
       <MealList onClick={(meal: Meal) => props.addMeal(meal)} />
     </Modal>
   );

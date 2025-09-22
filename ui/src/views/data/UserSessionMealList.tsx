@@ -1,5 +1,6 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+import { createStore, SetStoreFunction } from "solid-js/store";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
@@ -11,7 +12,7 @@ import CopyMealModal from "../CopyMealModal";
 import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/userSessionMealMethods";
 import { DraggableRow } from "./UserSessionMealDraggableRow";
-import { SetStoreFunction } from "solid-js/store";
+import MealMoreModal from "../MealMoreModal";
 
 interface Props {
   meals: Meal[];
@@ -23,6 +24,8 @@ interface Props {
 
 export const MealList: Component<Props> = (props) => {
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
+  const [showMoreMeal, setShowMoreMeal] = createSignal(false);
+  const [selectedMeal, setSelectedMeal] = createStore<{ meal: Meal }>({ meal: {} as Meal });
   const { pb, updateRecord } = useAuthPB();
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {
@@ -164,8 +167,13 @@ export const MealList: Component<Props> = (props) => {
     {
       header: "",
       id: "more",
-      cell: () => (
-        <IconButton onClick={() => {}}>
+      cell: (ctx) => (
+        <IconButton
+          onClick={() => {
+            setSelectedMeal({ meal: ctx.row.original });
+            setShowMoreMeal(true);
+          }}
+        >
           <Ellipsis />
         </IconButton>
       ),
@@ -251,6 +259,13 @@ export const MealList: Component<Props> = (props) => {
       </div>
       <Show when={showCopyMeal()}>
         <CopyMealModal setModalVisible={(v) => setShowCopyMeal(v)} addMeal={addMeal} />
+      </Show>
+      <Show when={showMoreMeal() && selectedMeal.meal}>
+        <MealMoreModal
+          setModalVisible={setShowMoreMeal}
+          meal={selectedMeal.meal}
+          setSelectedMeal={setSelectedMeal}
+        />
       </Show>
     </div>
   );

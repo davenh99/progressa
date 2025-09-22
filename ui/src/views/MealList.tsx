@@ -30,7 +30,7 @@ export const MealList: Component<Props> = (props) => {
     {
       header: "",
       id: "continue",
-      cell: () => <ArrowRight />,
+      cell: () => <ArrowRight class="self-end" />,
     },
   ]);
 
@@ -67,35 +67,31 @@ export const MealList: Component<Props> = (props) => {
 
   return (
     <Show when={!!meals()} fallback={<Loading />}>
-      <div class="bg-base-100 rounded-lg shadow px-6 py-3">
-        <div class="overflow-x-auto">
-          <table class="table w-full">
-            <Input
-              type="text"
-              placeholder="Search Past Meals"
-              class="p-1"
-              value={nameFilter()}
-              onInput={(e) => setNameFilter(e.currentTarget.value)}
-            />
-          </table>
+      <div class="bg-ash-gray-900 rounded-lg p-3 flex flex-col flex-1 overflow-hidden">
+        <Input
+          type="text"
+          placeholder="Search Past Meals"
+          class="p-1"
+          value={nameFilter()}
+          onInput={(e) => setNameFilter(e.currentTarget.value)}
+        />
 
-          <div class="max-h-[40vh] overflow-y-auto">
-            <table class="table w-full">
-              <tbody>
-                <For each={table.getRowModel().rows}>
-                  {(row) => (
-                    <tr class="hover" onClick={() => props.onClick(row.original)}>
-                      <For each={row.getVisibleCells()}>
-                        {(cell) => (
-                          <td class="p-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                        )}
-                      </For>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          </div>
+        <div class="overflow-y-auto flex-1">
+          <table class="table w-full">
+            <tbody>
+              <For each={table.getRowModel().rows}>
+                {(row) => (
+                  <tr class="hover" onClick={() => props.onClick(row.original)}>
+                    <For each={row.getVisibleCells()}>
+                      {(cell) => (
+                        <td class="p-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      )}
+                    </For>
+                  </tr>
+                )}
+              </For>
+            </tbody>
+          </table>
         </div>
         <Show when={table.getRowModel().rows.length === 0}>
           <div class="text-center py-4">No meals found</div>

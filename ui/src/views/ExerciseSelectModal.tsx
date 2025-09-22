@@ -16,7 +16,7 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
 
   return (
     <Modal setModalVisible={props.setModalVisible}>
-      <p class="pb-2">Select Exercise</p>
+      <h2 class="pb-2">Select Exercise</h2>
       <Show
         when={selectedExercise()}
         fallback={
