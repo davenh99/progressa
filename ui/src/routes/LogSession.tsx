@@ -6,15 +6,15 @@ import { useSearchParams } from "@solidjs/router";
 import { useAuthPB } from "../config/pocketbase";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector, Button } from "../components";
 import Container from "../views/Container";
-import type { Meal, SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
+import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
 import { MealList, UserSessionExerciseList } from "../views/data";
 import Loading from "../views/Loading";
 import LogSessionNav from "../views/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
 import SectionHeader from "../views/SectionHeader";
-import { ContainerIcon } from "lucide-solid";
 import { DataNumberInput } from "../components/NumberInput";
 import Blob from "../views/Blob";
+import { USER_SESSION_EXPAND } from "../config/constants";
 
 type SearchParams = {
   date: string;
@@ -42,7 +42,9 @@ const LogSession: Component = () => {
       mealsOrder: [],
     };
     try {
-      const newSession = await pb.collection<UserSession>("userSessions").create(createData);
+      const newSession = await pb
+        .collection<UserSession>("userSessions")
+        .create(createData, { expand: USER_SESSION_EXPAND });
       setSession({ session: newSession });
     } catch (e) {
       console.log(e);

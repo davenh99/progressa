@@ -29,7 +29,6 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
-  const { updateRecord } = useAuthPB();
 
   createEffect(() => {
     const element = ref;

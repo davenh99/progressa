@@ -1,6 +1,6 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
-import { createStore, SetStoreFunction } from "solid-js/store";
+import { SetStoreFunction } from "solid-js/store";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
@@ -25,7 +25,7 @@ interface Props {
 export const MealList: Component<Props> = (props) => {
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
   const [showMoreMeal, setShowMoreMeal] = createSignal(false);
-  const [selectedMeal, setSelectedMeal] = createStore<{ meal: Meal }>({ meal: {} as Meal });
+  const [selectedMealInd, setSelectedMealInd] = createSignal(-1);
   const { pb, updateRecord } = useAuthPB();
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {
@@ -41,7 +41,7 @@ export const MealList: Component<Props> = (props) => {
 
     try {
       props.setSession("session", "expand", "meals_via_userSession", newMeals);
-      await pb.collection("userSessionExercises").delete(props.meals[index].id);
+      await pb.collection("meals").delete(props.meals[index].id);
 
       await updateRecord(
         "userSessions",
@@ -170,7 +170,7 @@ export const MealList: Component<Props> = (props) => {
       cell: (ctx) => (
         <IconButton
           onClick={() => {
-            setSelectedMeal({ meal: ctx.row.original });
+            setSelectedMealInd(ctx.row.index);
             setShowMoreMeal(true);
           }}
         >
@@ -192,7 +192,7 @@ export const MealList: Component<Props> = (props) => {
   createEffect(() => {
     return monitorForElements({
       canMonitor({ source }) {
-        return source.data.isUserSessionExerciseRow as boolean;
+        return source.data.isMealRow as boolean;
       },
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
@@ -203,7 +203,7 @@ export const MealList: Component<Props> = (props) => {
         const sourceData = source.data;
         const targetData = target.data;
 
-        if (!sourceData.isUserSessionExerciseRow || !targetData.isUserSessionExerciseRow) {
+        if (!sourceData.isMealRow || !targetData.isMealRow) {
           return;
         }
 
@@ -260,11 +260,14 @@ export const MealList: Component<Props> = (props) => {
       <Show when={showCopyMeal()}>
         <CopyMealModal setModalVisible={(v) => setShowCopyMeal(v)} addMeal={addMeal} />
       </Show>
-      <Show when={showMoreMeal() && selectedMeal.meal}>
+      <Show when={showMoreMeal() && props.meals[selectedMealInd()]}>
         <MealMoreModal
+          sessionID={props.sessionID}
+          setSession={props.setSession}
           setModalVisible={setShowMoreMeal}
-          meal={selectedMeal.meal}
-          setSelectedMeal={setSelectedMeal}
+          initialMeal={props.meals[selectedMealInd()]}
+          deleteRow={() => deleteRow(selectedMealInd())}
+          duplicateRow={() => addRowAtIndex(selectedMealInd(), selectedMealInd())}
         />
       </Show>
     </div>

@@ -1,9 +1,10 @@
-import { createEffect, useContext } from "solid-js";
+import { useContext } from "solid-js";
 import { PBContext } from "./context";
-import { UserSession, UserSessionExercise } from "../../../Types";
+import { UserSession } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
 import { USER_SESSION_EXPAND } from "../constants";
-import { sortUserSessionExercises } from "../../methods/sortUserSessionExercises";
+import { sortUserSessionExercises } from "../../methods/userSessionExerciseMethods";
+import { sortMeals } from "../../methods/userSessionMealMethods";
 
 const BaseSignUpData = {
   dob: "",
@@ -96,7 +97,7 @@ export function useAuthPB() {
     }
   };
 
-  const userSessionToSortedExercises = (session: UserSession) => {
+  const userSessionToSortedExercisesAndMeals = (session: UserSession) => {
     const newSession = { ...session };
     if (newSession.expand?.userSessionExercises_via_userSession) {
       newSession.expand.userSessionExercises_via_userSession = sortUserSessionExercises(
@@ -104,24 +105,46 @@ export function useAuthPB() {
         newSession.itemsOrder ?? []
       );
     }
+    if (newSession.expand?.meals_via_userSession) {
+      newSession.expand.meals_via_userSession = sortMeals(
+        newSession.expand.meals_via_userSession ?? [],
+        newSession.mealsOrder ?? []
+      );
+    }
     return newSession;
   };
 
   const getSessionByDate = async (date: string): Promise<UserSession | null> => {
     try {
-      return userSessionToSortedExercises(
+      return userSessionToSortedExercisesAndMeals(
         await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date}'`, {
           expand: USER_SESSION_EXPAND,
         })
       );
     } catch (e) {
       if (e instanceof ClientResponseError && e.status === 404) {
+        return null;
       } else {
         throw e;
       }
-      return null;
     }
   };
 
-  return { pb, user, logout, getUserSessions, updateRecord, getSessionByDate };
+  const getSessionByID = async (id: string): Promise<UserSession | null> => {
+    try {
+      return userSessionToSortedExercisesAndMeals(
+        await pb.collection<UserSession>("userSessions").getOne(id, {
+          expand: USER_SESSION_EXPAND,
+        })
+      );
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+        return null;
+      } else {
+        throw e;
+      }
+    }
+  };
+
+  return { pb, user, logout, getUserSessions, updateRecord, getSessionByDate, getSessionByID };
 }
