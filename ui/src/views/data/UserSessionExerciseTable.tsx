@@ -10,10 +10,8 @@ import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/el
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import Grip from "lucide-solid/icons/grip-vertical";
-import Down from "lucide-solid/icons/chevron-down";
-import Up from "lucide-solid/icons/chevron-up";
 
-import { DataTime, DataTextArea, IconButton, TagArea } from "../../components";
+import { DataTime } from "../../components";
 import { DraggingState, UserSession, UserSessionExercise } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
@@ -43,11 +41,8 @@ interface DraggableRowProps {
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let ref: HTMLDivElement | undefined = undefined;
   let groupRef: HTMLDivElement | undefined = undefined;
-  let dragHandleRef: HTMLDivElement | undefined = undefined;
-  let dragHandleMasterRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
-  const { updateRecord } = useAuthPB();
 
   createEffect(() => {
     if (!props.firstOfSuperset && !props.lastOfSuperset) return;
@@ -109,13 +104,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     if (!props.firstOfSuperset) return;
 
     const element = ref;
-    const dragHandle = dragHandleRef;
     invariant(element);
-    invariant(dragHandle);
 
     draggable({
       element,
-      dragHandle,
       getInitialData() {
         return {
           id: props.row.original.id,
@@ -153,15 +145,12 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
     if (!props.firstOfGroup) return;
 
     const element = groupRef;
-    const dragHandle = dragHandleMasterRef;
     invariant(element);
-    invariant(dragHandle);
 
     const groupInds = props.getGroupInds();
 
     draggable({
       element,
-      dragHandle,
       getInitialData() {
         return {
           id: props.row.original.id,
@@ -204,9 +193,6 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
-          <div ref={dragHandleMasterRef} class="cursor-grab active:cursor-grabbing">
-            <Grip />
-          </div>
           <p>
             {props.row.original.expand?.variation?.name
               ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
@@ -224,17 +210,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         >
           <div class="flex w-full">
             <For each={props.row.getVisibleCells()}>
-              {(cell) => (
-                <Cell>
-                  {cell.column.id === "handle" && props.firstOfSuperset ? (
-                    <div ref={dragHandleRef} class="cursor-grab active:cursor-grabbing">
-                      <Grip />
-                    </div>
-                  ) : (
-                    flexRender(cell.column.columnDef.cell, cell.getContext())
-                  )}
-                </Cell>
-              )}
+              {(cell) => <Cell>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Cell>}
             </For>
           </div>
           <Show when={props.lastOfSuperset}>

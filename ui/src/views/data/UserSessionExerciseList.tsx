@@ -174,10 +174,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
     {
-      header: "",
-      id: "handle",
-    },
-    {
       accessorKey: "isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
