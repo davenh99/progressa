@@ -6,14 +6,15 @@ interface Props {
   onClick?: () => void;
   href?: string;
   class?: string;
+  variant?: "text";
 }
 
 export const Button: ParentComponent<Props> = (props) => {
-  const [local, others] = splitProps(props, ["children", "href", "onClick", "class"]);
+  const [local, others] = splitProps(props, ["children", "href", "onClick", "class", "variant"]);
 
-  const classes = `rounded-lg bg-forest-green-800 px-3 py-1.5 font-bold active:opacity-80 ${
-    local.class ?? ""
-  }`;
+  const classes = `${
+    local.variant === "text" ? "" : "rounded-lg bg-forest-green-800"
+  } px-3 py-1.5 font-bold active:opacity-80 ${local.class ?? ""}`;
 
   return (
     <Show

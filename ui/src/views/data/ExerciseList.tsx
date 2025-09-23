@@ -66,21 +66,8 @@ export const ExerciseList: Component<Props> = (props) => {
 
   return (
     <Show when={!!exercises()} fallback={<Loading />}>
-      <div class="bg-base-100 rounded-lg shadow px-6 py-3">
+      <div class="bg-ash-gray-900 rounded-lg p-1">
         <div class="overflow-x-auto">
-          <table class="table w-full">
-            <thead class="sticky top-0 bg-base-100 z-10">
-              <For each={table.getHeaderGroups()}>
-                {(headerGroup) => (
-                  <tr>
-                    <For each={headerGroup.headers}>
-                      {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
-                    </For>
-                  </tr>
-                )}
-              </For>
-            </thead>
-          </table>
           <Input
             type="text"
             placeholder="Search Exercises"

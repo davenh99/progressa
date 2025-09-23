@@ -32,7 +32,7 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
           />
         }
       >
-        <Button onClick={() => setSelectedExercise(null)} class="flex flex-row">
+        <Button variant="text" onClick={() => setSelectedExercise(null)} class="flex flex-row">
           <ArrowLeft />
           <p>{selectedExercise()?.name || ""}</p>
         </Button>

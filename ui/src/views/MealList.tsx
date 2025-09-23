@@ -67,7 +67,7 @@ export const MealList: Component<Props> = (props) => {
 
   return (
     <Show when={!!meals()} fallback={<Loading />}>
-      <div class="bg-ash-gray-900 rounded-lg p-3 flex flex-col flex-1 overflow-hidden">
+      <div class="bg-ash-gray-900 rounded-lg p-1 flex flex-col flex-1 overflow-hidden">
         <Input
           type="text"
           placeholder="Search Past Meals"
