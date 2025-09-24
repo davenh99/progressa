@@ -111,7 +111,7 @@ export const MealList: Component<Props> = (props) => {
 
   const columns = createMemo<ColumnDef<Meal>[]>(() => [
     {
-      header: "",
+      header: "name",
       accessorKey: "name",
       cell: (ctx) => (
         <DataInput
@@ -230,12 +230,12 @@ export const MealList: Component<Props> = (props) => {
               <div class="flex">
                 <For each={headerGroup.headers}>
                   {(header) => {
-                    let classes = `text-right p-2 ${
+                    let classes = `p-2 ${
                       header.column.id === "name"
-                        ? "flex-6"
+                        ? "flex-6 text-left"
                         : header.column.id === "more"
-                        ? "flex-1"
-                        : "flex-2"
+                        ? "flex-1 text-right"
+                        : "flex-2 text-right"
                     }`;
 
                     return (
@@ -260,7 +260,7 @@ export const MealList: Component<Props> = (props) => {
       <Show when={showCopyMeal()}>
         <CopyMealModal setModalVisible={(v) => setShowCopyMeal(v)} addMeal={addMeal} />
       </Show>
-      <Show when={showMoreMeal() && props.meals[selectedMealInd()]}>
+      <Show when={showMoreMeal() && selectedMealInd() >= 0}>
         <MealMoreModal
           sessionID={props.sessionID}
           setSession={props.setSession}

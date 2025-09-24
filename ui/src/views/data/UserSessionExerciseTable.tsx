@@ -193,11 +193,21 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}`}
       >
         <Show when={props.firstOfGroup}>
+          {/* exercise name */}
           <p>
             {props.row.original.expand?.variation?.name
               ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
               : props.row.original.expand?.exercise?.name}
           </p>
+
+          {/* column headers */}
+          <div class="w-full flex flex-row justify-between mt-1">
+            <p>set</p>
+            <p>{props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"}</p>
+            <p>+kg</p>
+            <p>rpe</p>
+            <p> </p>
+          </div>
         </Show>
         <Show when={dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfSuperset}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
@@ -233,43 +243,6 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 />
               </div>
             </div>
-            {/* <Show when={props.row.original}>
-              <DataTextArea
-                label="Notes"
-                value={props.getSupersetParent(props.row.index).notes}
-                onValueChange={(notes) => {
-                  const recordID = props.row.original.supersetParent || props.row.original.id;
-
-                  props.setExerciseRows("rows", (r) => r.id === recordID, "sessionExercise", "notes", notes);
-                }}
-                saveFunc={(v: string) =>
-                  updateRecord(
-                    "userSessionExercises",
-                    props.row.original.supersetParent || props.row.original.id,
-                    "notes",
-                    v
-                  )
-                }
-              />
-
-              <TagArea
-                tags={props.getSupersetParent(props.row.index).expand?.tags ?? []}
-                setTags={(tags) => {
-                  const recordID = props.row.original.supersetParent || props.row.original.id;
-
-                  props.setExerciseRows(
-                    "rows",
-                    (r) => r.sessionExercise.id === recordID,
-                    "sessionExercise",
-                    "expand",
-                    "tags",
-                    tags
-                  );
-                }}
-                modelName="userSessionExercises"
-                recordID={props.row.original.supersetParent || props.row.original.id}
-              />
-            </Show> */}
           </Show>
         </div>
         <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>
@@ -281,5 +254,5 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
 };
 
 export const Cell: ParentComponent = (props) => {
-  return <div class={`p-1 flex-1`}>{props.children}</div>;
+  return <div class={`py-1 flex-1`}>{props.children}</div>;
 };

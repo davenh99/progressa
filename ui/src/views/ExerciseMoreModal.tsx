@@ -1,11 +1,19 @@
 import { Component } from "solid-js";
+import { SetStoreFunction } from "solid-js/store";
 
-import { Meal } from "../../Types";
+import { UserSession, UserSessionExercise } from "../../Types";
 import { Modal } from "../components";
 
 interface Props {
-  setModalVisible: (v: boolean) => void;
-  addMeal: (meal: Meal) => Promise<void>;
+  setModalVisible: (visible: boolean) => void;
+  initialExercise: UserSessionExercise;
+  sessionID: string;
+  setSession: SetStoreFunction<{
+    session: UserSession | null;
+  }>;
+  deleteRow: () => Promise<void>;
+  duplicateRow: () => Promise<void>;
+  addDropSet: () => Promise<void>;
 }
 
 export const ExerciseMoreModal: Component<Props> = (props) => {

@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 
 import { Meal, UserSession } from "../../Types";
-import { Button, Input, Modal, TagArea, TextArea } from "../components";
+import { Button, Input, NumberInput, Modal, TagArea, TextArea } from "../components";
 import { useAuthPB } from "../config/pocketbase";
 
 interface Props {
@@ -46,30 +46,38 @@ export const MealMoreModal: Component<Props> = (props) => {
           value={meal.description}
           onInput={(e) => setMeal("description", e.currentTarget.value)}
         />
-        <Input
-          label="Energy"
-          variant="bordered"
-          value={meal.kj}
-          onInput={(e) => setMeal("kj", Number(e.currentTarget.value))}
-        />
-        <Input
-          label="Protein"
-          variant="bordered"
-          value={meal.gramsProtein}
-          onInput={(e) => setMeal("gramsProtein", Number(e.currentTarget.value))}
-        />
-        <Input
-          label="Carbohydrates"
-          variant="bordered"
-          value={meal.gramsCarbohydrate}
-          onInput={(e) => setMeal("gramsCarbohydrate", Number(e.currentTarget.value))}
-        />
-        <Input
-          label="Fats"
-          variant="bordered"
-          value={meal.gramsFat}
-          onInput={(e) => setMeal("gramsFat", Number(e.currentTarget.value))}
-        />
+        <div class="flex space-x-0.5">
+          <NumberInput
+            label="Energy"
+            value={meal.kj}
+            onInput={(e) => setMeal("kj", Number(e.currentTarget.value))}
+          />
+          <p>kj</p>
+        </div>
+        <div class="flex space-x-0.5">
+          <NumberInput
+            label="Protein"
+            value={meal.gramsProtein}
+            onInput={(e) => setMeal("gramsProtein", Number(e.currentTarget.value))}
+          />
+          <p>g</p>
+        </div>
+        <div class="flex space-x-0.5">
+          <NumberInput
+            label="Carbohydrates"
+            value={meal.gramsCarbohydrate}
+            onInput={(e) => setMeal("gramsCarbohydrate", Number(e.currentTarget.value))}
+          />
+          <p>g</p>
+        </div>
+        <div class="flex space-x-0.5">
+          <NumberInput
+            label="Fats"
+            value={meal.gramsFat}
+            onInput={(e) => setMeal("gramsFat", Number(e.currentTarget.value))}
+          />
+          <p>g</p>
+        </div>
         <TagArea
           tags={meal.expand.tags ?? []}
           setTags={(tags) => setMeal("expand", "tags", tags)}

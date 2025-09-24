@@ -1,10 +1,9 @@
 import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
-import { createStore, SetStoreFunction } from "solid-js/store";
-import Copy from "lucide-solid/icons/copy";
-import Trash from "lucide-solid/icons/trash-2";
-import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
+import { SetStoreFunction } from "solid-js/store";
+import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import Ellipsis from "lucide-solid/icons/ellipsis";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
@@ -16,11 +15,13 @@ import {
   IconButton,
   DataTime,
   DataNumberInput,
+  RPESelect,
 } from "../../components";
 import { DraggableRow, Table, TableBody } from "./UserSessionExerciseTable";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import ExerciseSelectModal from "../ExerciseSelectModal";
 import { USER_SESSION_EXERCISE_EXPAND } from "../../config/constants";
+import ExerciseMoreModal from "../ExerciseMoreModal";
 
 interface Props {
   sessionExercises: UserSessionExercise[];
@@ -32,6 +33,8 @@ interface Props {
 
 export const UserSessionExerciseList: Component<Props> = (props) => {
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
+  const [showMoreExercise, setShowMoreExercise] = createSignal(false);
+  const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
   const { pb, user, updateRecord } = useAuthPB();
 
   const getSupersetParent = (index: number, data: UserSessionExercise[]): UserSessionExercise => {
@@ -177,7 +180,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorKey: "isWarmup",
       header: "Warmup?",
       cell: (ctx) => (
-        <Show when={!ctx.row.original.supersetParent} fallback={<p class="italic">dropset</p>}>
+        <Show when={!ctx.row.original.supersetParent} fallback={<p>D</p>}>
           <Show when={ctx.getValue() as boolean} fallback={<p>{ctx.row.index + 1}</p>}>
             <p>W</p>
           </Show>
@@ -289,54 +292,34 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorKey: "perceivedEffort",
       header: "RPE",
       cell: (ctx) => (
-        <DataSlider
-          value={ctx.getValue() as number}
-          onValueChange={(v) =>
-            props.setSession(
-              "session",
-              "expand",
-              "userSessionExercises_via_userSession",
-              ctx.row.index,
-              "perceivedEffort",
-              v as number
-            )
-          }
-          saveFunc={(v: number) => saveRow(ctx.row.original.id, "perceivedEffort", v)}
-        />
+        <RPESelect value={ctx.getValue() as number} />
+        // <DataSlider
+        //   value={ctx.getValue() as number}
+        //   onValueChange={(v) =>
+        //     props.setSession(
+        //       "session",
+        //       "expand",
+        //       "userSessionExercises_via_userSession",
+        //       ctx.row.index,
+        //       "perceivedEffort",
+        //       v as number
+        //     )
+        //   }
+        //   saveFunc={(v: number) => saveRow(ctx.row.original.id, "perceivedEffort", v)}
+        // />
       ),
     },
     {
       header: "",
-      id: "add-dropset",
-      cell: (ctx) => (
-        <Show when={!ctx.row.original.supersetParent}>
-          <Button
-            onClick={() => addRowsAtIndex(ctx.row.index, undefined, getDropsetAddData(ctx.row.original))}
-          >
-            + dropset
-          </Button>
-        </Show>
-      ),
-    },
-    {
-      header: "",
-      id: "duplicate",
+      id: "more",
       cell: (ctx) => (
         <IconButton
-          onClick={() =>
-            addRowsAtIndex(ctx.row.index, getSupersetInds(ctx.row.index, props.sessionExercises))
-          }
+          onClick={() => {
+            setShowMoreExercise(true);
+            setSelectedExerciseInd(ctx.row.index);
+          }}
         >
-          <Copy />
-        </IconButton>
-      ),
-    },
-    {
-      header: "",
-      id: "delete",
-      cell: (ctx) => (
-        <IconButton onClick={() => deleteRows(getSupersetInds(ctx.row.index, props.sessionExercises))}>
-          <Trash />
+          <Ellipsis />
         </IconButton>
       ),
     },
@@ -429,6 +412,28 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         <ExerciseSelectModal
           setModalVisible={setShowCreateSessionExercise}
           addSessionExercise={addSessionExercise}
+        />
+      </Show>
+      <Show when={showMoreExercise() && selectedExerciseInd() >= 0}>
+        <ExerciseMoreModal
+          sessionID={props.sessionID}
+          setSession={props.setSession}
+          setModalVisible={setShowMoreExercise}
+          initialExercise={props.sessionExercises[selectedExerciseInd()]}
+          deleteRow={() => deleteRows(getSupersetInds(selectedExerciseInd(), props.sessionExercises))}
+          duplicateRow={() =>
+            addRowsAtIndex(
+              selectedExerciseInd(),
+              getSupersetInds(selectedExerciseInd(), props.sessionExercises)
+            )
+          }
+          addDropSet={() =>
+            addRowsAtIndex(
+              selectedExerciseInd(),
+              undefined,
+              getDropsetAddData(props.sessionExercises[selectedExerciseInd()])
+            )
+          }
         />
       </Show>
     </div>
