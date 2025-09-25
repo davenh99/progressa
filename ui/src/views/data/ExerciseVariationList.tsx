@@ -29,7 +29,7 @@ export const ExerciseVariationList: Component<Props> = (props) => {
   });
 
   return (
-    <div class="bg-base-100 rounded-lg shadow p-6">
+    <div class="bg-base-100 rounded-lg shadow p-1">
       <div class="overflow-x-auto">
         <table class="table w-full">
           <thead>

@@ -1,8 +1,9 @@
 import { Component } from "solid-js";
-import { SetStoreFunction } from "solid-js/store";
+import { createStore, SetStoreFunction } from "solid-js/store";
 
 import { UserSession, UserSessionExercise } from "../../Types";
-import { Modal } from "../components";
+import { Button, Modal, TagArea, TextArea } from "../components";
+import { useAuthPB } from "../config/pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
@@ -17,9 +18,52 @@ interface Props {
 }
 
 export const ExerciseMoreModal: Component<Props> = (props) => {
+  const [exercise, setExercise] = createStore(props.initialExercise);
+  const { pb, getSessionByID } = useAuthPB();
+
+  const save = async () => {
+    try {
+      await pb.collection("userSessionExercises").update(exercise.id, exercise);
+      // lazy way to refresh the session for now. could also set the state.
+      const updatedSession = await getSessionByID(props.sessionID);
+      props.setSession({ session: updatedSession });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
-    <Modal setModalVisible={props.setModalVisible}>
+    <Modal saveFunc={save} setModalVisible={props.setModalVisible}>
       <h2 class="pb-2">Exercise Options</h2>
+      <TextArea
+        label="Notes"
+        value={exercise.notes}
+        onInput={(e) => setExercise("notes", e.currentTarget.value)}
+      />
+      <TagArea
+        tags={exercise.expand?.tags ?? []}
+        setTags={(tags) => {
+          setExercise("expand", "tags", tags);
+          setExercise(
+            "tags",
+            tags.map((t) => t.id)
+          );
+        }}
+        modelName="userSessionExercises"
+        recordID={exercise.id}
+      />
+      <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
+      <h3>Actions</h3>
+      <div class="space-x-2 space-y-2">
+        <Button onClick={() => props.addDropSet().then(() => props.setModalVisible(false))}>
+          Add Drop Set
+        </Button>
+        <Button onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}>
+          Duplicate
+        </Button>
+        <Button onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}>Delete</Button>
+      </div>
+      <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
     </Modal>
   );
 };

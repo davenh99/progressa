@@ -1,4 +1,4 @@
-import { Component, For, ParentComponent, Show, createEffect, createSignal } from "solid-js";
+import { Component, For, Show, createEffect, createSignal } from "solid-js";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -9,20 +9,10 @@ import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/eleme
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
-import Grip from "lucide-solid/icons/grip-vertical";
 
 import { DataTime } from "../../components";
 import { DraggingState, UserSession, UserSessionExercise } from "../../../Types";
-import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
-
-export const Table: ParentComponent = (props) => {
-  return <div class="w-full">{props.children}</div>;
-};
-
-export const TableBody: ParentComponent = (props) => {
-  return <div>{props.children}</div>;
-};
 
 interface DraggableRowProps {
   row: RowType<UserSessionExercise>;

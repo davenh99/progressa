@@ -7,17 +7,8 @@ import Ellipsis from "lucide-solid/icons/ellipsis";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
-import {
-  Button,
-  DataInput,
-  DataSlider,
-  DataSelect,
-  IconButton,
-  DataTime,
-  DataNumberInput,
-  RPESelect,
-} from "../../components";
-import { DraggableRow, Table, TableBody } from "./UserSessionExerciseTable";
+import { Button, DataSelect, IconButton, DataTime, DataNumberInput, RPESelect } from "../../components";
+import { DraggableRow } from "./UserSessionExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
 import ExerciseSelectModal from "../ExerciseSelectModal";
 import { USER_SESSION_EXERCISE_EXPAND } from "../../config/constants";
@@ -367,36 +358,34 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   return (
     <div class="flex flex-col items-center">
-      <Table>
-        <TableBody>
-          <For each={table.getRowModel().rows}>
-            {(row) => (
-              <DraggableRow
-                row={row}
-                saveRow={saveRow}
-                firstOfGroup={
-                  row.index === 0 ||
-                  row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
-                  row.original.variation !== props.sessionExercises[row.index - 1].variation
-                }
-                lastOfGroup={
-                  row.index === props.sessionExercises.length - 1 ||
-                  row.original.exercise !== props.sessionExercises[row.index + 1].exercise ||
-                  row.original.variation !== props.sessionExercises[row.index + 1].variation
-                }
-                firstOfSuperset={!row.original.supersetParent}
-                lastOfSuperset={
-                  row.index === props.sessionExercises.length - 1 ||
-                  !props.sessionExercises[row.index + 1].supersetParent
-                }
-                getGroupInds={() => getGroupInds(row.index, props.sessionExercises)}
-                setSession={props.setSession}
-                getSupersetParent={(i: number) => getSupersetParent(i, props.sessionExercises)}
-              />
-            )}
-          </For>
-        </TableBody>
-      </Table>
+      <div class="w-full">
+        <For each={table.getRowModel().rows}>
+          {(row) => (
+            <DraggableRow
+              row={row}
+              saveRow={saveRow}
+              firstOfGroup={
+                row.index === 0 ||
+                row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
+                row.original.variation !== props.sessionExercises[row.index - 1].variation
+              }
+              lastOfGroup={
+                row.index === props.sessionExercises.length - 1 ||
+                row.original.exercise !== props.sessionExercises[row.index + 1].exercise ||
+                row.original.variation !== props.sessionExercises[row.index + 1].variation
+              }
+              firstOfSuperset={!row.original.supersetParent}
+              lastOfSuperset={
+                row.index === props.sessionExercises.length - 1 ||
+                !props.sessionExercises[row.index + 1].supersetParent
+              }
+              getGroupInds={() => getGroupInds(row.index, props.sessionExercises)}
+              setSession={props.setSession}
+              getSupersetParent={(i: number) => getSupersetParent(i, props.sessionExercises)}
+            />
+          )}
+        </For>
+      </div>
       <Button onClick={() => setShowCreateSessionExercise(true)} class="mt-2">
         Add Set
       </Button>

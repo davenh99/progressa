@@ -80,7 +80,13 @@ export const MealMoreModal: Component<Props> = (props) => {
         </div>
         <TagArea
           tags={meal.expand.tags ?? []}
-          setTags={(tags) => setMeal("expand", "tags", tags)}
+          setTags={(tags) => {
+            setMeal("expand", "tags", tags);
+            setMeal(
+              "tags",
+              tags.map((t) => t.id)
+            );
+          }}
           modelName="meals"
           recordID={meal.id}
         />
