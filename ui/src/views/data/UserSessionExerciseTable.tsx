@@ -227,7 +227,6 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             <div class="flex flex-row justify-between">
               <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 flex flex-row">
                 <DataTime
-                  label="Rest: "
                   value={props.row.original.restAfter}
                   onValueChange={(v) =>
                     props.setSession(

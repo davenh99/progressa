@@ -5,24 +5,23 @@ import { debounce } from "../methods/debounce";
 
 interface ExtraProps {
   label?: string;
+  width?: string;
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
 export const NumberInput: ParentComponent<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class"]);
+  const [local, others] = splitProps(props, ["label", "class", "width"]);
+
+  const classes = `input outline-none text-right ${local.class ?? ""}`;
 
   return (
     <TextField class="flex flex-row space-x-1">
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
-      <TextField.Input
-        type="number"
-        class={`input outline-none w-[2.5rem] text-right ${local.class ?? ""}`}
-        {...others}
-      />
+      <TextField.Input type="number" class={classes} style={{ width: local.width ?? "2.5rem" }} {...others} />
     </TextField>
   );
 };
@@ -43,6 +42,7 @@ export const DataNumberInput: ParentComponent<DataProps> = (props) => {
       }}
       label={props.label}
       type={props.type}
+      width={props.width}
     />
   );
 };

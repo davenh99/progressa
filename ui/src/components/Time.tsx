@@ -2,15 +2,14 @@ import { Component, createEffect, createSignal } from "solid-js";
 import NumberInput from "./NumberInput";
 
 interface Props {
-  label?: string;
   value: number;
   onValueChange: (v: number) => void;
   saveFunc: (v: number) => Promise<any>;
 }
 
 export const DataTime: Component<Props> = (props) => {
-  const [seconds, setSeconds] = createSignal(0);
-  const [minutes, setMinutes] = createSignal(0);
+  const [minutes, setMinutes] = createSignal(Math.floor(props.value / 60));
+  const [seconds, setSeconds] = createSignal(Math.round(props.value % 60));
 
   createEffect(() => {
     const min = minutes() || 0;
@@ -21,50 +20,45 @@ export const DataTime: Component<Props> = (props) => {
     props.saveFunc(newVal).then(() => props.onValueChange(newVal));
   });
 
+  // TODO this was making a loop, do I need the code and how to avoid the loop?
   // not onMount, should be reactive to external state changes...
-  createEffect(() => {
-    setMinutes(Math.floor(props.value / 60));
-    setSeconds(Math.round(props.value % 60));
-  });
+  // createEffect(() => {
+  //   setMinutes(Math.floor(props.value / 60));
+  //   setSeconds(Math.round(props.value % 60));
+  // });
 
   return (
-    <div class="p-1 flex flex-row gap-2">
-      <p>{props.label || ""}</p>
-      <div class="flex items-center gap-2">
-        <div class="flex flex-col items-center">
-          <NumberInput
-            value={minutes()}
-            onInput={(e) => {
-              const raw = parseInt(e.currentTarget.value) || 0;
-              const clamped = Math.max(0, raw);
-              setMinutes(clamped);
+    <div class="px-1 flex items-center">
+      <NumberInput
+        width="1.2rem"
+        value={minutes()}
+        onInput={(e) => {
+          const raw = parseInt(e.currentTarget.value) || 0;
+          const clamped = Math.max(0, raw);
+          setMinutes(clamped);
 
-              if (clamped !== raw) {
-                e.currentTarget.value = clamped.toString();
-              }
-            }}
-            min={0}
-          />
-          <span class="text-xs text-gray-500">min</span>
-        </div>
-        <div class="flex flex-col items-center">
-          <NumberInput
-            value={seconds()}
-            onInput={(e) => {
-              const raw = parseInt(e.currentTarget.value) || 0;
-              const clamped = Math.min(59, Math.max(0, raw));
-              setSeconds(clamped);
+          if (clamped !== raw) {
+            e.currentTarget.value = clamped.toString();
+          }
+        }}
+        min={0}
+      />
+      <p>:</p>
+      <NumberInput
+        width="1.2rem"
+        value={seconds().toString().padStart(2, "0")}
+        onInput={(e) => {
+          const raw = parseInt(e.currentTarget.value) || 0;
+          const clamped = Math.min(59, Math.max(0, raw));
+          setSeconds(clamped);
 
-              if (clamped !== raw) {
-                e.currentTarget.value = clamped.toString();
-              }
-            }}
-            min={0}
-            max={59}
-          />
-          <span class="text-xs text-gray-500">sec</span>
-        </div>
-      </div>
+          if (clamped !== raw) {
+            e.currentTarget.value = clamped.toString();
+          }
+        }}
+        min={0}
+        max={59}
+      />
     </div>
   );
 };

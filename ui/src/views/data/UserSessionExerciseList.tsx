@@ -239,9 +239,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                     }
                     saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
                   />
-                  <p>
-                    {ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? ""}
-                  </p>
                 </div>
               }
             >
