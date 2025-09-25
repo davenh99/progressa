@@ -202,30 +202,31 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
 
           {/* column headers */}
           <div class="w-full flex flex-row justify-between mt-1">
-            <p>set</p>
-            <p>{props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"}</p>
-            <p>+kg</p>
-            <p>rpe</p>
-            <p> </p>
+            <p class="flex-2">set</p>
+            <p class="flex-2">
+              {props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"}
+            </p>
+            <p class="flex-2">+kg</p>
+            <p class="flex-2">rpe</p>
+            <p class="flex-1"> </p>
           </div>
         </Show>
         <Show when={dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfSuperset}>
           <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
         </Show>
-        <div
-          ref={ref}
-          class={`flex flex-col p-1 ${dragging() === "dragging" ? "opacity-40" : ""} bg-ash-gray-800 ${
-            props.firstOfSuperset ? "rounded-t-md" : ""
-          } ${props.lastOfSuperset ? "rounded-b-md" : ""}`}
-        >
+        <div ref={ref} class={`flex flex-col ${dragging() === "dragging" ? "opacity-40" : ""}`}>
           <div class="flex w-full">
             <For each={props.row.getVisibleCells()}>
-              {(cell) => <Cell>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Cell>}
+              {(cell) => {
+                const classes = `py-1 ${cell.column.id === "more" ? "flex-1" : "flex-2"}`;
+
+                return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
+              }}
             </For>
           </div>
           <Show when={props.lastOfSuperset}>
-            <div class="flex flex-row justify-between">
-              <div class="rounded-lg bg-dark-slate-gray-800 p-1 ml-15 grow-0 flex flex-row">
+            <div class="flex flex-row justify-around">
+              <div class="rounded-lg bg-dark-slate-gray-800">
                 <DataTime
                   value={props.row.original.restAfter}
                   onValueChange={(v) =>
@@ -250,8 +251,4 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       </div>
     </>
   );
-};
-
-export const Cell: ParentComponent = (props) => {
-  return <div class={`py-1 flex-1`}>{props.children}</div>;
 };

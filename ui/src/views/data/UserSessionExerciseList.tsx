@@ -168,7 +168,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       userSession: props.sessionID,
       variation: variationID || undefined,
       exercise: exerciseID,
-      perceivedEffort: 70,
+      perceivedEffort: 0,
     };
 
     addRowsAtIndex(props.sessionExercises.length, undefined, data);
@@ -265,45 +265,40 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       accessorKey: "addedWeight",
       header: "",
       cell: (ctx) => (
-        <div class="flex flex-row space-x-1">
-          <DataInput
-            type="number"
-            value={ctx.getValue() as number}
-            onValueChange={(v) =>
-              props.setSession(
-                "session",
-                "expand",
-                "userSessionExercises_via_userSession",
-                ctx.row.index,
-                "addedWeight",
-                v as number
-              )
-            }
-            saveFunc={(v) => saveRow(ctx.row.original.id, "addedWeight", v)}
-          />
-          <p>kg</p>
-        </div>
+        <DataNumberInput
+          value={ctx.getValue() as number}
+          onValueChange={(v) =>
+            props.setSession(
+              "session",
+              "expand",
+              "userSessionExercises_via_userSession",
+              ctx.row.index,
+              "addedWeight",
+              v as number
+            )
+          }
+          saveFunc={(v) => saveRow(ctx.row.original.id, "addedWeight", v)}
+        />
       ),
     },
     {
       accessorKey: "perceivedEffort",
       header: "RPE",
       cell: (ctx) => (
-        <RPESelect value={ctx.getValue() as number} />
-        // <DataSlider
-        //   value={ctx.getValue() as number}
-        //   onValueChange={(v) =>
-        //     props.setSession(
-        //       "session",
-        //       "expand",
-        //       "userSessionExercises_via_userSession",
-        //       ctx.row.index,
-        //       "perceivedEffort",
-        //       v as number
-        //     )
-        //   }
-        //   saveFunc={(v: number) => saveRow(ctx.row.original.id, "perceivedEffort", v)}
-        // />
+        <RPESelect
+          value={ctx.row.original.perceivedEffort}
+          onChange={(v) => {
+            props.setSession(
+              "session",
+              "expand",
+              "userSessionExercises_via_userSession",
+              ctx.row.index,
+              "perceivedEffort",
+              v
+            );
+            saveRow(ctx.row.original.id, "perceivedEffort", v);
+          }}
+        />
       ),
     },
     {

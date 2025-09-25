@@ -14,7 +14,7 @@ type InputProps<T extends ValidComponent = "input"> = ExtraProps &
 export const NumberInput: ParentComponent<InputProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "width"]);
 
-  const classes = `input outline-none text-right ${local.class ?? ""}`;
+  const classes = `input outline-none text-right my-0 ${local.class ?? ""}`;
 
   return (
     <TextField class="flex flex-row space-x-1">
