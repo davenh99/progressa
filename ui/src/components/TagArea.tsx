@@ -9,21 +9,22 @@ import { ClientResponseError } from "pocketbase";
 
 interface Props {
   onClick: () => void;
-  name: string;
+  tag: TagType;
 }
 
-export const Tag: Component<Props> = (props) => {
+const Tag: Component<Props> = (props) => {
   return (
-    <div class="flex items-center bg-cambridge-blue-600 pl-2 pr-1 py-1 rounded-full select-none">
-      <span class="text-sm font-bold">{props.name}</span>
-      <KobalteButton onClick={props.onClick} class="ml-1 p-1 rounded-full flex items-center justify-center">
+    <div
+      style={{ "background-color": `${props.tag.colorHex}30`, color: "#ccf" }}
+      class="flex items-center pl-2 pr-1 py-1 rounded-full select-none border-1"
+    >
+      <span class="text-sm font-bold">{props.tag.name}</span>
+      <KobalteButton onClick={props.onClick} class="p-1 rounded-full flex items-center justify-center">
         <CloseIcon size={14} />
       </KobalteButton>
     </div>
   );
 };
-
-export default Tag;
 
 interface TagAreaProps {
   tags: TagType[];
@@ -55,7 +56,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
           if (e instanceof ClientResponseError && e.status == 404) {
             const createdTag = await pb
               .collection<TagType>("tags")
-              .create({ name: newTag, public: false, createdBy: user.id });
+              .create({ name: newTag, public: false, createdBy: user.id, colorHex: "#ccccff" });
 
             await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
             props.setTags([...props.tags, createdTag]);
@@ -89,8 +90,10 @@ export const TagArea: Component<TagAreaProps> = (props) => {
         class="flex-1 min-w-[120px] mb-2"
       />
       <div class="flex flex-wrap gap-2">
-        <For each={props.tags || []}>{(t) => <Tag name={t.name} onClick={() => deleteTag(t)} />}</For>
+        <For each={props.tags || []}>{(t) => <Tag tag={t} onClick={() => deleteTag(t)} />}</For>
       </div>
     </div>
   );
 };
+
+export default TagArea;
