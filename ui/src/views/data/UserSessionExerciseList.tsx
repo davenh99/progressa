@@ -28,6 +28,22 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
   const { pb, user, updateRecord } = useAuthPB();
 
+  const setNumbers = createMemo(() => {
+    const setNumbers = [];
+    let curSet = 0;
+
+    for (const se of props.sessionExercises) {
+      if (se.isWarmup) {
+        setNumbers.push("W");
+      } else if (se.supersetParent) {
+        setNumbers.push("D");
+      } else {
+        setNumbers.push(++curSet);
+      }
+    }
+    return setNumbers;
+  });
+
   const getSupersetParent = (index: number, data: UserSessionExercise[]): UserSessionExercise => {
     if (!data[index].supersetParent) {
       return data[index];
@@ -168,22 +184,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
     {
-      accessorKey: "isWarmup",
-      header: "Warmup?",
-      cell: (ctx) => (
-        <Show when={!ctx.row.original.supersetParent} fallback={<p>D</p>}>
-          <Show when={ctx.getValue() as boolean} fallback={<p>{ctx.row.index + 1}</p>}>
-            <p>W</p>
-          </Show>
-        </Show>
-      ),
+      header: "Set Type",
+      cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
     },
     {
       accessorFn: (row) =>
         row.expand?.exercise?.expand?.defaultMeasurementType?.numeric
           ? "measurementNumeric"
           : "measurementValue",
-      header: "",
       id: "measurement",
       cell: (ctx) => {
         return (
@@ -254,7 +262,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     {
       accessorKey: "addedWeight",
-      header: "",
       cell: (ctx) => (
         <DataNumberInput
           value={ctx.getValue() as number}
@@ -274,7 +281,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     },
     {
       accessorKey: "perceivedEffort",
-      header: "RPE",
       cell: (ctx) => (
         <RPESelect
           value={ctx.row.original.perceivedEffort}
@@ -293,7 +299,6 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       ),
     },
     {
-      header: "",
       id: "more",
       cell: (ctx) => (
         <IconButton

@@ -28,15 +28,13 @@ export const TextArea: ParentComponent<TextAreaProps> = (props) => {
   );
 
   return (
-    <TextField>
+    <TextField class={local.class ?? ""}>
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.TextArea
         ref={textareaRef}
-        class={`${
-          local.class ?? ""
-        } w-full resize-none border-2 border-ash-gray-400 rounded-sm overflow-hidden px-2 py-1`}
+        class={`w-full resize-none border-2 border-ash-gray-400 rounded-sm overflow-hidden px-2 py-1`}
         {...others}
       />
     </TextField>

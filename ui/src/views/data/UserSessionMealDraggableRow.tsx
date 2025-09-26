@@ -16,6 +16,7 @@ import { DataTextArea, IconButton, TagArea } from "../../components";
 import { DraggingState, Meal, UserSession } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
+import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
 
 interface DraggableRowProps {
   row: Row<Meal>;
@@ -118,46 +119,27 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   });
 
   return (
-    <>
-      <Show when={dragging() === "dragging-over" && closestEdge() === "top"}>
-        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-      </Show>
-      <div
-        ref={ref}
-        class={`flex flex-col p-1 cursor-grab active:cursor-grabbing ${
-          dragging() === "dragging" ? "opacity-40" : ""
-        } rounded-md`}
-      >
-        <div class="flex w-full">
-          <For each={props.row.getVisibleCells()}>
-            {(cell) => {
-              let classes = `px-2 ${
-                cell.column.id === "name" ? "flex-6" : cell.column.id === "more" ? "flex-1" : "flex-2"
-              }`;
+    <div
+      ref={ref}
+      class={`flex flex-col p-1 cursor-grab active:cursor-grabbing ${
+        dragging() === "dragging" ? "opacity-40" : ""
+      } rounded-md
+        ${dragging() === "dragging-over" && closestEdge() === "top" ? DROP_ABOVE_CLASS : ""}
+        ${dragging() === "dragging-over" && closestEdge() === "bottom" ? DROP_BELOW_CLASS : ""}
+        
+        `}
+    >
+      <div class="flex w-full">
+        <For each={props.row.getVisibleCells()}>
+          {(cell) => {
+            let classes = `px-2 ${
+              cell.column.id === "name" ? "flex-6" : cell.column.id === "more" ? "flex-1" : "flex-2"
+            }`;
 
-              return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
-            }}
-          </For>
-        </div>
-        {/* <Show when={props.row.original.expanded}>
-          <DataTextArea
-            label="Description"
-            value={props.row.original.meal.description}
-            saveFunc={(v: string) => updateRecord("meals", props.row.original.meal.id, "description", v)}
-            onValueChange={(v) => props.setMealRows("rows", props.row.index, "meal", "description", v)}
-          />
-
-          <TagArea
-            tags={props.row.original.meal.expand?.tags ?? []}
-            setTags={(tags) => props.setMealRows("rows", props.row.index, "meal", "expand", "tags", tags)}
-            modelName="meals"
-            recordID={props.row.original.meal.id}
-          />
-        </Show> */}
+            return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
+          }}
+        </For>
       </div>
-      <Show when={dragging() === "dragging-over" && closestEdge() === "bottom"}>
-        <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-      </Show>
-    </>
+    </div>
   );
 };

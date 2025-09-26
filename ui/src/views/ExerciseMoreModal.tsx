@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 
 import { UserSession, UserSessionExercise } from "../../Types";
-import { Button, Modal, TagArea, TextArea } from "../components";
+import { Button, Checkbox, Modal, TagArea, TextArea } from "../components";
 import { useAuthPB } from "../config/pocketbase";
 
 interface Props {
@@ -35,7 +35,13 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
   return (
     <Modal saveFunc={save} setModalVisible={props.setModalVisible}>
       <h2 class="pb-2">Exercise Options</h2>
+      <Checkbox
+        checked={exercise.isWarmup}
+        onChange={(v) => setExercise("isWarmup", v)}
+        label="mark as warmup"
+      />
       <TextArea
+        class="mt-2"
         label="Notes"
         value={exercise.notes}
         onInput={(e) => setExercise("notes", e.currentTarget.value)}

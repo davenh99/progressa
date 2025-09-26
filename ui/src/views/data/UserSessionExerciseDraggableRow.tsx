@@ -13,6 +13,7 @@ import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 import { DataTime } from "../../components";
 import { DraggingState, UserSession, UserSessionExercise } from "../../../Types";
 import { SetStoreFunction } from "solid-js/store";
+import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
 
 interface DraggableRowProps {
   row: RowType<UserSessionExercise>;
@@ -180,11 +181,16 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         ref={groupRef}
         class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}`}
+        } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}
+      ${
+        dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfGroup
+          ? DROP_ABOVE_CLASS
+          : ""
+      }`}
       >
         <Show when={props.firstOfGroup}>
           {/* exercise name */}
-          <p>
+          <p class="font-bold">
             {props.row.original.expand?.variation?.name
               ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
               : props.row.original.expand?.exercise?.name}
@@ -201,10 +207,24 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             <p class="flex-1"> </p>
           </div>
         </Show>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfSuperset}>
-          <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-        </Show>
-        <div ref={ref} class={`flex flex-col ${dragging() === "dragging" ? "opacity-40" : ""}`}>
+        <div
+          ref={ref}
+          class={`flex flex-col ${dragging() === "dragging" ? "opacity-40" : ""}
+        ${
+          dragging() === "dragging-over" &&
+          closestEdge() === "top" &&
+          props.firstOfSuperset &&
+          !props.firstOfGroup
+            ? DROP_ABOVE_CLASS
+            : ""
+        }
+        ${
+          dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset
+            ? DROP_BELOW_CLASS
+            : ""
+        }
+        `}
+        >
           <div class="flex w-full">
             <For each={props.row.getVisibleCells()}>
               {(cell) => {
@@ -235,9 +255,6 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             </div>
           </Show>
         </div>
-        <Show when={dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset}>
-          <div class={`h-1 bg-blue-400 rounded-full relative`}></div>
-        </Show>
       </div>
     </>
   );

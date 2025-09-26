@@ -10,7 +10,7 @@ interface Props {
 
 export const Checkbox: ParentComponent<Props> = (props) => {
   return (
-    <KobalteCheckbox checked={props.checked} onChange={props.onChange}>
+    <KobalteCheckbox checked={props.checked} onChange={props.onChange} class="flex flex-row space-x-2">
       <KobalteCheckbox.Input />
       <KobalteCheckbox.Control class="h-5 w-5 bg-ash-gray-500 rounded-sm">
         <KobalteCheckbox.Indicator>
