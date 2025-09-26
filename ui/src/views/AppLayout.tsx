@@ -49,32 +49,31 @@ export const AppLayout: ParentComponent = (props) => {
       </nav>
 
       {/* Main content */}
-      <main class="flex-1 flex flex-col overflow-hidden">{props.children}</main>
+      <main class="flex-1 flex flex-col overflow-y-auto">{props.children}</main>
 
       {/* Bottom nav (mobile global nav) */}
-      <nav class={`sm:hidden fixed bottom-0 left-0 right-0 flex justify-center`}>
-        <div
-          class={`bg-charcoal-400/80 text-white flex justify-between
-          py-2.5 px-5 my-3 space-x-[12vw] rounded-full backdrop-blur-xs`}
+      <nav
+        class="sm:hidden fixed bottom-3 left-1/2 -translate-x-1/2
+         bg-charcoal-400/80 text-white flex justify-between
+         py-2.5 px-5 space-x-[12vw] rounded-full backdrop-blur-xs"
+      >
+        <A href="/" class="flex flex-col items-center">
+          <ClipboardList size={30} class={iconClasses("/")} />
+        </A>
+        <A
+          href="/log"
+          class="flex flex-col items-center"
+          onClick={(e) => {
+            if (isLogActive()) {
+              e.preventDefault();
+            }
+          }}
         >
-          <A href="/" class="flex flex-col items-center">
-            <ClipboardList size={30} class={iconClasses("/")} />
-          </A>
-          <A
-            href="/log"
-            class="flex flex-col items-center"
-            onClick={(e) => {
-              if (isLogActive()) {
-                e.preventDefault();
-              }
-            }}
-          >
-            <Log size={30} class={iconClasses("/log")} />
-          </A>
-          <A href="/profile" class="flex flex-col items-center">
-            <User size={30} class={iconClasses("/profile")} />
-          </A>
-        </div>
+          <Log size={30} class={iconClasses("/log")} />
+        </A>
+        <A href="/profile" class="flex flex-col items-center">
+          <User size={30} class={iconClasses("/profile")} />
+        </A>
       </nav>
     </div>
   );
