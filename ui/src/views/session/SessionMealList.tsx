@@ -5,24 +5,24 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
-import { Meal, UserSession } from "../../../Types";
+import { SessionMeal, Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, DataInput, DataNumberInput, IconButton } from "../../components";
-import CopyMealModal from "../CopyMealModal";
-import { USER_SESSION_MEAL_EXPAND } from "../../config/constants";
-import { extractMealData } from "../../methods/userSessionMealMethods";
-import { DraggableRow } from "./UserSessionMealDraggableRow";
-import MealMoreModal from "../MealMoreModal";
+import CopyMealModal from "./CopyMealModal";
+import { SESSION_MEAL_EXPAND } from "../../config/constants";
+import { extractMealData } from "../../methods/sessionMeal";
+import { DraggableRow } from "./SessionMealDraggableRow";
+import MealMoreModal from "./MealMoreModal";
 
 interface Props {
-  meals: Meal[];
+  meals: SessionMeal[];
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: UserSession | null;
+    session: Session | null;
   }>;
 }
 
-export const MealList: Component<Props> = (props) => {
+export const SessionMealList: Component<Props> = (props) => {
   const [showCopyMeal, setShowCopyMeal] = createSignal(false);
   const [showMoreMeal, setShowMoreMeal] = createSignal(false);
   const [selectedMealInd, setSelectedMealInd] = createSignal(-1);
@@ -30,7 +30,7 @@ export const MealList: Component<Props> = (props) => {
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
-      await updateRecord("meals", recordID, field, newVal);
+      await updateRecord("sessionMeals", recordID, field, newVal);
     } catch (e) {
       console.error(e);
     }
@@ -40,11 +40,11 @@ export const MealList: Component<Props> = (props) => {
     const newMeals = props.meals.filter((_, ind) => ind !== index);
 
     try {
-      props.setSession("session", "expand", "meals_via_userSession", newMeals);
-      await pb.collection("meals").delete(props.meals[index].id);
+      props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
+      await pb.collection("sessionMeals").delete(props.meals[index].id);
 
       await updateRecord(
-        "userSessions",
+        "sessions",
         props.sessionID,
         "mealsOrder",
         newMeals.map((r) => r.id)
@@ -62,24 +62,24 @@ export const MealList: Component<Props> = (props) => {
       draggedItemNewInd > draggedItemOldInd ? draggedItemNewInd - 1 : draggedItemNewInd;
     newMeals.splice(adjustedNewIndex, 0, ...draggedItem);
 
-    props.setSession("session", "expand", "meals_via_userSession", newMeals);
+    props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
 
     updateRecord(
-      "userSessions",
+      "sessions",
       props.sessionID,
       "mealsOrder",
       newMeals.map((r) => r.id)
     ).catch(console.error);
   };
 
-  const insertRowAndSync = async (index: number, record: Meal) => {
+  const insertRowAndSync = async (index: number, record: SessionMeal) => {
     const newMeals = [...props.meals];
 
     newMeals.splice(index, 0, record);
-    props.setSession("session", "expand", "meals_via_userSession", newMeals);
+    props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
 
     await updateRecord(
-      "userSessions",
+      "sessions",
       props.sessionID,
       "mealsOrder",
       newMeals.map((r) => r.id)
@@ -88,28 +88,28 @@ export const MealList: Component<Props> = (props) => {
 
   const addRowAtIndex = async (index: number, duplicateInd?: number, createData?: { [k: string]: any }) => {
     if (createData) {
-      const record = await pb.collection<Meal>("meals").create(createData, {
-        expand: USER_SESSION_MEAL_EXPAND,
+      const record = await pb.collection<SessionMeal>("sessionMeals").create(createData, {
+        expand: SESSION_MEAL_EXPAND,
       });
 
       await insertRowAndSync(index + 1, record);
     } else if (duplicateInd !== undefined) {
       const record = await pb
-        .collection<Meal>("meals")
-        .create(extractMealData(props.meals[duplicateInd]), { expand: USER_SESSION_MEAL_EXPAND });
+        .collection<SessionMeal>("sessionMeals")
+        .create(extractMealData(props.meals[duplicateInd]), { expand: SESSION_MEAL_EXPAND });
 
       await insertRowAndSync(index + 1, record);
     }
   };
 
-  const addMeal = async (mealToCopy?: Meal) => {
-    const data = mealToCopy ? extractMealData(mealToCopy) : { userSession: props.sessionID };
+  const addMeal = async (mealToCopy?: SessionMeal) => {
+    const data = mealToCopy ? extractMealData(mealToCopy) : { session: props.sessionID };
 
     addRowAtIndex(props.meals.length, undefined, data);
     setShowCopyMeal(false);
   };
 
-  const columns = createMemo<ColumnDef<Meal>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionMeal>[]>(() => [
     {
       header: "name",
       accessorKey: "name",
@@ -119,7 +119,14 @@ export const MealList: Component<Props> = (props) => {
           noPadding
           value={ctx.getValue() as string}
           onValueChange={(v) =>
-            props.setSession("session", "expand", "meals_via_userSession", ctx.row.index, "name", v as string)
+            props.setSession(
+              "session",
+              "expand",
+              "sessionMeals_via_session",
+              ctx.row.index,
+              "name",
+              v as string
+            )
           }
           saveFunc={(v) => saveRow(ctx.row.original.id, "name", v)}
         />
@@ -133,7 +140,14 @@ export const MealList: Component<Props> = (props) => {
           <DataNumberInput
             value={ctx.getValue() as number}
             onValueChange={(v) =>
-              props.setSession("session", "expand", "meals_via_userSession", ctx.row.index, "kj", v as number)
+              props.setSession(
+                "session",
+                "expand",
+                "sessionMeals_via_session",
+                ctx.row.index,
+                "kj",
+                v as number
+              )
             }
             saveFunc={(v) => saveRow(ctx.row.original.id, "kj", v)}
           />
@@ -152,7 +166,7 @@ export const MealList: Component<Props> = (props) => {
               props.setSession(
                 "session",
                 "expand",
-                "meals_via_userSession",
+                "sessionMeals_via_session",
                 ctx.row.index,
                 "gramsProtein",
                 v as number
@@ -276,4 +290,4 @@ export const MealList: Component<Props> = (props) => {
   );
 };
 
-export default MealList;
+export default SessionMealList;

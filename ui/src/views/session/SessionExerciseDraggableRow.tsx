@@ -11,21 +11,21 @@ import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 
 import { DataTime } from "../../components";
-import { DraggingState, UserSession, UserSessionExercise } from "../../../Types";
+import { DraggingState, Session, SessionExercise } from "../../../Types";
 import { SetStoreFunction } from "solid-js/store";
 import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
 
 interface DraggableRowProps {
-  row: RowType<UserSessionExercise>;
+  row: RowType<SessionExercise>;
   firstOfGroup: boolean;
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
-  getSupersetParent: (index: number) => UserSessionExercise;
+  getSupersetParent: (index: number) => SessionExercise;
   setSession: SetStoreFunction<{
-    session: UserSession | null;
+    session: Session | null;
   }>;
 }
 
@@ -53,7 +53,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           return false;
         }
         // only allowing sessionExercises to be dropped on me
-        return source.data.isUserSessionExerciseRow as boolean;
+        return source.data.isSessionExerciseRow as boolean;
       },
       getIsSticky() {
         return true;
@@ -64,7 +64,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         if (props.lastOfSuperset) allowedEdges.push("bottom");
 
         return attachClosestEdge(
-          { id: props.row.original.id, ind: props.row.index, isUserSessionExerciseRow: true },
+          { id: props.row.original.id, ind: props.row.index, isSessionExerciseRow: true },
           { element, input, allowedEdges }
         );
       },
@@ -103,7 +103,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return {
           id: props.row.original.id,
           ind: props.row.index,
-          isUserSessionExerciseRow: true,
+          isSessionExerciseRow: true,
         };
       },
       onGenerateDragPreview({ nativeSetDragImage }) {
@@ -146,7 +146,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return {
           id: props.row.original.id,
           ind: props.row.index,
-          isUserSessionExerciseRow: true,
+          isSessionExerciseRow: true,
           isGroup: true,
           groupInds,
         };
@@ -243,7 +243,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                     props.setSession(
                       "session",
                       "expand",
-                      "userSessionExercises_via_userSession",
+                      "sessionExercises_via_session",
                       props.row.index,
                       "restAfter",
                       v

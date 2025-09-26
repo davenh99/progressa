@@ -2,7 +2,7 @@ import { createSignal, ParentComponent, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { Button } from "./";
-import LoadFullScreen from "../views/LoadFullScreen";
+import LoadFullScreen from "../views/app/LoadFullScreen";
 
 interface Props {
   setModalVisible: (v: boolean) => void;

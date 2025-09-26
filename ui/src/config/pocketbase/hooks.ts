@@ -1,10 +1,10 @@
 import { useContext } from "solid-js";
 import { PBContext } from "./context";
-import { UserSession } from "../../../Types";
+import { Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
-import { USER_SESSION_EXPAND } from "../constants";
-import { sortUserSessionExercises } from "../../methods/userSessionExerciseMethods";
-import { sortMeals } from "../../methods/userSessionMealMethods";
+import { SESSION_EXPAND } from "../constants";
+import { sortSessionExercises } from "../../methods/sessionExercise";
+import { sortMeals } from "../../methods/sessionMeal";
 
 const BaseSignUpData = {
   dob: "",
@@ -67,16 +67,16 @@ export function useAuthPB() {
     throw new Error("User not authenticated");
   }
 
-  const getUserSessions = async () => {
+  const getSessions = async () => {
     try {
-      const userSessions = await pb.collection<UserSession>("userSessions").getFullList({
+      const sessions = await pb.collection<Session>("sessions").getFullList({
         filter: `user = '${user.id}'`,
         sort: "-userDay",
       });
 
-      return userSessions;
+      return sessions;
     } catch (e: any) {
-      throw new Error("get userSessions error", e);
+      throw new Error("get sessions error", e);
     }
   };
 
@@ -97,28 +97,28 @@ export function useAuthPB() {
     }
   };
 
-  const userSessionToSortedExercisesAndMeals = (session: UserSession) => {
+  const sessionToSortedExercisesAndMeals = (session: Session) => {
     const newSession = { ...session };
-    if (newSession.expand?.userSessionExercises_via_userSession) {
-      newSession.expand.userSessionExercises_via_userSession = sortUserSessionExercises(
-        newSession.expand.userSessionExercises_via_userSession ?? [],
-        newSession.itemsOrder ?? []
+    if (newSession.expand?.sessionExercises_via_session) {
+      newSession.expand.sessionExercises_via_session = sortSessionExercises(
+        newSession.expand.sessionExercises_via_session ?? [],
+        newSession.exercisesOrder ?? []
       );
     }
-    if (newSession.expand?.meals_via_userSession) {
-      newSession.expand.meals_via_userSession = sortMeals(
-        newSession.expand.meals_via_userSession ?? [],
+    if (newSession.expand?.sessionMeals_via_session) {
+      newSession.expand.sessionMeals_via_session = sortMeals(
+        newSession.expand.sessionMeals_via_session ?? [],
         newSession.mealsOrder ?? []
       );
     }
     return newSession;
   };
 
-  const getSessionByDate = async (date: string): Promise<UserSession | null> => {
+  const getSessionByDate = async (date: string): Promise<Session | null> => {
     try {
-      return userSessionToSortedExercisesAndMeals(
-        await pb.collection<UserSession>("userSessions").getFirstListItem(`userDay = '${date}'`, {
-          expand: USER_SESSION_EXPAND,
+      return sessionToSortedExercisesAndMeals(
+        await pb.collection<Session>("sessions").getFirstListItem(`userDay = '${date}'`, {
+          expand: SESSION_EXPAND,
         })
       );
     } catch (e) {
@@ -130,11 +130,11 @@ export function useAuthPB() {
     }
   };
 
-  const getSessionByID = async (id: string): Promise<UserSession | null> => {
+  const getSessionByID = async (id: string): Promise<Session | null> => {
     try {
-      return userSessionToSortedExercisesAndMeals(
-        await pb.collection<UserSession>("userSessions").getOne(id, {
-          expand: USER_SESSION_EXPAND,
+      return sessionToSortedExercisesAndMeals(
+        await pb.collection<Session>("sessions").getOne(id, {
+          expand: SESSION_EXPAND,
         })
       );
     } catch (e) {
@@ -146,5 +146,5 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getUserSessions, updateRecord, getSessionByDate, getSessionByID };
+  return { pb, user, logout, getSessions, updateRecord, getSessionByDate, getSessionByID };
 }

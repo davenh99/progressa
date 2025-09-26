@@ -1,6 +1,6 @@
-import { UserSessionExercise } from "../../Types";
+import { SessionExercise } from "../../Types";
 
-export const getSupersetInds = (index: number, data: UserSessionExercise[]) => {
+export const getSupersetInds = (index: number, data: SessionExercise[]) => {
   const inds = [index];
   const sessionExerciseId = data[index].id;
 
@@ -13,7 +13,7 @@ export const getSupersetInds = (index: number, data: UserSessionExercise[]) => {
   return inds;
 };
 
-export const getGroupInds = (index: number, data: UserSessionExercise[]) => {
+export const getGroupInds = (index: number, data: SessionExercise[]) => {
   const inds = [];
   const exerciseId = data[index].exercise;
 
@@ -28,12 +28,12 @@ export const getGroupInds = (index: number, data: UserSessionExercise[]) => {
   return inds;
 };
 
-// helper for getting the userSessionExercise in a way that we can send to backend to create new
-export const getDropsetAddData = (sessionExercise: UserSessionExercise) => {
+// helper for getting the SessionExercise in a way that we can send to backend to create new
+export const getDropsetAddData = (sessionExercise: SessionExercise) => {
   const {
     user,
     exercise,
-    userSession,
+    session,
     variation,
     perceivedEffort,
     addedWeight,
@@ -46,7 +46,7 @@ export const getDropsetAddData = (sessionExercise: UserSessionExercise) => {
   return {
     user,
     exercise,
-    userSession,
+    session,
     variation,
     perceivedEffort,
     addedWeight,
@@ -58,11 +58,11 @@ export const getDropsetAddData = (sessionExercise: UserSessionExercise) => {
   };
 };
 
-export const sortUserSessionExercises = (userSessionExercises: UserSessionExercise[], order: string[]) => {
-  const itemsMap = new Map(userSessionExercises.map((item) => [item.id, item]));
+export const sortSessionExercises = (sessionExercises: SessionExercise[], order: string[]) => {
+  const itemsMap = new Map(sessionExercises.map((item) => [item.id, item]));
 
   const orderedItems = order.map((id) => itemsMap.get(id)).filter((item) => item !== undefined);
-  const unorderedItems = userSessionExercises.filter((item) => !order.includes(item.id));
+  const unorderedItems = sessionExercises.filter((item) => !order.includes(item.id));
 
   return [...orderedItems, ...unorderedItems];
 };

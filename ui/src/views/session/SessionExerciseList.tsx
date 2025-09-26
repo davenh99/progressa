@@ -6,23 +6,23 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
+import { Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
 import { Button, DataSelect, IconButton, DataTime, DataNumberInput, RPESelect } from "../../components";
-import { DraggableRow } from "./UserSessionExerciseDraggableRow";
-import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/userSessionExerciseMethods";
-import ExerciseSelectModal from "../ExerciseSelectModal";
-import { USER_SESSION_EXERCISE_EXPAND } from "../../config/constants";
-import ExerciseMoreModal from "../ExerciseMoreModal";
+import { DraggableRow } from "./SessionExerciseDraggableRow";
+import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
+import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
+import { SESSION_EXERCISE_EXPAND } from "../../config/constants";
+import ExerciseMoreModal from "./ExerciseMoreModal";
 
 interface Props {
-  sessionExercises: UserSessionExercise[];
+  sessionExercises: SessionExercise[];
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: UserSession | null;
+    session: Session | null;
   }>;
 }
 
-export const UserSessionExerciseList: Component<Props> = (props) => {
+export const SessionExerciseList: Component<Props> = (props) => {
   const [showCreateSessionExercise, setShowCreateSessionExercise] = createSignal(false);
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
@@ -44,7 +44,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     return setNumbers;
   });
 
-  const getSupersetParent = (index: number, data: UserSessionExercise[]): UserSessionExercise => {
+  const getSupersetParent = (index: number, data: SessionExercise[]): SessionExercise => {
     if (!data[index].supersetParent) {
       return data[index];
     } else {
@@ -60,7 +60,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
   const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
-      await updateRecord("userSessionExercises", recordID, field, newVal);
+      await updateRecord("sessionExercises", recordID, field, newVal);
     } catch (e) {
       console.error(e);
     }
@@ -71,14 +71,14 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
 
     try {
       const delPromises = indices.map((index) =>
-        pb.collection("userSessionExercises").delete(props.sessionExercises[index].id)
+        pb.collection("sessionExercises").delete(props.sessionExercises[index].id)
       );
-      props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
+      props.setSession("session", "expand", "sessionExercises_via_session", newRows);
       await Promise.all(delPromises);
       await updateRecord(
-        "userSessions",
+        "sessions",
         props.sessionID,
-        "itemsOrder",
+        "exercisesOrder",
         newRows.map((r) => r.id)
       );
     } catch (e) {
@@ -95,21 +95,21 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       draggedItemsNewInd > draggedItemsOldInd ? draggedItemsNewInd - count : draggedItemsNewInd;
     newRows.splice(adjustedNewIndex, 0, ...draggedItems);
 
-    props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
+    props.setSession("session", "expand", "sessionExercises_via_session", newRows);
 
-    // send the updated list to 'itemsOrder'
+    // send the updated list to 'exercisesOrder'
     updateRecord(
-      "userSessions",
+      "sessions",
       props.sessionID,
-      "itemsOrder",
+      "exercisesOrder",
       newRows.map((r) => r.id)
     ).catch(console.error);
   };
 
-  const buildCreateData = (row: UserSessionExercise, supersetParent?: string) => ({
+  const buildCreateData = (row: SessionExercise, supersetParent?: string) => ({
     user: user.id,
     exercise: row.exercise,
-    userSession: row.userSession,
+    session: row.session,
     variation: row.variation,
     perceivedEffort: row.perceivedEffort,
     addedWeight: row.addedWeight,
@@ -120,16 +120,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     ...(supersetParent ? { supersetParent } : {}),
   });
 
-  const insertRowsAndSync = async (index: number, records: UserSessionExercise[]) => {
+  const insertRowsAndSync = async (index: number, records: SessionExercise[]) => {
     const newRows = [...props.sessionExercises];
     newRows.splice(index, 0, ...records);
 
-    props.setSession("session", "expand", "userSessionExercises_via_userSession", newRows);
+    props.setSession("session", "expand", "sessionExercises_via_session", newRows);
 
     await updateRecord(
-      "userSessions",
+      "sessions",
       props.sessionID,
-      "itemsOrder",
+      "exercisesOrder",
       newRows.map((r) => r.id)
     );
   };
@@ -137,11 +137,11 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   const addRowsAtIndex = async (
     index: number,
     duplicateInds?: number[],
-    createData?: UserSessionExerciseCreateData
+    createData?: SessionExerciseCreateData
   ) => {
     if (createData) {
-      const record = await pb.collection<UserSessionExercise>("userSessionExercises").create(createData, {
-        expand: USER_SESSION_EXERCISE_EXPAND,
+      const record = await pb.collection<SessionExercise>("sessionExercises").create(createData, {
+        expand: SESSION_EXERCISE_EXPAND,
       });
 
       await insertRowsAndSync(index + 1, [record]);
@@ -149,16 +149,16 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
       pb.autoCancellation(false);
 
       const parentRecord = await pb
-        .collection<UserSessionExercise>("userSessionExercises")
+        .collection<SessionExercise>("sessionExercises")
         .create(buildCreateData(props.sessionExercises[duplicateInds[0]]), {
-          expand: USER_SESSION_EXERCISE_EXPAND,
+          expand: SESSION_EXERCISE_EXPAND,
         });
 
       const childPromises = duplicateInds.slice(1).map((ind) =>
         pb
-          .collection<UserSessionExercise>("userSessionExercises")
+          .collection<SessionExercise>("sessionExercises")
           .create(buildCreateData(props.sessionExercises[ind], parentRecord.id), {
-            expand: USER_SESSION_EXERCISE_EXPAND,
+            expand: SESSION_EXERCISE_EXPAND,
           })
       );
 
@@ -170,9 +170,9 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   };
 
   const addSessionExercise = async (exerciseID: string, variationID?: string) => {
-    const data: UserSessionExerciseCreateData = {
+    const data: SessionExerciseCreateData = {
       user: user.id,
-      userSession: props.sessionID,
+      session: props.sessionID,
       variation: variationID || undefined,
       exercise: exerciseID,
       perceivedEffort: 0,
@@ -182,7 +182,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
     setShowCreateSessionExercise(false);
   };
 
-  const columns = createMemo<ColumnDef<UserSessionExercise>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionExercise>[]>(() => [
     {
       header: "Set Type",
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
@@ -209,7 +209,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                   props.setSession(
                     "session",
                     "expand",
-                    "userSessionExercises_via_userSession",
+                    "sessionExercises_via_session",
                     ctx.row.index,
                     "expand",
                     "measurementValue",
@@ -230,7 +230,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                       props.setSession(
                         "session",
                         "expand",
-                        "userSessionExercises_via_userSession",
+                        "sessionExercises_via_session",
                         ctx.row.index,
                         "measurementNumeric",
                         v as number
@@ -247,7 +247,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
                   props.setSession(
                     "session",
                     "expand",
-                    "userSessionExercises_via_userSession",
+                    "sessionExercises_via_session",
                     ctx.row.index,
                     "measurementNumeric",
                     v
@@ -269,7 +269,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             props.setSession(
               "session",
               "expand",
-              "userSessionExercises_via_userSession",
+              "sessionExercises_via_session",
               ctx.row.index,
               "addedWeight",
               v as number
@@ -288,7 +288,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
             props.setSession(
               "session",
               "expand",
-              "userSessionExercises_via_userSession",
+              "sessionExercises_via_session",
               ctx.row.index,
               "perceivedEffort",
               v
@@ -325,7 +325,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
   createEffect(() => {
     return monitorForElements({
       canMonitor({ source }) {
-        return source.data.isUserSessionExerciseRow as boolean;
+        return source.data.issessionExerciseRow as boolean;
       },
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
@@ -336,7 +336,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
         const sourceData = source.data;
         const targetData = target.data;
 
-        if (!sourceData.isUserSessionExerciseRow || !targetData.isUserSessionExerciseRow) {
+        if (!sourceData.issessionExerciseRow || !targetData.issessionExerciseRow) {
           return;
         }
 

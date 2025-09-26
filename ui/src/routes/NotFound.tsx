@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { A } from "@solidjs/router";
 
-import Container from "../views/Container";
+import Container from "../views/app/Container";
 
 const NotFound: Component = () => {
   return (

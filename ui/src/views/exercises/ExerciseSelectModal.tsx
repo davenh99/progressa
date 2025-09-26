@@ -1,9 +1,10 @@
 import { Component, createSignal, Show } from "solid-js";
 import ArrowLeft from "lucide-solid/icons/arrow-left";
 
-import { ExerciseList, ExerciseVariationList } from "./data";
-import { Exercise, ExerciseVariation } from "../../Types";
-import { Button, Modal } from "../components";
+import { Exercise, ExerciseVariation } from "../../../Types";
+import { Button, Modal } from "../../components";
+import { ExerciseList } from "./ExerciseList";
+import { ExerciseVariationList } from "./ExerciseVariationList";
 
 interface Props {
   setModalVisible: (v: boolean) => void;

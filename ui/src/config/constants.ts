@@ -1,8 +1,8 @@
-export const USER_SESSION_EXPAND =
-  "tags, userSessionExercises_via_userSession.exercise.defaultMeasurementType.measurementValues_via_measurementType, userSessionExercises_via_userSession.measurementValue, userSessionExercises_via_userSession.variation, userSessionExercises_via_userSession.tags, meals_via_userSession.tags";
-export const USER_SESSION_EXERCISE_EXPAND =
+export const SESSION_EXPAND =
+  "tags, sessionExercises_via_session.exercise.defaultMeasurementType.measurementValues_via_measurementType, sessionExercises_via_session.measurementValue, sessionExercises_via_session.variation, sessionExercises_via_session.tags, sessionMeals_via_session.tags";
+export const SESSION_EXERCISE_EXPAND =
   "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, variation, tags";
-export const USER_SESSION_MEAL_EXPAND = "tags";
+export const SESSION_MEAL_EXPAND = "tags";
 
 export const DROP_ABOVE_CLASS = `
   relative 

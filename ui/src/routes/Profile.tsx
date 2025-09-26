@@ -4,9 +4,9 @@ import Logout from "lucide-solid/icons/log-out";
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
 import { Button, DataInput, DataNumberInput } from "../components";
-import Container from "../views/Container";
-import SectionHeader from "../views/SectionHeader";
-import Blob from "../views/Blob";
+import Container from "../views/app/Container";
+import SectionHeader from "../views/app/SectionHeader";
+import Blob from "../views/app/Blob";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();

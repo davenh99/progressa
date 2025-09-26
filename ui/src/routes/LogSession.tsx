@@ -5,16 +5,17 @@ import { useSearchParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
 import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector, Button } from "../components";
-import Container from "../views/Container";
-import type { SleepQuality, UserSession, UserSessionCreateData } from "../../Types";
-import { MealList, UserSessionExerciseList } from "../views/data";
-import Loading from "../views/Loading";
-import LogSessionNav from "../views/LogSessionNav";
+import Container from "../views/app/Container";
+import type { SleepQuality, Session, SessionCreateData } from "../../Types";
+import Loading from "../views/app/Loading";
+import LogSessionNav from "../views/session/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
-import SectionHeader from "../views/SectionHeader";
+import SectionHeader from "../views/app/SectionHeader";
 import { DataNumberInput } from "../components/NumberInput";
-import Blob from "../views/Blob";
-import { USER_SESSION_EXPAND } from "../config/constants";
+import Blob from "../views/app/Blob";
+import { SESSION_EXPAND } from "../config/constants";
+import { SessionExerciseList } from "../views/session/SessionExerciseList";
+import { SessionMealList } from "../views/session/SessionMealList";
 
 type SearchParams = {
   date: string;
@@ -22,7 +23,7 @@ type SearchParams = {
 
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(false);
-  const [session, setSession] = createStore<{ session: UserSession | null }>({ session: null });
+  const [session, setSession] = createStore<{ session: Session | null }>({ session: null });
   const { pb, user, updateRecord, getSessionByDate } = useAuthPB();
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
 
@@ -30,7 +31,7 @@ const LogSession: Component = () => {
     if (!searchParams.date) {
       throw new Error("Tried to create a session without a date");
     }
-    const createData: UserSessionCreateData = {
+    const createData: SessionCreateData = {
       name: "Workout",
       notes: "",
       tags: [],
@@ -38,13 +39,13 @@ const LogSession: Component = () => {
       userDay: searchParams.date,
       userHeight: user.height,
       userWeight: user.weight,
-      itemsOrder: [],
+      exercisesOrder: [],
       mealsOrder: [],
     };
     try {
       const newSession = await pb
-        .collection<UserSession>("userSessions")
-        .create(createData, { expand: USER_SESSION_EXPAND });
+        .collection<Session>("sessions")
+        .create(createData, { expand: SESSION_EXPAND });
       setSession({ session: newSession });
     } catch (e) {
       console.log(e);
@@ -53,7 +54,7 @@ const LogSession: Component = () => {
 
   const sessionUpdate = async (field: string, newVal: any) => {
     if (session.session?.id) {
-      return await updateRecord<UserSession>("userSessions", session.session?.id, field, newVal);
+      return await updateRecord<Session>("sessions", session.session?.id, field, newVal);
     } else {
       throw new Error("Tried to update a session when missing id");
     }
@@ -124,8 +125,8 @@ const LogSession: Component = () => {
             <Tabs.Content value="exercises" class="flex flex-1 overflow-hidden">
               <Container class="pb-30">
                 <h2>Exercises</h2>
-                <UserSessionExerciseList
-                  sessionExercises={session.session?.expand?.userSessionExercises_via_userSession ?? []}
+                <SessionExerciseList
+                  sessionExercises={session.session?.expand?.sessionExercises_via_session ?? []}
                   sessionID={session.session!.id}
                   setSession={setSession}
                 />
@@ -136,8 +137,8 @@ const LogSession: Component = () => {
               <Container class="space-y-4 pb-30">
                 <Blob>
                   <h2>Meals</h2>
-                  <MealList
-                    meals={session.session?.expand?.meals_via_userSession ?? []}
+                  <SessionMealList
+                    meals={session.session?.expand?.sessionMeals_via_session ?? []}
                     sessionID={session.session!.id}
                     setSession={setSession}
                   />
@@ -195,7 +196,7 @@ const LogSession: Component = () => {
                   <TagArea
                     tags={session.session?.expand?.tags ?? []}
                     setTags={(tags) => setSession("session", "expand", "tags", tags)}
-                    modelName="userSessions"
+                    modelName="sessions"
                     recordID={session.session!.id}
                   />
                 </div>

@@ -8,21 +8,21 @@ import {
 } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
-import { useAuthPB } from "../config/pocketbase";
-import { Meal } from "../../Types";
-import Loading from "./Loading";
-import { Input } from "../components";
+import { useAuthPB } from "../../config/pocketbase";
+import { SessionMeal } from "../../../Types";
+import Loading from "../app/Loading";
+import { Input } from "../../components";
 
 interface Props {
-  onClick: (meal: Meal) => void;
+  onClick: (meal: SessionMeal) => void;
 }
 
 export const MealList: Component<Props> = (props) => {
-  const [meals, setMeals] = createSignal<Meal[]>([]);
+  const [meals, setMeals] = createSignal<SessionMeal[]>([]);
   const [nameFilter, setNameFilter] = createSignal<string>("");
   const { pb, user } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<Meal>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionMeal>[]>(() => [
     {
       accessorKey: "name",
       header: "Meal",
@@ -50,8 +50,8 @@ export const MealList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const meals = await pb.collection<Meal>("meals").getFullList({
-        filter: `userSession.user = '${user.id}' && name != ''`,
+      const meals = await pb.collection<SessionMeal>("sessionMeals").getFullList({
+        filter: `session.user = '${user.id}' && name != ''`,
         sort: "name",
       });
 

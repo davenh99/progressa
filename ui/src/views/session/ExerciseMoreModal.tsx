@@ -4,16 +4,16 @@ import Plus from "lucide-solid/icons/plus";
 import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
-import { UserSession, UserSessionExercise } from "../../Types";
-import { Button, Checkbox, Modal, TagArea, TextArea } from "../components";
-import { useAuthPB } from "../config/pocketbase";
+import { Session, SessionExercise } from "../../../Types";
+import { Button, Checkbox, Modal, TagArea, TextArea } from "../../components";
+import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
-  initialExercise: UserSessionExercise;
+  initialExercise: SessionExercise;
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: UserSession | null;
+    session: Session | null;
   }>;
   deleteRow: () => Promise<void>;
   duplicateRow: () => Promise<void>;
@@ -26,7 +26,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
 
   const save = async () => {
     try {
-      await pb.collection("userSessionExercises").update(exercise.id, exercise);
+      await pb.collection("sessionExercises").update(exercise.id, exercise);
       // lazy way to refresh the session for now. could also set the state.
       const updatedSession = await getSessionByID(props.sessionID);
       props.setSession({ session: updatedSession });
@@ -60,7 +60,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
             tags.map((t) => t.id)
           );
         }}
-        modelName="userSessionExercises"
+        modelName="sessionExercises"
         recordID={exercise.id}
       />
       <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>

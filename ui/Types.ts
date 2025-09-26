@@ -31,15 +31,6 @@ export interface MeasurementValue {
   createdBy: string;
 }
 
-export interface Session {
-  id: string;
-  name: string;
-  createdBy: string;
-  description: string;
-  usersSaved: string[];
-  public: boolean;
-}
-
 export interface Exercise {
   id: string;
   name: string;
@@ -63,7 +54,7 @@ export interface ExerciseVariation {
   description: string;
 }
 
-export interface UserSessionCreateData {
+export interface SessionCreateData {
   name: string;
   user: string;
   userDay: string;
@@ -71,29 +62,29 @@ export interface UserSessionCreateData {
   tags: string[];
   userHeight: number;
   userWeight: number;
-  itemsOrder: string[] | null;
+  exercisesOrder: string[] | null;
   mealsOrder: string[] | null;
   sleepQuality?: SleepQuality;
 }
 
-export interface UserSession extends UserSessionCreateData {
+export interface Session extends SessionCreateData {
   id: string;
   expand?: {
     tags?: Tag[];
-    userSessionExercises_via_userSession?: UserSessionExercise[];
-    meals_via_userSession?: Meal[];
+    sessionExercises_via_session?: SessionExercise[];
+    sessionMeals_via_session?: SessionMeal[];
   };
 }
 
-export interface UserSessionExerciseCreateData {
+export interface SessionExerciseCreateData {
   user: string;
   exercise: string;
-  userSession: string;
+  session: string;
   variation?: string;
   perceivedEffort: number; // 0 - 100
 }
 
-export interface UserSessionExercise extends UserSessionExerciseCreateData {
+export interface SessionExercise extends SessionExerciseCreateData {
   id: string;
   notes: string;
   tags: string[];
@@ -115,11 +106,12 @@ export interface Tag {
   id: string;
   name: string;
   createdBy: string;
+  colorHex: string;
   public: boolean;
 }
 
-export interface MealCreateData {
-  userSession: string;
+export interface SessionMealCreateData {
+  session: string;
   name: string;
   description: string;
   tags: string[];
@@ -129,7 +121,7 @@ export interface MealCreateData {
   gramsFat: number;
 }
 
-export interface Meal extends MealCreateData {
+export interface SessionMeal extends SessionMealCreateData {
   id: string;
   expand: {
     tags: Tag[];

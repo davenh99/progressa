@@ -2,15 +2,15 @@ import { Component, createMemo, createSignal, For, onMount, Show } from "solid-j
 import { A } from "@solidjs/router";
 import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
 
-import { UserSession } from "../../../Types";
+import { Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import Loading from "../Loading";
+import Loading from "../app/Loading";
 
-export const UserSessionList: Component = (props) => {
-  const [sessions, setSessions] = createSignal<UserSession[]>([]);
+export const SessionList: Component = (props) => {
+  const [sessions, setSessions] = createSignal<Session[]>([]);
   const { pb } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<UserSession>[]>(() => [
+  const columns = createMemo<ColumnDef<Session>[]>(() => [
     {
       accessorKey: "name",
       header: "Session Name",
@@ -33,7 +33,7 @@ export const UserSessionList: Component = (props) => {
 
   const getData = async () => {
     try {
-      const sessions = await pb.collection<UserSession>("userSessions").getFullList({ sort: "-userDay" });
+      const sessions = await pb.collection<Session>("sessions").getFullList({ sort: "-userDay" });
 
       setSessions(sessions);
     } catch (e) {

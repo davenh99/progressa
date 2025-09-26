@@ -6,8 +6,8 @@ import { Router, Route } from "@solidjs/router";
 import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
 import { ThemeProvider } from "./config/theme";
-import AppLayout from "./views/AppLayout";
-import LoadFullScreen from "./views/LoadFullScreen";
+import AppLayout from "./views/app/AppLayout";
+import LoadFullScreen from "./views/app/LoadFullScreen";
 
 const NotFound = lazy(() => import("./routes/NotFound"));
 const Auth = lazy(() => import("./routes/Auth"));

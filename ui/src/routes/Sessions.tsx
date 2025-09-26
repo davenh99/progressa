@@ -1,9 +1,9 @@
 import { Component } from "solid-js";
 
-import { UserSessionList } from "../views/data";
-import Container from "../views/Container";
+import { SessionList } from "../views/session/SessionList";
+import Container from "../views/app/Container";
 import { Button } from "../components";
-import SectionHeader from "../views/SectionHeader";
+import SectionHeader from "../views/app/SectionHeader";
 
 const Sessions: Component = () => {
   return (
@@ -17,7 +17,7 @@ const Sessions: Component = () => {
         </div>
       </SectionHeader>
       <Container noPadding>
-        <UserSessionList />
+        <SessionList />
       </Container>
     </>
   );

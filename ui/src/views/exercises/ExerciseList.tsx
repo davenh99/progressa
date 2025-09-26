@@ -10,7 +10,7 @@ import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { Exercise } from "../../../Types";
-import Loading from "../Loading";
+import Loading from "../app/Loading";
 import { Input } from "../../components";
 
 interface Props {

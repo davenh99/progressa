@@ -1,4 +1,4 @@
-import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { Component, For, createEffect, createSignal } from "solid-js";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -9,20 +9,16 @@ import { pointerOutsideOfPreview } from "@atlaskit/pragmatic-drag-and-drop/eleme
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import invariant from "tiny-invariant";
 import { flexRender, type Row } from "@tanstack/solid-table";
-import Down from "lucide-solid/icons/chevron-down";
-import Up from "lucide-solid/icons/chevron-up";
 
-import { DataTextArea, IconButton, TagArea } from "../../components";
-import { DraggingState, Meal, UserSession } from "../../../Types";
-import { useAuthPB } from "../../config/pocketbase";
+import { DraggingState, SessionMeal, Session } from "../../../Types";
 import { SetStoreFunction } from "solid-js/store";
 import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
 
 interface DraggableRowProps {
-  row: Row<Meal>;
+  row: Row<SessionMeal>;
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   setSession: SetStoreFunction<{
-    session: UserSession | null;
+    session: Session | null;
   }>;
 }
 
