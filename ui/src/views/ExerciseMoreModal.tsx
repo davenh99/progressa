@@ -1,5 +1,8 @@
 import { Component, createEffect } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
+import Plus from "lucide-solid/icons/plus";
+import Copy from "lucide-solid/icons/copy";
+import Delete from "lucide-solid/icons/x";
 
 import { UserSession, UserSessionExercise } from "../../Types";
 import { Button, Checkbox, Modal, TagArea, TextArea } from "../components";
@@ -40,7 +43,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
       <Checkbox
         checked={exercise.isWarmup}
         onChange={(v) => setExercise("isWarmup", v)}
-        label="mark as warmup"
+        label="Mark as warmup"
       />
       <TextArea
         class="mt-2"
@@ -61,15 +64,32 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
         recordID={exercise.id}
       />
       <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
-      <h3>Actions</h3>
-      <div class="space-x-2 space-y-2">
-        <Button onClick={() => props.addDropSet().then(() => props.setModalVisible(false))}>
-          Add Drop Set
+      <div class="flex flex-col">
+        <Button
+          variant="text"
+          class="flex flex-row items-center space-x-1"
+          onClick={() => props.addDropSet().then(() => props.setModalVisible(false))}
+        >
+          <Plus size={16} />
+          <p>Add Drop Set</p>
         </Button>
-        <Button onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}>
-          Duplicate
+        <Button
+          variant="text"
+          class="flex flex-row items-center space-x-1"
+          onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}
+        >
+          <Copy size={16} />
+          <p>Duplicate</p>
         </Button>
-        <Button onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}>Delete</Button>
+        <Button
+          variant="text"
+          variantColor="bad"
+          class="flex flex-row items-center space-x-1"
+          onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}
+        >
+          <Delete size={16} />
+          <p>Delete</p>
+        </Button>
       </div>
       <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
     </Modal>

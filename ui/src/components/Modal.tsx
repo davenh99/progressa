@@ -33,6 +33,7 @@ export const Modal: ParentComponent<Props> = (props) => {
 
             <Show when={props.saveFunc}>
               <Button
+                variantColor="good"
                 onClick={() => {
                   setLoading(true);
                   props.saveFunc!()

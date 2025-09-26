@@ -197,7 +197,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           </p>
 
           {/* column headers */}
-          <div class="w-full flex flex-row justify-between mt-1">
+          <div class="w-full flex flex-row justify-between mt-1 text-center">
             <p class="flex-2">set</p>
             <p class="flex-2">
               {props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"}
@@ -225,7 +225,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         }
         `}
         >
-          <div class="flex w-full">
+          <div class="flex w-full text-center">
             <For each={props.row.getVisibleCells()}>
               {(cell) => {
                 const classes = `py-1 ${cell.column.id === "more" ? "flex-1" : "flex-2"}`;

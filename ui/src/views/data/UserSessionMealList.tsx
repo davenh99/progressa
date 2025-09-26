@@ -254,7 +254,9 @@ export const MealList: Component<Props> = (props) => {
         </For>
       </div>
       <div class="flex flex-row justify-center space-x-3 mt-4">
-        <Button onClick={() => addMeal()}>Add Meal</Button>
+        <Button variantColor="good" onClick={() => addMeal()}>
+          Add Meal
+        </Button>
         <Button onClick={() => setShowCopyMeal(true)}>Copy Meal</Button>
       </div>
       <Show when={showCopyMeal()}>

@@ -3,7 +3,7 @@ import { SetStoreFunction } from "solid-js/store";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import Ellipsis from "lucide-solid/icons/ellipsis";
+import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { UserSession, UserSessionExercise, UserSessionExerciseCreateData } from "../../../Types";
@@ -391,7 +391,7 @@ export const UserSessionExerciseList: Component<Props> = (props) => {
           )}
         </For>
       </div>
-      <Button onClick={() => setShowCreateSessionExercise(true)} class="mt-2">
+      <Button variantColor="good" onClick={() => setShowCreateSessionExercise(true)} class="mt-2">
         Add Set
       </Button>
       <Show when={showCreateSessionExercise()}>

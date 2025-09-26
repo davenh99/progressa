@@ -7,6 +7,7 @@ import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
 import { ThemeProvider } from "./config/theme";
 import AppLayout from "./views/AppLayout";
+import LoadFullScreen from "./views/LoadFullScreen";
 
 const NotFound = lazy(() => import("./routes/NotFound"));
 const Auth = lazy(() => import("./routes/Auth"));
@@ -40,7 +41,7 @@ function Content() {
   // and run checkAuth() if offline periodically?
 
   return (
-    <Show when={!store.loading} fallback={<p>loading</p>}>
+    <Show when={!store.loading} fallback={<LoadFullScreen />}>
       <Show when={!!store.user} fallback={<Auth />}>
         <Show when={!store.networkError} fallback={<p>Network Error, could not connect to server.</p>}>
           <Router>

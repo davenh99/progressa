@@ -1,8 +1,9 @@
 import { Component, createSignal, Show } from "solid-js";
+import Logout from "lucide-solid/icons/log-out";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import { Button, DataInput, DataNumberInput, Switch } from "../components";
+import { Button, DataInput, DataNumberInput } from "../components";
 import Container from "../views/Container";
 import SectionHeader from "../views/SectionHeader";
 import Blob from "../views/Blob";
@@ -54,8 +55,13 @@ const Profile: Component = () => {
               </Show>
             </div>
           </div>
-          <Button onClick={logout} class="self-end mt-5 bg-gray-600 text-red-500">
-            log out
+          <Button
+            variantColor="bad"
+            onClick={logout}
+            class="self-end mt-5 flex flex-row items-center space-x-1"
+          >
+            <Logout size={16} />
+            <p>log out</p>
           </Button>
         </Blob>
         {/* <Blob class="space-y-4">

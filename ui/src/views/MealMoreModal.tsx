@@ -1,5 +1,7 @@
 import { Component, createEffect } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
+import Copy from "lucide-solid/icons/copy";
+import Delete from "lucide-solid/icons/x";
 
 import { Meal, UserSession } from "../../Types";
 import { Button, Input, NumberInput, Modal, TagArea, TextArea } from "../components";
@@ -93,12 +95,24 @@ export const MealMoreModal: Component<Props> = (props) => {
           recordID={meal.id}
         />
         <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
-        <h3>Actions</h3>
-        <div class="space-x-2">
-          <Button onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}>
-            Duplicate
+        <div class="flex flex-col">
+          <Button
+            variant="text"
+            class="flex flex-row items-center space-x-1"
+            onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}
+          >
+            <Copy size={16} />
+            <p>Duplicate</p>
           </Button>
-          <Button onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}>Delete</Button>
+          <Button
+            variant="text"
+            variantColor="bad"
+            class="flex flex-row items-center space-x-1"
+            onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}
+          >
+            <Delete size={16} />
+            <p>Delete</p>
+          </Button>
         </div>
         <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
       </div>
