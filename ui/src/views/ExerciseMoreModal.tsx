@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createEffect } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 
 import { UserSession, UserSessionExercise } from "../../Types";
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const ExerciseMoreModal: Component<Props> = (props) => {
-  const [exercise, setExercise] = createStore(props.initialExercise);
+  const [exercise, setExercise] = createStore(JSON.parse(JSON.stringify(props.initialExercise)));
   const { pb, getSessionByID } = useAuthPB();
 
   const save = async () => {
@@ -31,6 +31,8 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
       console.log(e);
     }
   };
+
+  createEffect(() => setExercise(JSON.parse(JSON.stringify(props.initialExercise))));
 
   return (
     <Modal saveFunc={save} setModalVisible={props.setModalVisible}>

@@ -37,7 +37,7 @@ export const Modal: ParentComponent<Props> = (props) => {
                   setLoading(true);
                   props.saveFunc!()
                     .then(() => props.setModalVisible(false))
-                    .finally(() => setLoading(true));
+                    .finally(() => setLoading(false));
                 }}
                 class="mt-3"
               >

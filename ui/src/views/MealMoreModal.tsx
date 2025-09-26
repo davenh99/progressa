@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createEffect } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 
 import { Meal, UserSession } from "../../Types";
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const MealMoreModal: Component<Props> = (props) => {
-  const [meal, setMeal] = createStore(props.initialMeal);
+  const [meal, setMeal] = createStore(JSON.parse(JSON.stringify(props.initialMeal)));
   const { pb, getSessionByID } = useAuthPB();
 
   const save = async () => {
@@ -30,6 +30,8 @@ export const MealMoreModal: Component<Props> = (props) => {
       console.log(e);
     }
   };
+
+  createEffect(() => setMeal(JSON.parse(JSON.stringify(props.initialMeal))));
 
   return (
     <Modal saveFunc={save} setModalVisible={() => props.setModalVisible(false)}>
