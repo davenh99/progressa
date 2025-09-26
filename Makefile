@@ -6,3 +6,6 @@ test:
 
 serve: build
 	@cd dist; ./progressa serve
+
+# production:
+#     @cd ui; npm run build
