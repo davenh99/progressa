@@ -1,4 +1,4 @@
-import { createEffect, createSignal, ParentComponent } from "solid-js";
+import { Component } from "solid-js";
 import { Slider as KobalteSlider } from "@kobalte/core/slider";
 import { debounce } from "../methods/debounce";
 
@@ -8,7 +8,7 @@ interface Props {
   onChange: (v: number) => void;
 }
 
-export const Slider: ParentComponent<Props> = (props) => {
+export const Slider: Component<Props> = (props) => {
   return (
     <KobalteSlider
       class="w-30"
@@ -38,7 +38,7 @@ interface DataProps {
   label?: string;
 }
 
-export const DataSlider: ParentComponent<DataProps> = (props) => {
+export const DataSlider: Component<DataProps> = (props) => {
   return (
     <Slider
       label={props.label || ""}

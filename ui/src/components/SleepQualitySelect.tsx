@@ -1,4 +1,4 @@
-import { ParentComponent, For } from "solid-js";
+import { Component, For } from "solid-js";
 import { SleepQuality } from "../../Types";
 import { debounce } from "../methods/debounce";
 
@@ -29,7 +29,7 @@ interface Props {
   onChange: (v: string) => void;
 }
 
-export const SleepQualitySelector: ParentComponent<Props> = (props) => {
+export const SleepQualitySelector: Component<Props> = (props) => {
   return (
     <div class="flex gap-3 flex-row items-center">
       <For each={sleepOptions}>
@@ -58,7 +58,7 @@ interface DataProps {
   label?: string;
 }
 
-export const DataSleepQualitySelector: ParentComponent<DataProps> = (props) => {
+export const DataSleepQualitySelector: Component<DataProps> = (props) => {
   return (
     <div class="flex flex-col gap-2">
       {props.label && <label class="text-sm">{props.label}</label>}

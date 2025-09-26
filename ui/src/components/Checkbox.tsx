@@ -1,4 +1,4 @@
-import { ParentComponent, Show } from "solid-js";
+import { Component, Show } from "solid-js";
 import { Checkbox as KobalteCheckbox } from "@kobalte/core/checkbox";
 import Check from "lucide-solid/icons/check";
 
@@ -8,7 +8,7 @@ interface Props {
   label?: string;
 }
 
-export const Checkbox: ParentComponent<Props> = (props) => {
+export const Checkbox: Component<Props> = (props) => {
   return (
     <KobalteCheckbox checked={props.checked} onChange={props.onChange} class="flex flex-row space-x-2">
       <KobalteCheckbox.Input />
@@ -30,7 +30,7 @@ interface DataProps {
   saveFunc: (v: boolean) => Promise<void>;
 }
 
-export const DataCheckbox: ParentComponent<DataProps> = (props) => {
+export const DataCheckbox: Component<DataProps> = (props) => {
   return (
     <Checkbox
       checked={props.value}

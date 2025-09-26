@@ -23,7 +23,7 @@ export const AppLayout: ParentComponent = (props) => {
     `active:opacity-80 ${isActive(path) ? "text-cambridge-blue-700" : "text-white"}`;
 
   return (
-    <div class="flex h-screen bg-black bg-radial from-emerald-500/50 via-lime-600/30 to-transparent">
+    <div class="flex h-screen bg-charcoal-600">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-gray-900 text-white py-4 space-y-6">
         <A href="/" class={linkClasses("/")}>

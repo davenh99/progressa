@@ -1,4 +1,4 @@
-import { createEffect, on, ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
+import { createEffect, on, Component, Show, splitProps, ValidComponent } from "solid-js";
 import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
@@ -10,7 +10,7 @@ interface ExtraProps {
 type TextAreaProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
-export const TextArea: ParentComponent<TextAreaProps> = (props) => {
+export const TextArea: Component<TextAreaProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class"]);
   let textareaRef: HTMLTextAreaElement | undefined;
 
@@ -47,7 +47,7 @@ interface DataProps extends TextAreaProps {
   saveFunc: (v: string) => Promise<any>;
 }
 
-export const DataTextArea: ParentComponent<DataProps> = (props) => {
+export const DataTextArea: Component<DataProps> = (props) => {
   return (
     <TextArea
       value={props.value}

@@ -1,4 +1,4 @@
-import { ParentComponent } from "solid-js";
+import { Component } from "solid-js";
 import { Select as KobalteSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
 import UpDown from "lucide-solid/icons/chevrons-up-down";
@@ -11,7 +11,7 @@ interface Props {
   placeholder?: string;
 }
 
-export const Select: ParentComponent<Props> = (props) => {
+export const Select: Component<Props> = (props) => {
   return (
     <KobalteSelect
       multiple={false}
@@ -52,7 +52,7 @@ interface DataProps {
   saveFunc: (id: string) => Promise<void>;
 }
 
-export const DataSelect: ParentComponent<DataProps> = (props) => {
+export const DataSelect: Component<DataProps> = (props) => {
   return (
     <Select
       value={props.value}

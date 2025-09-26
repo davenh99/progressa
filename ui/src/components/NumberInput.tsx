@@ -1,4 +1,4 @@
-import { ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
+import { Component, Show, splitProps, ValidComponent } from "solid-js";
 import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
@@ -11,7 +11,7 @@ interface ExtraProps {
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
-export const NumberInput: ParentComponent<InputProps> = (props) => {
+export const NumberInput: Component<InputProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "width"]);
 
   const classes = `input outline-none text-right my-0 ${local.class ?? ""}`;
@@ -32,7 +32,7 @@ interface DataProps extends InputProps {
   saveFunc: (v: number | string) => Promise<any>;
 }
 
-export const DataNumberInput: ParentComponent<DataProps> = (props) => {
+export const DataNumberInput: Component<DataProps> = (props) => {
   return (
     <NumberInput
       value={props.value}
