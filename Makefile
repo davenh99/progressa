@@ -7,5 +7,10 @@ test:
 serve: build
 	@cd dist; ./progressa serve
 
-# production:
-#     @cd ui; npm run build
+frontend:
+	@cd ui && npm run build
+
+prod: frontend build
+
+prod-serve: prod
+	@cd dist; ./progressa serve
