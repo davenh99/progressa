@@ -4,7 +4,6 @@ import (
 	"embed"
 	"io/fs"
 	"log"
-	"net/http"
 	"workouter/utils"
 
 	"github.com/pocketbase/pocketbase"
@@ -45,9 +44,7 @@ func main() {
 				return err
 			}
 
-			if !e.Router.HasRoute(http.MethodGet, "/{path...}") {
-				e.Router.GET("/{path...}", apis.Static(distFS, true))
-			}
+			e.Router.GET("/{path...}", apis.Static(distFS, true))
 
 			return e.Next()
 		},
