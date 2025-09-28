@@ -27,14 +27,14 @@ export const Button: ParentComponent<Props> = (props) => {
           return `${extendedClass} text-charcoal-500`;
       }
     } else {
-      const extendedClass = `${baseClass} rounded-md px-3 py-1 text-charcoal-300`;
+      const extendedClass = `${baseClass} rounded-md px-3 py-1 text-charcoal-300 border-1`;
       switch (props.variantColor) {
         case "good":
-          return `${extendedClass} bg-green-400`;
+          return `${extendedClass} bg-green-400/20 text-green-400`;
         case "bad":
-          return `${extendedClass} bg-red-400`;
+          return `${extendedClass} bg-red-400/20 text-red-400`;
         default:
-          return `${extendedClass} bg-charcoal-800`;
+          return `${extendedClass} bg-charcoal-800/20 text-charcoal-800`;
       }
     }
   });
