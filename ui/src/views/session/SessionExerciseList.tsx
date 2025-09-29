@@ -325,7 +325,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   createEffect(() => {
     return monitorForElements({
       canMonitor({ source }) {
-        return source.data.issessionExerciseRow as boolean;
+        return source.data.isSessionExerciseRow as boolean;
       },
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
@@ -336,7 +336,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
         const sourceData = source.data;
         const targetData = target.data;
 
-        if (!sourceData.issessionExerciseRow || !targetData.issessionExerciseRow) {
+        if (!sourceData.isSessionExerciseRow || !targetData.isSessionExerciseRow) {
           return;
         }
 
