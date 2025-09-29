@@ -6,7 +6,7 @@ interface Props {
 
 const Blob: ParentComponent<Props> = (props) => {
   return (
-    <div class={`${props.class ?? ""} rounded-2xl p-2 bg-charcoal-100/80 text-dark-slate-gray-900`}>
+    <div class={`${props.class ?? ""} rounded-2xl p-2 bg-charcoal-300/80 text-dark-slate-gray-900`}>
       {props.children}
     </div>
   );

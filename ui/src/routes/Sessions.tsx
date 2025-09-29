@@ -16,7 +16,7 @@ const Sessions: Component = () => {
           </Button>
         </div>
       </SectionHeader>
-      <Container noPadding>
+      <Container noPadding class="pb-25">
         <SessionList />
       </Container>
     </>

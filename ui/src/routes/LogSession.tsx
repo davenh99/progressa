@@ -100,7 +100,7 @@ const LogSession: Component = () => {
           <h1 class="text-xl font-bold">Log Session</h1>
           <Input
             type="date"
-            class="rounded-md bg-cambridge-blue-800 px-2 py-1 text-black"
+            class="rounded-md bg-cambridge-blue-800/20 border-1 px-2 py-1 text-cambridge-blue-800"
             value={searchParams.date}
             onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
           />
