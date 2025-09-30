@@ -7,10 +7,18 @@ test:
 serve: build
 	@cd dist; ./progressa serve
 
-frontend:
+build-ui:
 	@cd ui && npm run build
 
-prod: frontend build
+ui-dev:
+	@cd ui && npm run dev
 
-prod-serve: prod
+prod: build-ui build
+
+serve-prod: prod
 	@cd dist; ./progressa serve
+
+serve-dev:
+	@trap "pkill -P $$" EXIT; \
+	(make serve &) && \
+	(make ui-dev)
