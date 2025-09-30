@@ -46,7 +46,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
         label="Mark as warmup"
       />
       <TextArea
-        class="mt-2"
+        class="my-2"
         label="Notes"
         value={exercise.notes}
         onInput={(e) => setExercise("notes", e.currentTarget.value)}
@@ -63,8 +63,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
         modelName="sessionExercises"
         recordID={exercise.id}
       />
-      <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
-      <div class="flex flex-col">
+      <div class="flex flex-col mt-3">
         <Button
           variant="text"
           class="flex flex-row items-center space-x-1"
@@ -91,7 +90,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
           <p>Delete</p>
         </Button>
       </div>
-      <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
+      <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
     </Modal>
   );
 };

@@ -66,7 +66,7 @@ export const ExerciseList: Component<Props> = (props) => {
 
   return (
     <Show when={!!exercises()} fallback={<Loading />}>
-      <div class="bg-ash-gray-900 rounded-lg p-1">
+      <div class="">
         <div class="overflow-x-auto">
           <Input
             type="text"

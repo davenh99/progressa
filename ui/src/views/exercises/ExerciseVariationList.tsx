@@ -29,7 +29,7 @@ export const ExerciseVariationList: Component<Props> = (props) => {
   });
 
   return (
-    <div class="bg-base-100 rounded-lg shadow p-1 mt-2">
+    <div class="mt-2">
       <div class="overflow-x-auto">
         <table class="table w-full">
           <thead>
@@ -43,7 +43,7 @@ export const ExerciseVariationList: Component<Props> = (props) => {
               )}
             </For>
           </thead>
-          <tbody>
+          <tbody class="max-h-[35vh] overflow-y-auto">
             <For each={table.getRowModel().rows}>
               {(row) => (
                 <tr class="hover" onClick={() => props.onClick(row.original)}>

@@ -34,7 +34,7 @@ export const TextArea: Component<TextAreaProps> = (props) => {
       </Show>
       <TextField.TextArea
         ref={textareaRef}
-        class={`w-full resize-none border-2 border-ash-gray-400 rounded-sm overflow-hidden px-2 py-1`}
+        class={`w-full resize-none bg-charcoal-600 rounded-md overflow-hidden px-2 py-1`}
         {...others}
       />
     </TextField>

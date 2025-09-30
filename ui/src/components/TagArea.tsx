@@ -79,7 +79,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
   };
 
   return (
-    <div class="border-2 border-ash-gray-400 rounded-sm p-2 flex flex-col">
+    <div class="rounded-md p-2 flex flex-col bg-charcoal-600">
       <Input
         label=""
         type="text"

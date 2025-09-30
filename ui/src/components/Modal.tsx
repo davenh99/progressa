@@ -18,11 +18,12 @@ export const Modal: ParentComponent<Props> = (props) => {
         <LoadFullScreen />
       </Show>
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/35"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
         onClick={() => props.setModalVisible(false)}
       >
         <div
-          class="bg-white rounded-xl shadow-lg p-4 md:p-6 w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col"
+          class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
+            w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
           <div class="flex flex-col flex-1 overflow-y-hidden">{props.children}</div>

@@ -24,7 +24,7 @@ export const Button: ParentComponent<Props> = (props) => {
         case "bad":
           return `${extendedClass} text-red-400`;
         default:
-          return `${extendedClass} text-charcoal-500`;
+          return `${extendedClass} text-charcoal-800`;
       }
     } else {
       const extendedClass = `${baseClass} rounded-md px-3 py-1 text-charcoal-300 border-1`;

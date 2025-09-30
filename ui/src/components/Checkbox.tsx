@@ -12,8 +12,8 @@ export const Checkbox: Component<Props> = (props) => {
   return (
     <KobalteCheckbox checked={props.checked} onChange={props.onChange} class="flex flex-row space-x-2">
       <KobalteCheckbox.Input />
-      <KobalteCheckbox.Control class="h-5 w-5 bg-ash-gray-500 rounded-sm">
-        <KobalteCheckbox.Indicator>
+      <KobalteCheckbox.Control class="h-5 w-5 bg-charcoal-600 rounded-sm">
+        <KobalteCheckbox.Indicator class="text-green-400">
           <Check />
         </KobalteCheckbox.Indicator>
       </KobalteCheckbox.Control>
