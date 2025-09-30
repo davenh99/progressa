@@ -186,7 +186,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfGroup
           ? DROP_ABOVE_CLASS
           : ""
-      }`}
+      } ${
+          dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfGroup
+            ? DROP_BELOW_CLASS
+            : ""
+        }`}
       >
         <Show when={props.firstOfGroup}>
           {/* exercise name */}
@@ -219,7 +223,10 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
             : ""
         }
         ${
-          dragging() === "dragging-over" && closestEdge() === "bottom" && props.lastOfSuperset
+          dragging() === "dragging-over" &&
+          closestEdge() === "bottom" &&
+          props.lastOfSuperset &&
+          !props.lastOfGroup
             ? DROP_BELOW_CLASS
             : ""
         }

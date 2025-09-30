@@ -12,7 +12,7 @@ import { DraggableRow } from "./SessionExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { SESSION_EXERCISE_EXPAND } from "../../config/constants";
-import ExerciseMoreModal from "./ExerciseMoreModal";
+import ExerciseMoreModal from "../exercises/ExerciseMoreModal";
 
 interface Props {
   sessionExercises: SessionExercise[];

@@ -8,11 +8,11 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import { SessionMeal, Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, DataInput, DataNumberInput, IconButton } from "../../components";
-import CopyMealModal from "./CopyMealModal";
+import CopyMealModal from "../meals/CopyMealModal";
 import { SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/sessionMeal";
 import { DraggableRow } from "./SessionMealDraggableRow";
-import MealMoreModal from "./MealMoreModal";
+import MealMoreModal from "../meals/MealMoreModal";
 
 interface Props {
   meals: SessionMeal[];
