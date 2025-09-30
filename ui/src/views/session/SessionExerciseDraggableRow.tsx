@@ -181,7 +181,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         ref={groupRef}
         class={`${props.firstOfGroup ? "mt-2 rounded-tl-lg rounded-tr-lg" : ""} ${
           props.lastOfGroup ? "pb-2 rounded-bl-lg rounded-br-lg" : ""
-        } bg-charcoal-900 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}
+        } bg-charcoal-900/15 px-2 ${props.row.original.supersetParent ? "" : "pt-1"}
       ${
         dragging() === "dragging-over" && closestEdge() === "top" && props.firstOfGroup
           ? DROP_ABOVE_CLASS
@@ -236,7 +236,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           </div>
           <Show when={props.lastOfSuperset}>
             <div class="flex flex-row justify-around">
-              <div class="rounded-lg bg-dark-slate-gray-800">
+              <div class="rounded-sm bg-dark-slate-gray-800/50">
                 <DataTime
                   value={props.row.original.restAfter}
                   onValueChange={(v) =>

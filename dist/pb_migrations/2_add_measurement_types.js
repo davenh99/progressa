@@ -5,16 +5,15 @@ migrate(
 
     const newMeasurementTypes = [
       { id: "m01s8yx7wfk2gxd", s: true, dn: "reps", n: "Reps", num: true, p: true },
-      { id: "8ldlgtjjvy3ircl", s: true, dn: "s", n: "Time", num: true, p: true },
-      { id: "8ldlgghjvy4ircl", s: true, dn: "", n: "Boulder grade (hueco)", num: false, p: true },
-      { id: "8ldlgghjvy5yrcl", s: true, dn: "", n: "Boulder grade (font)", num: false, p: true },
-      { id: "8ldlgghjvt7yrcl", s: true, dn: "", n: "Route grade (ewbanks)", num: false, p: true },
-      { id: "8ldlyyhjvt7yrbl", s: true, dn: "", n: "Route grade (french)", num: false, p: true },
+      { id: "8ldlgtjjvy3ircl", s: true, dn: "time", n: "Time", num: true, p: true },
+      { id: "8ldlgghjvy4ircl", s: true, dn: "grade", n: "Boulder grade (hueco)", num: false, p: true },
+      { id: "8ldlgghjvy5yrcl", s: true, dn: "grade", n: "Boulder grade (font)", num: false, p: true },
+      { id: "8ldlgghjvt7yrcl", s: true, dn: "grade", n: "Route grade (ewbanks)", num: false, p: true },
+      { id: "8ldlyyhjvt7yrbl", s: true, dn: "grade", n: "Route grade (french)", num: false, p: true },
     ];
 
     for (const m of newMeasurementTypes) {
       let record = new Record(measurementTypes);
-
       record.set("id", m.id);
       record.set("system", m.s);
       record.set("name", m.n);

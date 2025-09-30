@@ -16,7 +16,7 @@ export const AppLayout: ParentComponent = (props) => {
 
   const linkClasses = (path: string) =>
     `flex flex-row space-x-2 mx-4 hover:text-gray-300 active:opacity-80 ${
-      isActive(path) ? "text-cambridge-blue-700" : "text-white"
+      isActive(path) ? "text-cambridge-blue-700" : "text-dark-slate-gray-900"
     }`;
 
   const iconClasses = (path: string) =>

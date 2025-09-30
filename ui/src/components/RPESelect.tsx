@@ -38,7 +38,7 @@ export const RPESelect: Component<Props> = (props) => {
       optionTextValue="val"
       itemComponent={(props) => (
         <Select.Item
-          class={`${props.item.rawValue.color} p-1 m-1 w-10 text-center rounded-md`}
+          class={`${props.item.rawValue.color} px-1 m-1 w-10 text-center text-black rounded-sm`}
           item={props.item}
         >
           <Select.ItemLabel>{props.item.textValue}</Select.ItemLabel>
@@ -49,7 +49,7 @@ export const RPESelect: Component<Props> = (props) => {
         <Select.Value<{ val: number; color: string }>>
           {(state) => {
             return (
-              <div class={`rounded-md w-10 ${state.selectedOption().color}`}>
+              <div class={`rounded-sm w-10 text-black ${state.selectedOption().color}`}>
                 <p>{state.selectedOption().val}</p>
               </div>
             );

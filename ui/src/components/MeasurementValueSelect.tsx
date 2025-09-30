@@ -22,23 +22,23 @@ export const Select: Component<Props> = (props) => {
       options={props.values}
       placeholder={props.placeholder}
       itemComponent={(props) => (
-        <KobalteSelect.Item item={props.item}>
+        <KobalteSelect.Item item={props.item} class="flex flex-row space-x-1 px-1">
           <KobalteSelect.ItemLabel>{props.item.textValue}</KobalteSelect.ItemLabel>
           <KobalteSelect.ItemIndicator>
-            <Check />
+            <Check size={16} />
           </KobalteSelect.ItemIndicator>
         </KobalteSelect.Item>
       )}
     >
-      <KobalteSelect.Trigger>
+      <KobalteSelect.Trigger class="rounded-sm border-1 bg-dark-slate-gray-900/20 flex flex-row px-1 items-center space-x-1">
         <KobalteSelect.Value<MeasurementValue>>{(state) => state.selectedOption().value}</KobalteSelect.Value>
         <KobalteSelect.Icon>
-          <UpDown />
+          <UpDown size={16} />
         </KobalteSelect.Icon>
       </KobalteSelect.Trigger>
       <KobalteSelect.Portal>
-        <KobalteSelect.Content>
-          <KobalteSelect.Listbox />
+        <KobalteSelect.Content class="rounded-sm border-1 bg-charcoal-500 text-dark-slate-gray-900">
+          <KobalteSelect.Listbox class="bg-dark-slate-gray-900/20 max-h-50 overflow-y-auto" />
         </KobalteSelect.Content>
       </KobalteSelect.Portal>
     </KobalteSelect>

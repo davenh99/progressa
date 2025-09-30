@@ -117,13 +117,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   return (
     <div
       ref={ref}
-      class={`flex flex-col p-1 cursor-grab active:cursor-grabbing ${
+      class={`flex flex-col cursor-grab active:cursor-grabbing ${
         dragging() === "dragging" ? "opacity-40" : ""
       } rounded-md
         ${dragging() === "dragging-over" && closestEdge() === "top" ? DROP_ABOVE_CLASS : ""}
-        ${dragging() === "dragging-over" && closestEdge() === "bottom" ? DROP_BELOW_CLASS : ""}
-        
-        `}
+        ${dragging() === "dragging-over" && closestEdge() === "bottom" ? DROP_BELOW_CLASS : ""}`}
     >
       <div class="flex w-full">
         <For each={props.row.getVisibleCells()}>

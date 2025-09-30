@@ -112,7 +112,7 @@ const LogSession: Component = () => {
           when={!!session.session}
           fallback={
             <div class="w-full flex flex-col justify-start items-center">
-              <p class="mt-2">No session yet for this date</p>
+              <p class="mt-2 text-dark-slate-gray-900">No session yet for this date</p>
               <Button variantColor="good" class="mt-4" onClick={() => createSession()}>
                 Create Session
               </Button>

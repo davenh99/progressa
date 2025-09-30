@@ -66,7 +66,7 @@ export const SessionList: Component = (props) => {
             <A
               href={`/log?date=${row.original.userDay}`}
               class={`bg-charcoal-600 text-dark-slate-gray-900 hover:opacity-80 flex flex-row w-full
-                justify-between p-2 border-b-1 border-charcoal-500`}
+                justify-between p-2 border-b-1 border-charcoal-500/40`}
             >
               <For each={row.getVisibleCells()}>
                 {(cell) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>}

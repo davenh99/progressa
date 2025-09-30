@@ -103,7 +103,7 @@ export const SessionMealList: Component<Props> = (props) => {
   };
 
   const addMeal = async (mealToCopy?: SessionMeal) => {
-    const data = mealToCopy ? extractMealData(mealToCopy) : { session: props.sessionID };
+    const data = mealToCopy ? extractMealData(mealToCopy) : { session: props.sessionID, name: "Meal" };
 
     addRowAtIndex(props.meals.length, undefined, data);
     setShowCopyMeal(false);
@@ -236,37 +236,35 @@ export const SessionMealList: Component<Props> = (props) => {
   });
 
   return (
-    <div class="mt-3">
-      <div class="bg-white/25 rounded-lg">
-        <Show when={table.getRowModel().rows.length}>
-          <For each={table.getHeaderGroups()}>
-            {(headerGroup) => (
-              <div class="flex">
-                <For each={headerGroup.headers}>
-                  {(header) => {
-                    let classes = `p-2 ${
-                      header.column.id === "name"
-                        ? "flex-6 text-left"
-                        : header.column.id === "more"
-                        ? "flex-1 text-right"
-                        : "flex-2 text-right"
-                    }`;
+    <div class="mt-1">
+      <Show when={table.getRowModel().rows.length}>
+        <For each={table.getHeaderGroups()}>
+          {(headerGroup) => (
+            <div class="flex">
+              <For each={headerGroup.headers}>
+                {(header) => {
+                  let classes = `p-2 font-bold ${
+                    header.column.id === "name"
+                      ? "flex-6 text-left"
+                      : header.column.id === "more"
+                      ? "flex-1 text-right"
+                      : "flex-2 text-right"
+                  }`;
 
-                    return (
-                      <div class={classes}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </div>
-                    );
-                  }}
-                </For>
-              </div>
-            )}
-          </For>
-        </Show>
-        <For each={table.getRowModel().rows}>
-          {(row) => <DraggableRow row={row} saveRow={saveRow} setSession={props.setSession} />}
+                  return (
+                    <div class={classes}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+          )}
         </For>
-      </div>
+      </Show>
+      <For each={table.getRowModel().rows}>
+        {(row) => <DraggableRow row={row} saveRow={saveRow} setSession={props.setSession} />}
+      </For>
       <div class="flex flex-row justify-center space-x-3 mt-4">
         <Button variantColor="good" onClick={() => addMeal()}>
           Add Meal
