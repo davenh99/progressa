@@ -117,6 +117,7 @@ export const SessionMealList: Component<Props> = (props) => {
         <DataInput
           type="text"
           noPadding
+          noBackground
           value={ctx.getValue() as string}
           onValueChange={(v) =>
             props.setSession(

@@ -39,14 +39,10 @@ export const MealMoreModal: Component<Props> = (props) => {
     <Modal saveFunc={save} setModalVisible={() => props.setModalVisible(false)}>
       <div class="overflow-y-auto space-y-1">
         <h2 class="pb-2">Meal Options</h2>
-        <Input
-          label="Name"
-          variant="bordered"
-          value={meal.name}
-          onInput={(e) => setMeal("name", e.currentTarget.value)}
-        />
+        <Input label="Name" value={meal.name} onInput={(e) => setMeal("name", e.currentTarget.value)} />
         <TextArea
           label="Description"
+          placeholder="My go-to lunch..."
           value={meal.description}
           onInput={(e) => setMeal("description", e.currentTarget.value)}
         />
@@ -94,8 +90,7 @@ export const MealMoreModal: Component<Props> = (props) => {
           modelName="sessionMeals"
           recordID={meal.id}
         />
-        <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
-        <div class="flex flex-col">
+        <div class="flex flex-col mt-3">
           <Button
             variant="text"
             class="flex flex-row items-center space-x-1"
@@ -114,7 +109,7 @@ export const MealMoreModal: Component<Props> = (props) => {
             <p>Delete</p>
           </Button>
         </div>
-        <div class="bg-charcoal-800 w-full h-[2px] my-2 rounded-full"></div>
+        <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
       </div>
     </Modal>
   );

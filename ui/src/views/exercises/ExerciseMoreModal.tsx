@@ -48,6 +48,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
       <TextArea
         class="my-2"
         label="Notes"
+        placeholder="Feeling strong..."
         value={exercise.notes}
         onInput={(e) => setExercise("notes", e.currentTarget.value)}
       />

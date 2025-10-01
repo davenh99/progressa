@@ -66,38 +66,37 @@ export const ExerciseList: Component<Props> = (props) => {
 
   return (
     <Show when={!!exercises()} fallback={<Loading />}>
-      <div class="">
-        <div class="overflow-x-auto">
-          <Input
-            type="text"
-            placeholder="Search Exercises"
-            class="p-1"
-            value={nameFilter()}
-            onInput={(e) => setNameFilter(e.currentTarget.value)}
-          />
+      <div class="overflow-x-auto">
+        <Input
+          type="text"
+          placeholder="Search Exercises"
+          class="p-1"
+          noPadding
+          value={nameFilter()}
+          onInput={(e) => setNameFilter(e.currentTarget.value)}
+        />
 
-          <div class="max-h-[40vh] overflow-y-auto">
-            <table class="table w-full">
-              <tbody>
-                <For each={table.getRowModel().rows}>
-                  {(row) => (
-                    <tr class="hover" onClick={() => props.onClick(row.original)}>
-                      <For each={row.getVisibleCells()}>
-                        {(cell) => (
-                          <td class="p-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                        )}
-                      </For>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          </div>
+        <div class="max-h-[40vh] overflow-y-auto">
+          <table class="table w-full">
+            <tbody>
+              <For each={table.getRowModel().rows}>
+                {(row) => (
+                  <tr class="hover" onClick={() => props.onClick(row.original)}>
+                    <For each={row.getVisibleCells()}>
+                      {(cell) => (
+                        <td class="p-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      )}
+                    </For>
+                  </tr>
+                )}
+              </For>
+            </tbody>
+          </table>
         </div>
-        <Show when={table.getRowModel().rows.length === 0}>
-          <div class="text-center py-4">No Exercises found</div>
-        </Show>
       </div>
+      <Show when={table.getRowModel().rows.length === 0}>
+        <div class="text-center py-4">No Exercises found</div>
+      </Show>
     </Show>
   );
 };

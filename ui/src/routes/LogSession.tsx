@@ -162,7 +162,6 @@ const LogSession: Component = () => {
                 <div>
                   <h3>Session name</h3>
                   <DataInput
-                    variant="bordered"
                     value={session.session?.name ?? "Workout"}
                     onValueChange={(v) => setSession("session", "name", v as string)}
                     type="text"
@@ -172,7 +171,7 @@ const LogSession: Component = () => {
 
                 <div class="flex flex-row items-center">
                   <h3 class="mr-2">Your weight this day</h3>
-                  <div class="border-2 border-ash-gray-400 rounded-sm flex flex-row p-1">
+                  <div class="bg-charcoal-600 rounded-sm flex flex-row p-1">
                     <DataNumberInput
                       value={session.session?.userWeight ?? user.weight}
                       onValueChange={(v) => setSession("session", "userWeight", Number(v))}
@@ -185,6 +184,7 @@ const LogSession: Component = () => {
                 <div>
                   <h3>Notes</h3>
                   <DataTextArea
+                    placeholder="Feeling rested today..."
                     value={session.session?.notes ?? ""}
                     onValueChange={(v) => setSession("session", "notes", v)}
                     saveFunc={(v: string) => sessionUpdate("notes", v)}

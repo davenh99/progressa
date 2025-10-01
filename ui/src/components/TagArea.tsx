@@ -83,6 +83,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       <Input
         label=""
         type="text"
+        noPadding
         value={tagInput()}
         onInput={(e) => setTagInput(e.currentTarget.value)}
         onKeyDown={handleTagInput}

@@ -29,33 +29,31 @@ export const ExerciseVariationList: Component<Props> = (props) => {
   });
 
   return (
-    <div class="mt-2">
-      <div class="overflow-x-auto">
-        <table class="table w-full">
-          <thead>
-            <For each={table.getHeaderGroups()}>
-              {(headerGroup) => (
-                <tr>
-                  <For each={headerGroup.headers}>
-                    {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
-                  </For>
-                </tr>
-              )}
-            </For>
-          </thead>
-          <tbody class="max-h-[35vh] overflow-y-auto">
-            <For each={table.getRowModel().rows}>
-              {(row) => (
-                <tr class="hover" onClick={() => props.onClick(row.original)}>
-                  <For each={row.getVisibleCells()}>
-                    {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
-                  </For>
-                </tr>
-              )}
-            </For>
-          </tbody>
-        </table>
-      </div>
+    <div class="mt-2 flex-1 overflow-y-auto max-h-[35vh]">
+      <table class="w-full">
+        <thead class="sticky top-0 bg-charcoal-500">
+          <For each={table.getHeaderGroups()}>
+            {(headerGroup) => (
+              <tr>
+                <For each={headerGroup.headers}>
+                  {(header) => <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>}
+                </For>
+              </tr>
+            )}
+          </For>
+        </thead>
+        <tbody>
+          <For each={table.getRowModel().rows}>
+            {(row) => (
+              <tr class="hover" onClick={() => props.onClick(row.original)}>
+                <For each={row.getVisibleCells()}>
+                  {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
+                </For>
+              </tr>
+            )}
+          </For>
+        </tbody>
+      </table>
       <Show when={props.variations().length === 0}>
         <div class="text-center py-4">No Variations found</div>
       </Show>
