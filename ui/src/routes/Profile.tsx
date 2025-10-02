@@ -1,4 +1,4 @@
-import { Component, createSignal, Show } from "solid-js";
+import { Component, createEffect, createSignal, Show } from "solid-js";
 import Logout from "lucide-solid/icons/log-out";
 
 import { useAuthPB } from "../config/pocketbase";
@@ -12,7 +12,7 @@ const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
   const [height, setHeight] = createSignal(user.height);
   const [weight, setWeight] = createSignal(user.weight);
-  const [dob, setDob] = createSignal(user.dob);
+  const [dob, setDob] = createSignal(new Date(user.dob).toLocaleDateString("en-ca"));
 
   return (
     <>
@@ -24,28 +24,36 @@ const Profile: Component = () => {
           <h2 class="text-xl font-semibold">{user.name}</h2>
           <div class="flex flex-col space-y-2 mt-2">
             <p>Email: {user.email}</p>
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-1">
               <DataNumberInput
                 label="Height:"
+                containerClass="flex-1 justify-between"
+                class="rounded-sm bg-charcoal-600 pr-0.5"
+                width="3.5rem"
                 value={height()}
                 onValueChange={(v) => setHeight(Number(v))}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
               />
-              <p>cm</p>
+              <p class="w-4">cm</p>
             </div>
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-1">
               <DataNumberInput
                 label="Weight:"
+                containerClass="flex-1 justify-between"
+                class="rounded-sm bg-charcoal-600 pr-0.5"
+                width="3.5rem"
                 value={weight()}
                 onValueChange={(v) => setWeight(Number(v))}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
               />
-              <p>kg</p>
+              <p class="w-4">kg</p>
             </div>
-            <div class="flex flex-row">
+            <div class="flex flex-row items-center space-x-1">
               <DataInput
                 label="DOB:"
                 type="date"
+                containerClass="justify-between flex-1"
+                class="flex-1 w-full"
                 value={dob()}
                 onValueChange={(v) => setDob(v as string)}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "dob", v)}

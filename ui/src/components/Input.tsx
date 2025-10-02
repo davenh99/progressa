@@ -8,20 +8,29 @@ interface ExtraProps {
   variant?: "bordered" | "none";
   noPadding?: boolean;
   noBackground?: boolean;
+  class?: string;
+  containerClass?: string;
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
   PolymorphicProps<T, TextFieldInputProps<T>>;
 
 export const Input: Component<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "variant", "noPadding", "noBackground"]);
+  const [local, others] = splitProps(props, [
+    "label",
+    "class",
+    "variant",
+    "noPadding",
+    "noBackground",
+    "containerClass",
+  ]);
 
   const style = local.variant === "bordered" ? "border-2 border-ash-gray-400" : "";
   const padding = local.noPadding ? "" : "px-2 py-1";
   const bg = local.noBackground ? "" : "bg-charcoal-600";
 
   return (
-    <TextField class="flex flex-row space-x-1">
+    <TextField class={`flex flex-row space-x-1 items-center ${local.containerClass ?? ""}`}>
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>

@@ -1,28 +1,30 @@
 import { Component, Show, splitProps, ValidComponent } from "solid-js";
-import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
+import { NumberField, type NumberFieldInputProps } from "@kobalte/core/number-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
 
 interface ExtraProps {
   label?: string;
   width?: string;
+  class?: string;
+  containerClass?: string;
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
-  PolymorphicProps<T, TextFieldInputProps<T>>;
+  PolymorphicProps<T, NumberFieldInputProps<T>>;
 
 export const NumberInput: Component<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "width"]);
+  const [local, others] = splitProps(props, ["label", "class", "width", "containerClass"]);
 
   const classes = `input outline-none text-right my-0 ${local.class ?? ""}`;
 
   return (
-    <TextField class="flex flex-row space-x-1">
+    <NumberField class={`flex flex-row space-x-1 ${local.containerClass ?? ""}`}>
       <Show when={local.label}>
-        <TextField.Label>{local.label}</TextField.Label>
+        <NumberField.Label>{local.label}</NumberField.Label>
       </Show>
-      <TextField.Input type="number" class={classes} style={{ width: local.width ?? "2.5rem" }} {...others} />
-    </TextField>
+      <NumberField.Input class={classes} style={{ width: local.width ?? "2.5rem" }} {...others} />
+    </NumberField>
   );
 };
 
@@ -33,16 +35,16 @@ interface DataProps extends InputProps {
 }
 
 export const DataNumberInput: Component<DataProps> = (props) => {
+  const [local, others] = splitProps(props, ["value", "onValueChange", "saveFunc"]);
+
   return (
     <NumberInput
-      value={props.value}
+      value={local.value}
       onInput={(e) => {
-        props.onValueChange(Number(e.currentTarget.value));
-        debounce(props.saveFunc)(Number(e.currentTarget.value));
+        local.onValueChange(Number(e.currentTarget.value));
+        debounce(local.saveFunc)(Number(e.currentTarget.value));
       }}
-      label={props.label}
-      type={props.type}
-      width={props.width}
+      {...others}
     />
   );
 };

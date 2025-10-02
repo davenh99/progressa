@@ -46,37 +46,49 @@ export const MealMoreModal: Component<Props> = (props) => {
           value={meal.description}
           onInput={(e) => setMeal("description", e.currentTarget.value)}
         />
-        <div class="flex space-x-0.5">
+        <div class="flex space-x-1">
           <NumberInput
             label="Energy"
             value={meal.kj}
+            containerClass="flex-1 justify-between"
+            class="rounded-sm bg-charcoal-600 pr-0.5"
+            width="3.5rem"
             onInput={(e) => setMeal("kj", Number(e.currentTarget.value))}
           />
-          <p>kj</p>
+          <p class="w-4">kj</p>
         </div>
-        <div class="flex space-x-0.5">
+        <div class="flex space-x-1">
           <NumberInput
             label="Protein"
+            containerClass="flex-1 justify-between"
+            class="rounded-sm bg-charcoal-600 pr-0.5"
+            width="3.5rem"
             value={meal.gramsProtein}
             onInput={(e) => setMeal("gramsProtein", Number(e.currentTarget.value))}
           />
-          <p>g</p>
+          <p class="w-4">g</p>
         </div>
-        <div class="flex space-x-0.5">
+        <div class="flex space-x-1">
           <NumberInput
             label="Carbohydrates"
+            containerClass="flex-1 justify-between"
+            class="rounded-sm bg-charcoal-600 pr-0.5"
+            width="3.5rem"
             value={meal.gramsCarbohydrate}
             onInput={(e) => setMeal("gramsCarbohydrate", Number(e.currentTarget.value))}
           />
-          <p>g</p>
+          <p class="w-4">g</p>
         </div>
-        <div class="flex space-x-0.5">
+        <div class="flex space-x-1 mb-1.5">
           <NumberInput
             label="Fats"
+            containerClass="flex-1 justify-between"
+            class="rounded-sm bg-charcoal-600 pr-0.5"
+            width="3.5rem"
             value={meal.gramsFat}
             onInput={(e) => setMeal("gramsFat", Number(e.currentTarget.value))}
           />
-          <p>g</p>
+          <p class="w-4">g</p>
         </div>
         <TagArea
           tags={meal.expand.tags ?? []}

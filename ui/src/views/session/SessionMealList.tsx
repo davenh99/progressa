@@ -150,6 +150,7 @@ export const SessionMealList: Component<Props> = (props) => {
                 v as number
               )
             }
+            width="3.5rem"
             saveFunc={(v) => saveRow(ctx.row.original.id, "kj", v)}
           />
           <p>kj</p>
@@ -173,6 +174,7 @@ export const SessionMealList: Component<Props> = (props) => {
                 v as number
               )
             }
+            width="3.5rem"
             saveFunc={(v) => saveRow(ctx.row.original.id, "gramsProtein", v)}
           />
           <p>g</p>
