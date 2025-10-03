@@ -69,12 +69,13 @@ export const MealList: Component<Props> = (props) => {
     <Show when={!!meals()} fallback={<Loading />}>
       <div class="p-1 flex flex-col flex-1 overflow-hidden">
         <Input
-          type="text"
-          placeholder="Search Past Meals"
-          class="p-1"
           noPadding
           value={nameFilter()}
-          onInput={(e) => setNameFilter(e.currentTarget.value)}
+          onChange={setNameFilter}
+          inputProps={{
+            placeholder: "Search Past Meals",
+            class: "p-1",
+          }}
         />
 
         <div class="overflow-y-auto flex-1">

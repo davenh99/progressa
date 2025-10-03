@@ -1,34 +1,43 @@
 import { Component, createMemo, Show, splitProps, ValidComponent } from "solid-js";
-import { NumberField, type NumberFieldRootProps } from "@kobalte/core/number-field";
+import {
+  NumberField,
+  type NumberFieldInputProps,
+  type NumberFieldRootProps,
+} from "@kobalte/core/number-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
+
+type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, NumberFieldInputProps<T>>;
 
 interface ExtraProps {
   label?: string;
   width?: string;
-  class?: string;
-  containerClass?: string;
+  inputProps?: InputProps;
 }
 
-type InputProps<T extends ValidComponent = "input"> = ExtraProps &
+type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, NumberFieldRootProps<T>>;
 
-export const NumberInput: Component<InputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "width", "containerClass"]);
+export const NumberInput: Component<InputRootProps> = (props) => {
+  const [local, others] = splitProps(props, ["label", "class", "width", "inputProps"]);
 
-  const classes = `input outline-none text-right my-0 ${local.class ?? ""}`;
+  const inputClasses = `input outline-none text-right my-0 ${local.inputProps?.class ?? ""}`;
 
   return (
-    <NumberField class={`flex flex-row space-x-1 ${local.containerClass ?? ""}`} {...others}>
+    <NumberField class={`flex flex-row space-x-1 ${local.class ?? ""}`} {...others}>
       <Show when={local.label}>
         <NumberField.Label>{local.label}</NumberField.Label>
       </Show>
-      <NumberField.Input class={classes} style={{ width: local.width ?? "2.5rem" }} />
+      <NumberField.Input
+        class={inputClasses}
+        style={{ width: local.width ?? "2.5rem" }}
+        {...local.inputProps}
+      />
     </NumberField>
   );
 };
 
-interface DataProps extends InputProps {
+interface DataProps extends InputRootProps {
   saveFunc: (v: number) => Promise<any>;
 }
 

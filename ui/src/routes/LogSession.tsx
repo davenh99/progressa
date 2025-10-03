@@ -99,10 +99,11 @@ const LogSession: Component = () => {
         <div class="flex flex-row justify-between">
           <h1 class="text-xl font-bold">Log Session</h1>
           <Input
-            type="date"
-            class="rounded-md bg-cambridge-blue-800/20 border-1 px-2 py-1 text-cambridge-blue-800"
             value={searchParams.date}
-            onInput={async (e) => setSearchParams({ date: e.currentTarget.value })}
+            inputProps={{
+              class: "rounded-md bg-cambridge-blue-800/20 border-1 px-2 py-1 text-cambridge-blue-800",
+            }}
+            onChange={async (v) => setSearchParams({ date: v })}
           />
         </div>
       </SectionHeader>
@@ -163,8 +164,7 @@ const LogSession: Component = () => {
                   <h3>Session name</h3>
                   <DataInput
                     value={session.session?.name ?? "Workout"}
-                    onValueChange={(v) => setSession("session", "name", v as string)}
-                    type="text"
+                    onChange={(v) => setSession("session", "name", v)}
                     saveFunc={(v) => sessionUpdate("name", v)}
                   />
                 </div>

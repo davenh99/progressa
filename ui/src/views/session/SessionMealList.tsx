@@ -115,19 +115,11 @@ export const SessionMealList: Component<Props> = (props) => {
       accessorKey: "name",
       cell: (ctx) => (
         <DataInput
-          type="text"
           noPadding
           noBackground
           value={ctx.getValue() as string}
-          onValueChange={(v) =>
-            props.setSession(
-              "session",
-              "expand",
-              "sessionMeals_via_session",
-              ctx.row.index,
-              "name",
-              v as string
-            )
+          onChange={(v) =>
+            props.setSession("session", "expand", "sessionMeals_via_session", ctx.row.index, "name", v)
           }
           saveFunc={(v) => saveRow(ctx.row.original.id, "name", v)}
         />

@@ -39,7 +39,7 @@ export const MealMoreModal: Component<Props> = (props) => {
     <Modal saveFunc={save} setModalVisible={() => props.setModalVisible(false)}>
       <div class="overflow-y-auto space-y-1">
         <h2 class="pb-2">Meal Options</h2>
-        <Input label="Name" value={meal.name} onInput={(e) => setMeal("name", e.currentTarget.value)} />
+        <Input label="Name" value={meal.name} onChange={(v) => setMeal("name", v)} />
         <TextArea
           label="Description"
           placeholder="My go-to lunch..."
@@ -49,44 +49,52 @@ export const MealMoreModal: Component<Props> = (props) => {
         <div class="flex space-x-1">
           <NumberInput
             label="Energy"
-            value={meal.kj}
-            containerClass="flex-1 justify-between"
-            class="rounded-sm bg-charcoal-600 pr-0.5"
+            rawValue={meal.kj}
+            class="flex-1 justify-between"
             width="3.5rem"
-            onInput={(e) => setMeal("kj", Number(e.currentTarget.value))}
+            onRawValueChange={(v) => setMeal("kj", v)}
+            inputProps={{
+              class: "rounded-sm bg-charcoal-600 pr-0.5",
+            }}
           />
           <p class="w-4">kj</p>
         </div>
         <div class="flex space-x-1">
           <NumberInput
             label="Protein"
-            containerClass="flex-1 justify-between"
-            class="rounded-sm bg-charcoal-600 pr-0.5"
+            class="flex-1 justify-between"
             width="3.5rem"
-            value={meal.gramsProtein}
-            onInput={(e) => setMeal("gramsProtein", Number(e.currentTarget.value))}
+            rawValue={meal.gramsProtein}
+            onRawValueChange={(v) => setMeal("gramsProtein", v)}
+            inputProps={{
+              class: "rounded-sm bg-charcoal-600 pr-0.5",
+            }}
           />
           <p class="w-4">g</p>
         </div>
         <div class="flex space-x-1">
           <NumberInput
             label="Carbohydrates"
-            containerClass="flex-1 justify-between"
-            class="rounded-sm bg-charcoal-600 pr-0.5"
+            class="flex-1 justify-between"
             width="3.5rem"
-            value={meal.gramsCarbohydrate}
-            onInput={(e) => setMeal("gramsCarbohydrate", Number(e.currentTarget.value))}
+            rawValue={meal.gramsCarbohydrate}
+            onRawValueChange={(v) => setMeal("gramsCarbohydrate", v)}
+            inputProps={{
+              class: "rounded-sm bg-charcoal-600 pr-0.5",
+            }}
           />
           <p class="w-4">g</p>
         </div>
         <div class="flex space-x-1 mb-1.5">
           <NumberInput
             label="Fats"
-            containerClass="flex-1 justify-between"
-            class="rounded-sm bg-charcoal-600 pr-0.5"
+            class="flex-1 justify-between"
             width="3.5rem"
-            value={meal.gramsFat}
-            onInput={(e) => setMeal("gramsFat", Number(e.currentTarget.value))}
+            rawValue={meal.gramsFat}
+            onRawValueChange={(v) => setMeal("gramsFat", v)}
+            inputProps={{
+              class: "rounded-sm bg-charcoal-600 pr-0.5",
+            }}
           />
           <p class="w-4">g</p>
         </div>

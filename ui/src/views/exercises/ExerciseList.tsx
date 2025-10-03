@@ -68,12 +68,10 @@ export const ExerciseList: Component<Props> = (props) => {
     <Show when={!!exercises()} fallback={<Loading />}>
       <div class="overflow-x-auto">
         <Input
-          type="text"
-          placeholder="Search Exercises"
-          class="p-1"
           noPadding
           value={nameFilter()}
-          onInput={(e) => setNameFilter(e.currentTarget.value)}
+          onChange={setNameFilter}
+          inputProps={{ placeholder: "Search Exercises", class: "p-1" }}
         />
 
         <div class="max-h-[40vh] overflow-y-auto">

@@ -82,12 +82,13 @@ export const TagArea: Component<TagAreaProps> = (props) => {
     <div class="rounded-md p-2 flex flex-col bg-charcoal-600">
       <Input
         label=""
-        type="text"
         noPadding
         value={tagInput()}
-        onInput={(e) => setTagInput(e.currentTarget.value)}
-        onKeyDown={handleTagInput}
-        placeholder="Add tags (press Enter)"
+        onChange={(v) => setTagInput(v)}
+        inputProps={{
+          onKeyDown: handleTagInput,
+          placeholder: "Add tags (press Enter)",
+        }}
         class="flex-1 min-w-[120px] mb-2"
       />
       <div class="flex flex-wrap gap-2">

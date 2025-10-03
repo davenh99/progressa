@@ -1,28 +1,29 @@
-import { Component, Show, splitProps, ValidComponent } from "solid-js";
-import { TextField, type TextFieldInputProps } from "@kobalte/core/text-field";
+import { Component, createMemo, Show, splitProps, ValidComponent } from "solid-js";
+import { TextField, type TextFieldInputProps, type TextFieldRootProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
+
+type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFieldInputProps<T>>;
 
 interface ExtraProps {
   label?: string;
   variant?: "bordered" | "none";
   noPadding?: boolean;
   noBackground?: boolean;
-  class?: string;
-  containerClass?: string;
+  inputProps?: InputProps;
 }
 
-type InputProps<T extends ValidComponent = "input"> = ExtraProps &
-  PolymorphicProps<T, TextFieldInputProps<T>>;
+type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
+  PolymorphicProps<T, TextFieldRootProps<T>>;
 
-export const Input: Component<InputProps> = (props) => {
+export const Input: Component<InputRootProps> = (props) => {
   const [local, others] = splitProps(props, [
     "label",
     "class",
     "variant",
     "noPadding",
     "noBackground",
-    "containerClass",
+    "inputProps",
   ]);
 
   const style = local.variant === "bordered" ? "border-2 border-ash-gray-400" : "";
@@ -30,31 +31,35 @@ export const Input: Component<InputProps> = (props) => {
   const bg = local.noBackground ? "" : "bg-charcoal-600";
 
   return (
-    <TextField class={`flex flex-row space-x-1 items-center ${local.containerClass ?? ""}`}>
+    <TextField class={`flex flex-row space-x-1 items-center ${local.class ?? ""}`} {...others}>
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${style} ${padding} ${bg} input outline-none w-full rounded-sm ${local.class ?? ""}`}
-        {...others}
+        class={`${style} ${padding} ${bg} input outline-none w-full rounded-sm ${
+          local.inputProps?.class ?? ""
+        }`}
+        {...local.inputProps}
       />
     </TextField>
   );
 };
 
-interface DataProps extends InputProps {
-  onValueChange: (v: number | string) => void;
-  saveFunc: (v: number | string) => Promise<any>;
+interface DataProps extends InputRootProps {
+  saveFunc: (v: string) => Promise<any>;
 }
 
 export const DataInput: Component<DataProps> = (props) => {
+  const [local, others] = splitProps(props, ["onChange", "saveFunc"]);
+  const debouncedSave = createMemo(() => debounce(local.saveFunc));
+
   return (
     <Input
-      onInput={(e) => {
-        props.onValueChange(e.currentTarget.value);
-        debounce(props.saveFunc)(e.currentTarget.value);
+      onChange={(v) => {
+        props.onChange?.(v);
+        debouncedSave()(v);
       }}
-      {...props}
+      {...others}
     />
   );
 };

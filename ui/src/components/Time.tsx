@@ -31,33 +31,37 @@ export const DataTime: Component<Props> = (props) => {
     <div class="px-1 flex items-center">
       <NumberInput
         width="1.2rem"
-        value={minutes()}
-        onInput={(e) => {
-          const raw = parseInt(e.currentTarget.value) || 0;
-          const clamped = Math.max(0, raw);
-          setMinutes(clamped);
+        inputProps={{
+          value: minutes(),
+          onInput: (e) => {
+            const raw = parseInt(e.currentTarget.value) || 0;
+            const clamped = Math.max(0, raw);
+            setMinutes(clamped);
 
-          if (clamped !== raw) {
-            e.currentTarget.value = clamped.toString();
-          }
+            if (clamped !== raw) {
+              e.currentTarget.value = clamped.toString();
+            }
+          },
+          min: 0,
         }}
-        min={0}
       />
       <p>:</p>
       <NumberInput
         width="1.2rem"
-        value={seconds().toString().padStart(2, "0")}
-        onInput={(e) => {
-          const raw = parseInt(e.currentTarget.value) || 0;
-          const clamped = Math.min(59, Math.max(0, raw));
-          setSeconds(clamped);
+        inputProps={{
+          value: seconds().toString().padStart(2, "0"),
+          onInput: (e) => {
+            const raw = parseInt(e.currentTarget.value) || 0;
+            const clamped = Math.min(59, Math.max(0, raw));
+            setSeconds(clamped);
 
-          if (clamped !== raw) {
-            e.currentTarget.value = clamped.toString();
-          }
+            if (clamped !== raw) {
+              e.currentTarget.value = clamped.toString();
+            }
+          },
+          min: 0,
+          max: 59,
         }}
-        min={0}
-        max={59}
       />
     </div>
   );

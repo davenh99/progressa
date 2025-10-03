@@ -27,36 +27,42 @@ const Profile: Component = () => {
             <div class="flex flex-row space-x-1">
               <DataNumberInput
                 label="Height:"
-                containerClass="flex-1 justify-between"
-                class="rounded-sm bg-charcoal-600 pr-0.5"
+                class="flex-1 justify-between"
                 width="3.5rem"
                 rawValue={height()}
                 onRawValueChange={setHeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
+                inputProps={{
+                  class: "rounded-sm bg-charcoal-600 pr-0.5",
+                }}
               />
               <p class="w-4">cm</p>
             </div>
             <div class="flex flex-row space-x-1">
               <DataNumberInput
                 label="Weight:"
-                containerClass="flex-1 justify-between"
-                class="rounded-sm bg-charcoal-600 pr-0.5"
+                class="flex-1 justify-between"
                 width="3.5rem"
                 rawValue={weight()}
                 onRawValueChange={setWeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
+                inputProps={{
+                  class: "rounded-sm bg-charcoal-600 pr-0.5",
+                }}
               />
               <p class="w-4">kg</p>
             </div>
             <div class="flex flex-row items-center space-x-1">
               <DataInput
                 label="DOB:"
-                type="date"
-                containerClass="justify-between flex-1"
-                class="flex-1 w-full"
+                class="justify-between flex-1"
                 value={dob()}
-                onValueChange={(v) => setDob(v as string)}
+                onChange={setDob}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "dob", v)}
+                inputProps={{
+                  class: "flex-1 w-full",
+                  type: "date",
+                }}
               />
               <Show when={!!user.dob}>
                 <p>(Age {getAge(user.dob)})</p>
