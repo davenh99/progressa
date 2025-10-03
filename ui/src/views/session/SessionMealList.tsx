@@ -139,8 +139,8 @@ export const SessionMealList: Component<Props> = (props) => {
       cell: (ctx) => (
         <div class="flex flex-row justify-end space-x-1">
           <DataNumberInput
-            value={ctx.getValue() as number}
-            onValueChange={(v) =>
+            rawValue={ctx.getValue() as number}
+            onRawValueChange={(v) =>
               props.setSession(
                 "session",
                 "expand",
@@ -163,8 +163,8 @@ export const SessionMealList: Component<Props> = (props) => {
       cell: (ctx) => (
         <div class="flex flex-row justify-end space-x-1">
           <DataNumberInput
-            value={ctx.getValue() as number}
-            onValueChange={(v) =>
+            rawValue={ctx.getValue() as number}
+            onRawValueChange={(v) =>
               props.setSession(
                 "session",
                 "expand",

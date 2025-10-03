@@ -1,5 +1,5 @@
-import { Component, Show, splitProps, ValidComponent } from "solid-js";
-import { NumberField, type NumberFieldInputProps } from "@kobalte/core/number-field";
+import { Component, createMemo, Show, splitProps, ValidComponent } from "solid-js";
+import { NumberField, type NumberFieldRootProps } from "@kobalte/core/number-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { debounce } from "../methods/debounce";
 
@@ -11,7 +11,7 @@ interface ExtraProps {
 }
 
 type InputProps<T extends ValidComponent = "input"> = ExtraProps &
-  PolymorphicProps<T, NumberFieldInputProps<T>>;
+  PolymorphicProps<T, NumberFieldRootProps<T>>;
 
 export const NumberInput: Component<InputProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "width", "containerClass"]);
@@ -19,30 +19,28 @@ export const NumberInput: Component<InputProps> = (props) => {
   const classes = `input outline-none text-right my-0 ${local.class ?? ""}`;
 
   return (
-    <NumberField class={`flex flex-row space-x-1 ${local.containerClass ?? ""}`}>
+    <NumberField class={`flex flex-row space-x-1 ${local.containerClass ?? ""}`} {...others}>
       <Show when={local.label}>
         <NumberField.Label>{local.label}</NumberField.Label>
       </Show>
-      <NumberField.Input class={classes} style={{ width: local.width ?? "2.5rem" }} {...others} />
+      <NumberField.Input class={classes} style={{ width: local.width ?? "2.5rem" }} />
     </NumberField>
   );
 };
 
 interface DataProps extends InputProps {
-  value: number | string;
-  onValueChange: (v: number | string) => void;
-  saveFunc: (v: number | string) => Promise<any>;
+  saveFunc: (v: number) => Promise<any>;
 }
 
 export const DataNumberInput: Component<DataProps> = (props) => {
-  const [local, others] = splitProps(props, ["value", "onValueChange", "saveFunc"]);
+  const [local, others] = splitProps(props, ["onRawValueChange", "saveFunc"]);
+  const debouncedSave = createMemo(() => debounce(local.saveFunc));
 
   return (
     <NumberInput
-      value={local.value}
-      onInput={(e) => {
-        local.onValueChange(Number(e.currentTarget.value));
-        debounce(local.saveFunc)(Number(e.currentTarget.value));
+      onRawValueChange={(v) => {
+        local.onRawValueChange?.(v);
+        debouncedSave()(v);
       }}
       {...others}
     />

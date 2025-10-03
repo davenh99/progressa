@@ -225,8 +225,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
               fallback={
                 <div class="flex flex-row space-x-1">
                   <DataNumberInput
-                    value={ctx.row.original.measurementNumeric || 0}
-                    onValueChange={(v) =>
+                    rawValue={ctx.row.original.measurementNumeric || 0}
+                    onRawValueChange={(v) =>
                       props.setSession(
                         "session",
                         "expand",
@@ -264,8 +264,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
       accessorKey: "addedWeight",
       cell: (ctx) => (
         <DataNumberInput
-          value={ctx.getValue() as number}
-          onValueChange={(v) =>
+          rawValue={ctx.getValue() as number}
+          onRawValueChange={(v) =>
             props.setSession(
               "session",
               "expand",

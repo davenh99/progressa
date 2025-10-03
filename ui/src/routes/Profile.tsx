@@ -30,8 +30,8 @@ const Profile: Component = () => {
                 containerClass="flex-1 justify-between"
                 class="rounded-sm bg-charcoal-600 pr-0.5"
                 width="3.5rem"
-                value={height()}
-                onValueChange={(v) => setHeight(Number(v))}
+                rawValue={height()}
+                onRawValueChange={setHeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
               />
               <p class="w-4">cm</p>
@@ -42,8 +42,8 @@ const Profile: Component = () => {
                 containerClass="flex-1 justify-between"
                 class="rounded-sm bg-charcoal-600 pr-0.5"
                 width="3.5rem"
-                value={weight()}
-                onValueChange={(v) => setWeight(Number(v))}
+                rawValue={weight()}
+                onRawValueChange={setWeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
               />
               <p class="w-4">kg</p>

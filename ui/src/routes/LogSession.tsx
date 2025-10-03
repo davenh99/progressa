@@ -173,8 +173,8 @@ const LogSession: Component = () => {
                   <h3 class="mr-2">Your weight this day</h3>
                   <div class="bg-charcoal-600 rounded-sm flex flex-row p-1">
                     <DataNumberInput
-                      value={session.session?.userWeight ?? user.weight}
-                      onValueChange={(v) => setSession("session", "userWeight", Number(v))}
+                      rawValue={session.session?.userWeight ?? user.weight}
+                      onRawValueChange={(v) => setSession("session", "userWeight", Number(v))}
                       saveFunc={(v) => updateWeight(v as number)}
                     />
                     <p class="ml-1">kg</p>
