@@ -22,3 +22,5 @@ serve-dev:
 	@trap "pkill -P $$" EXIT; \
 	(make serve &) && \
 	(make ui-dev)
+
+dev: serve-dev
