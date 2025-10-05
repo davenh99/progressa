@@ -40,18 +40,15 @@ export const Button: ParentComponent<Props> = (props) => {
   });
 
   return (
-    <Show
-      when={local.href}
-      fallback={
-        <KobalteButton onClick={local.onClick} class={classes()} {...others}>
-          {local.children}
-        </KobalteButton>
-      }
+    <KobalteButton
+      as={local.href ? A : "button"}
+      href={local.href ?? ""}
+      onClick={local.onClick}
+      class={classes()}
+      {...others}
     >
-      <A href={local.href!} class={classes()} {...others}>
-        {local.children}
-      </A>
-    </Show>
+      {local.children}
+    </KobalteButton>
   );
 };
 

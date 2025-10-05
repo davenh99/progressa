@@ -1,9 +1,9 @@
-import { Component, createEffect, createSignal, Show } from "solid-js";
+import { Component, createSignal, Show } from "solid-js";
 import Logout from "lucide-solid/icons/log-out";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import { Button, DataInput, DataNumberInput } from "../components";
+import { Button, DataDateInput, DataNumberInput } from "../components";
 import Container from "../views/app/Container";
 import SectionHeader from "../views/app/SectionHeader";
 import Blob from "../views/app/Blob";
@@ -21,8 +21,13 @@ const Profile: Component = () => {
       </SectionHeader>
       <Container class="space-y-4">
         <Blob class="flex flex-col">
-          <h2 class="text-xl font-semibold">{user.name}</h2>
-          <div class="flex flex-col space-y-2 mt-2">
+          <div class="flex flex-row items-center space-x-2">
+            <h2 class="text-xl font-semibold">{user.name}</h2>
+            <Show when={!!user.dob}>
+              <p>({getAge(user.dob)} years old)</p>
+            </Show>
+          </div>
+          <div class="flex flex-col space-y-2 mt-3">
             <p>Email: {user.email}</p>
             <div class="flex flex-row space-x-1">
               <DataNumberInput
@@ -53,20 +58,17 @@ const Profile: Component = () => {
               <p class="w-4">kg</p>
             </div>
             <div class="flex flex-row items-center space-x-1">
-              <DataInput
+              <DataDateInput
                 label="DOB:"
-                class="justify-between flex-1"
-                value={dob()}
+                containerClass="justify-between flex-1 items-center"
                 onChange={setDob}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "dob", v)}
                 inputProps={{
-                  class: "flex-1 w-full",
                   type: "date",
+                  value: dob(),
+                  onInput: (e) => setDob(e.currentTarget.value),
                 }}
               />
-              <Show when={!!user.dob}>
-                <p>(Age {getAge(user.dob)})</p>
-              </Show>
             </div>
           </div>
           <Button

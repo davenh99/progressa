@@ -4,7 +4,15 @@ import { createStore } from "solid-js/store";
 import { useSearchParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
-import { DataInput, Input, DataTextArea, TagArea, DataSleepQualitySelector, Button } from "../components";
+import {
+  DataInput,
+  Input,
+  DataTextArea,
+  TagArea,
+  DataSleepQualitySelector,
+  Button,
+  DateInput,
+} from "../components";
 import Container from "../views/app/Container";
 import type { SleepQuality, Session, SessionCreateData } from "../../Types";
 import Loading from "../views/app/Loading";
@@ -98,12 +106,11 @@ const LogSession: Component = () => {
       <SectionHeader>
         <div class="flex flex-row justify-between">
           <h1 class="text-xl font-bold">Log Session</h1>
-          <Input
-            value={searchParams.date}
+          <DateInput
             inputProps={{
-              class: "rounded-md bg-cambridge-blue-800/20 border-1 px-2 py-1 text-cambridge-blue-800",
+              value: searchParams.date,
+              onInput: async (e) => setSearchParams({ date: e.currentTarget.value }),
             }}
-            onChange={async (v) => setSearchParams({ date: v })}
           />
         </div>
       </SectionHeader>
