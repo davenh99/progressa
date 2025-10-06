@@ -1,13 +1,52 @@
 import { Component, createMemo, Show, splitProps, ValidComponent } from "solid-js";
 import { TextField, type TextFieldInputProps, type TextFieldRootProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
+import { tv } from "tailwind-variants";
+
 import { debounce } from "../methods/debounce";
+
+const inputRoot = tv({
+  base: "flex gap-1",
+  variants: {
+    labelPosition: {
+      inline: "flex-row items-center",
+      above: "flex-col",
+    },
+  },
+  defaultVariants: {
+    labelPosition: "inline",
+  },
+});
+
+const inputField = tv({
+  base: "w-full rounded-sm outline-none",
+  variants: {
+    variant: {
+      bordered: "border-2 border-ash-gray-400",
+      none: "",
+    },
+    padding: {
+      yes: "px-2 py-1",
+      no: "",
+    },
+    background: {
+      yes: "bg-charcoal-600",
+      no: "",
+    },
+  },
+  defaultVariants: {
+    variant: "none",
+    padding: "yes",
+    background: "yes",
+  },
+});
 
 type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFieldInputProps<T>>;
 
 interface ExtraProps {
   label?: string;
   variant?: "bordered" | "none";
+  labelPosition?: "inline" | "above";
   noPadding?: boolean;
   noBackground?: boolean;
   inputProps?: InputProps;
@@ -24,21 +63,21 @@ export const Input: Component<InputRootProps> = (props) => {
     "noPadding",
     "noBackground",
     "inputProps",
+    "labelPosition",
   ]);
 
-  const style = local.variant === "bordered" ? "border-2 border-ash-gray-400" : "";
-  const padding = local.noPadding ? "" : "px-2 py-1";
-  const bg = local.noBackground ? "" : "bg-charcoal-600";
-
   return (
-    <TextField class={`flex flex-row space-x-1 items-center ${local.class ?? ""}`} {...others}>
+    <TextField class={inputRoot({ labelPosition: local.labelPosition, class: local.class })} {...others}>
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
-        class={`${style} ${padding} ${bg} input outline-none w-full rounded-sm ${
-          local.inputProps?.class ?? ""
-        }`}
+        class={inputField({
+          variant: local.variant,
+          padding: local.noPadding ? "no" : "yes",
+          background: local.noBackground ? "no" : "yes",
+          class: local.inputProps?.class,
+        })}
         {...local.inputProps}
       />
     </TextField>

@@ -12,20 +12,22 @@ interface DateInputProps {
 export const DateInput: Component<DateInputProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "containerClass", "inputProps"]);
 
-  const inputMerged = mergeProps(
-    {
-      type: "date",
-      class: `input rounded-sm px-2 py-1 bg-cambridge-blue-800/20 border-1 text-cambridge-blue-800 ${
-        local.class ?? ""
-      } ${local.inputProps?.class ?? ""}`,
-    },
-    local.inputProps
+  const inputMerged = createMemo(() =>
+    mergeProps(
+      {
+        type: "date",
+        class: `input rounded-sm px-2 py-1 bg-cambridge-blue-800/20 border-1 text-cambridge-blue-800 ${
+          local.class ?? ""
+        } ${local.inputProps?.class ?? ""}`,
+      },
+      local.inputProps
+    )
   );
 
   return (
     <label class={`${props.containerClass ?? ""} flex flex-row space-y-1`} {...others}>
       {props.label && <span>{props.label}</span>}
-      <input {...inputMerged} />
+      <input {...inputMerged()} value={inputMerged().value ?? ""} />
     </label>
   );
 };

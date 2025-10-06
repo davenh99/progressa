@@ -6,7 +6,7 @@ import { getAge } from "../methods/getAge";
 import { Button, DataDateInput, DataNumberInput } from "../components";
 import Container from "../views/app/Container";
 import SectionHeader from "../views/app/SectionHeader";
-import Blob from "../views/app/Blob";
+import Card from "../views/app/Card";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
@@ -20,7 +20,7 @@ const Profile: Component = () => {
         <h1 class="text-2xl font-bold">Profile</h1>
       </SectionHeader>
       <Container class="space-y-4">
-        <Blob class="flex flex-col">
+        <Card class="flex flex-col">
           <div class="flex flex-row items-center space-x-2">
             <h2 class="text-xl font-semibold">{user.name}</h2>
             <Show when={!!user.dob}>
@@ -38,7 +38,7 @@ const Profile: Component = () => {
                 onRawValueChange={setHeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "height", v)}
                 inputProps={{
-                  class: "rounded-sm bg-charcoal-600 pr-0.5",
+                  class: "rounded-sm bg-charcoal-600 pr-0.5 text-right",
                 }}
               />
               <p class="w-4">cm</p>
@@ -52,7 +52,7 @@ const Profile: Component = () => {
                 onRawValueChange={setWeight}
                 saveFunc={(v) => updateRecord<any>("users", user.id, "weight", v)}
                 inputProps={{
-                  class: "rounded-sm bg-charcoal-600 pr-0.5",
+                  class: "rounded-sm bg-charcoal-600 pr-0.5 text-right",
                 }}
               />
               <p class="w-4">kg</p>
@@ -79,13 +79,13 @@ const Profile: Component = () => {
             <Logout size={16} />
             <p>log out</p>
           </Button>
-        </Blob>
-        {/* <Blob class="space-y-4">
+        </Card>
+        {/* <Card class="space-y-4">
           <h2>Settings</h2>
           <Switch label="Use RPE" />
           <Switch label="Use Device Dark Mode" />
           <Switch label="Dark mode on" />
-        </Blob> */}
+        </Card> */}
       </Container>
     </>
   );

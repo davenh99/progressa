@@ -20,7 +20,7 @@ import LogSessionNav from "../views/session/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
 import SectionHeader from "../views/app/SectionHeader";
 import { DataNumberInput } from "../components/NumberInput";
-import Blob from "../views/app/Blob";
+import Card from "../views/app/Card";
 import { SESSION_EXPAND } from "../config/constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
 import { SessionMealList } from "../views/session/SessionMealList";
@@ -143,23 +143,23 @@ const LogSession: Component = () => {
 
             <Tabs.Content value="meals-sleep">
               <Container class="space-y-4 pb-30">
-                <Blob>
+                <Card>
                   <h2>Meals</h2>
                   <SessionMealList
                     meals={session.session?.expand?.sessionMeals_via_session ?? []}
                     sessionID={session.session!.id}
                     setSession={setSession}
                   />
-                </Blob>
+                </Card>
 
-                <Blob class="space-y-3">
+                <Card class="space-y-3">
                   <h2>Sleep Quality</h2>
                   <DataSleepQualitySelector
                     value={session.session?.sleepQuality}
                     onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
                     saveFunc={(v: string) => sessionUpdate("sleepQuality", v)}
                   />
-                </Blob>
+                </Card>
               </Container>
             </Tabs.Content>
 

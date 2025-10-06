@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import { AuthProviderInfo } from "pocketbase";
 
 import { usePB } from "../config/pocketbase";
-import AuthEmail from "../views/auth/Email";
+import AuthEmail from "../views/auth/AuthEmail";
 import OAuthButton from "../views/auth/OAuthButton";
 import { Button } from "../components";
 import Container from "../views/app/Container";
@@ -27,9 +27,9 @@ const Auth: Component = () => {
   });
 
   return (
-    <Container class="bg-charcoal-500 w-screen h-screen flex flex-col items-center pt-[30vh]">
-      <Card>
-        <h1 style={{ "font-family": "Audiowide" }} class="mb-5">
+    <Container class="bg-charcoal-500 w-screen h-screen flex flex-col items-center justify-center">
+      <Card class="w-[90vw] max-w-80 flex flex-col items-center pb-5">
+        <h1 style={{ "font-family": "Audiowide" }} class="mb-3 text-dark-slate-gray-800">
           Progressa
         </h1>
         <Show
@@ -43,11 +43,11 @@ const Auth: Component = () => {
             </>
           }
         >
-          <h2 class="mb-3">Sign in</h2>
+          <h2 class="mb-6">Sign in</h2>
           <For each={OAuthProviders}>
             {(provider) => <OAuthButton name={provider.name} displayName={provider.displayName} />}
           </For>
-          <Button variantColor="neutral" onClick={() => setEmailLogin(true)}>
+          <Button class="w-[95%]" variantColor="neutral" onClick={() => setEmailLogin(true)}>
             Continue with Email
           </Button>
         </Show>

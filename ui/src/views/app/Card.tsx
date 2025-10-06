@@ -6,7 +6,7 @@ interface Props {
 
 const Card: ParentComponent<Props> = (props) => {
   return (
-    <div class={`${props.class ?? ""} rounded-2xl p-2 bg-charcoal-900/15 text-dark-slate-gray-900`}>
+    <div class={`${props.class ?? ""} rounded-xl p-2 bg-charcoal-900/15 text-dark-slate-gray-900`}>
       {props.children}
     </div>
   );

@@ -1,8 +1,8 @@
-import { ParentComponent, splitProps, Show, createMemo } from "solid-js";
+import { ParentComponent, splitProps, createMemo } from "solid-js";
 import { A } from "@solidjs/router";
-import { Button as KobalteButton } from "@kobalte/core/button";
+import { ButtonRootProps, Button as KobalteButton } from "@kobalte/core/button";
 
-interface Props {
+interface Props extends ButtonRootProps {
   onClick?: () => void;
   href?: string;
   class?: string;
@@ -17,7 +17,7 @@ export const Button: ParentComponent<Props> = (props) => {
     const baseClass = `font-bold active:opacity-80 ${local.class ?? ""}`;
 
     if (props.variant === "text") {
-      const extendedClass = `${baseClass} p-1`;
+      const extendedClass = `${baseClass} px-1`;
       switch (props.variantColor) {
         case "good":
           return `${extendedClass} text-green-400`;
