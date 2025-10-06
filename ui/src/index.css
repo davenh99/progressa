@@ -9,6 +9,13 @@
   margin: 0;
 }
 
+@font-face {
+  font-family: "Audiowide";
+  src: url("/fonts/Audiowide-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme {
   --color-ash-gray: #cad2c5;
   --color-ash-gray-100: #282e23;

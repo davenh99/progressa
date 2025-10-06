@@ -5,6 +5,9 @@ import { AuthProviderInfo } from "pocketbase";
 import { usePB } from "../config/pocketbase";
 import AuthEmail from "../views/auth/Email";
 import OAuthButton from "../views/auth/OAuthButton";
+import { Button } from "../components";
+import Container from "../views/app/Container";
+import Card from "../views/app/Card";
 
 const Auth: Component = () => {
   const [emailLogin, setEmailLogin] = createSignal(false);
@@ -24,30 +27,32 @@ const Auth: Component = () => {
   });
 
   return (
-    <Show
-      when={!emailLogin()}
-      fallback={
-        <>
-          <AuthEmail />
-          <div onclick={() => setEmailLogin(false)}>
-            <p>Sign in another way</p>
-          </div>
-        </>
-      }
-    >
-      <div>
-        <div>
-          <h2>Sign in</h2>
+    <Container class="bg-charcoal-500 w-screen h-screen flex flex-col items-center pt-[30vh]">
+      <Card>
+        <h1 style={{ "font-family": "Audiowide" }} class="mb-5">
+          Progressa
+        </h1>
+        <Show
+          when={!emailLogin()}
+          fallback={
+            <>
+              <AuthEmail />
+              <Button variant="text" onClick={() => setEmailLogin(false)}>
+                <p>Sign in another way</p>
+              </Button>
+            </>
+          }
+        >
+          <h2 class="mb-3">Sign in</h2>
           <For each={OAuthProviders}>
             {(provider) => <OAuthButton name={provider.name} displayName={provider.displayName} />}
           </For>
-          <div></div>
-          <div onclick={() => setEmailLogin(true)}>
-            <p>Continue with Email</p>
-          </div>
-        </div>
-      </div>
-    </Show>
+          <Button variantColor="neutral" onClick={() => setEmailLogin(true)}>
+            Continue with Email
+          </Button>
+        </Show>
+      </Card>
+    </Container>
   );
 };
 

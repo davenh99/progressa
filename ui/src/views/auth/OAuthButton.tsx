@@ -1,5 +1,6 @@
 import { Component } from "solid-js";
 import { usePB } from "../../config/pocketbase";
+import { Button } from "../../components";
 
 interface Props {
   name: string;
@@ -10,13 +11,13 @@ const OAuthButton: Component<Props> = (props) => {
   const { OAuthSignIn } = usePB();
 
   return (
-    <div
+    <Button
       onClick={() => {
         OAuthSignIn(props.name);
       }}
     >
       <p>Continue with {props.displayName}</p>
-    </div>
+    </Button>
   );
 };
 

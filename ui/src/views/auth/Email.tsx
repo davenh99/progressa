@@ -1,5 +1,6 @@
 import { Component, createSignal, Show, JSX } from "solid-js";
 import { usePB } from "../../config/pocketbase";
+import { Input } from "../../components";
 
 const AuthEmail: Component = () => {
   const [email, setEmail] = createSignal("");
@@ -56,19 +57,28 @@ const AuthEmail: Component = () => {
         <Show when={isCreatingAccount()}>
           <div>
             <label for="username">username</label>
-            <input
-              type="text"
-              id="username"
-              value={username()}
-              onInput={(e) => setUsername(e.target.value)}
-              required
+            <Input
+              inputProps={{
+                id: "username",
+                value: username(),
+                onInput: (e) => setUsername(e.currentTarget.value),
+                required: true,
+              }}
             />
           </div>
         </Show>
 
         <div>
           <label for="email">{isCreatingAccount() ? "email" : "email or username"}</label>
-          <input type={isCreatingAccount() ? "email" : "text"} id="email" value={email()} onInput={(e) => setEmail(e.target.value)} required />
+          <Input
+            inputProps={{
+              id: "email",
+              value: email(),
+              onInput: (e) => setEmail(e.currentTarget.value),
+              required: true,
+              type: isCreatingAccount() ? "email" : "text",
+            }}
+          />
         </div>
 
         <div>
