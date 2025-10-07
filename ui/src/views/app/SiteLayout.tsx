@@ -24,7 +24,7 @@ export const SiteLayout: ParentComponent = (props) => {
       </Header>
 
       <main class="flex-1 flex flex-col overflow-y-auto">
-        <Container class="flex flex-col">{props.children}</Container>
+        <Container class="flex flex-col items-center">{props.children}</Container>
       </main>
 
       <Footer class="text-xs">

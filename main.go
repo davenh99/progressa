@@ -4,7 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"log"
-	"workouter/utils"
+	"progressa/utils"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
