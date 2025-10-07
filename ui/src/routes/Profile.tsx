@@ -1,11 +1,12 @@
 import { Component, createSignal, Show } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import Logout from "lucide-solid/icons/log-out";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
 import { Button, DataDateInput, DataNumberInput } from "../components";
 import Container from "../views/app/Container";
-import SectionHeader from "../views/app/SectionHeader";
+import Header from "../views/app/Header";
 import Card from "../views/app/Card";
 
 const Profile: Component = () => {
@@ -13,12 +14,13 @@ const Profile: Component = () => {
   const [height, setHeight] = createSignal(user.height);
   const [weight, setWeight] = createSignal(user.weight);
   const [dob, setDob] = createSignal(new Date(user.dob).toLocaleDateString("en-ca"));
+  const navigate = useNavigate();
 
   return (
     <>
-      <SectionHeader>
+      <Header>
         <h1 class="text-2xl font-bold">Profile</h1>
-      </SectionHeader>
+      </Header>
       <Container class="space-y-4">
         <Card class="flex flex-col">
           <div class="flex flex-row items-center space-x-2">
@@ -73,7 +75,10 @@ const Profile: Component = () => {
           </div>
           <Button
             variantColor="bad"
-            onClick={logout}
+            onClick={() => {
+              logout();
+              navigate("/");
+            }}
             class="self-end mt-5 flex flex-row items-center space-x-1"
           >
             <Logout size={16} />

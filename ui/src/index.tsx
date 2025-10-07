@@ -8,6 +8,8 @@ import { PBProvider, usePB } from "./config/pocketbase";
 import { ThemeProvider } from "./config/theme";
 import AppLayout from "./views/app/AppLayout";
 import LoadFullScreen from "./views/app/LoadFullScreen";
+import SiteLayout from "./views/app/SiteLayout";
+import Landing from "./routes/Landing";
 
 const NotFound = lazy(() => import("./routes/NotFound"));
 const Auth = lazy(() => import("./routes/Auth"));
@@ -42,20 +44,34 @@ function Content() {
 
   return (
     <Show when={!store.loading} fallback={<LoadFullScreen />}>
-      <Show when={!!store.user} fallback={<Auth />}>
-        <Show when={!store.networkError} fallback={<p>Network Error, could not connect to server.</p>}>
-          <Router>
-            <Route path="/" component={AppLayout}>
-              <Route path="/" component={Sessions} />
-              <Route path="/profile" component={Profile} />
-              <Route path="/log" component={LogSession} />
-            </Route>
-
-            <Route path="/auth" component={Auth} />
-            <Route path="/*paramName" component={NotFound} />
-          </Router>
-        </Show>
+      <Show when={!store.networkError} fallback={<p>Network Error, could not connect to server.</p>}>
+        <Router>
+          <Show when={!!store.user} fallback={<Site />}>
+            <App />
+          </Show>
+          <Route path="/*paramName" component={NotFound} />
+        </Router>
       </Show>
     </Show>
+  );
+}
+
+function App() {
+  return (
+    <Route path="/" component={AppLayout}>
+      <Route path="/" component={Profile} />
+      <Route path="/sessions" component={Sessions} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/log" component={LogSession} />
+    </Route>
+  );
+}
+
+function Site() {
+  return (
+    <Route path="/" component={SiteLayout}>
+      <Route path="/" component={Landing} />
+      <Route path="/auth" component={Auth} />
+    </Route>
   );
 }

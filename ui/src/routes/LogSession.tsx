@@ -4,21 +4,13 @@ import { createStore } from "solid-js/store";
 import { useSearchParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
-import {
-  DataInput,
-  Input,
-  DataTextArea,
-  TagArea,
-  DataSleepQualitySelector,
-  Button,
-  DateInput,
-} from "../components";
+import { DataInput, DataTextArea, TagArea, DataSleepQualitySelector, Button, DateInput } from "../components";
 import Container from "../views/app/Container";
 import type { SleepQuality, Session, SessionCreateData } from "../../Types";
 import Loading from "../views/app/Loading";
 import LogSessionNav from "../views/session/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
-import SectionHeader from "../views/app/SectionHeader";
+import Header from "../views/app/Header";
 import { DataNumberInput } from "../components/NumberInput";
 import Card from "../views/app/Card";
 import { SESSION_EXPAND } from "../config/constants";
@@ -103,7 +95,7 @@ const LogSession: Component = () => {
 
   return (
     <>
-      <SectionHeader>
+      <Header>
         <div class="flex flex-row justify-between">
           <h1 class="text-xl font-bold">Log Session</h1>
           <DateInput
@@ -113,7 +105,7 @@ const LogSession: Component = () => {
             }}
           />
         </div>
-      </SectionHeader>
+      </Header>
 
       <Show when={!loading()} fallback={<Loading />}>
         <Show

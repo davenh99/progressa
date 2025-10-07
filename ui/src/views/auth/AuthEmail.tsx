@@ -50,7 +50,7 @@ const AuthEmail: Component = () => {
       <h2 class="mb-5">{isCreatingAccount() ? "Create Account" : "Sign in"}</h2>
 
       <Show when={error()}>
-        <div>{error()}</div>
+        <div class="text-red-600">{error()}</div>
       </Show>
 
       <form onSubmit={handleSubmit} class="flex flex-col items-center w-full">

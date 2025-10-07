@@ -6,7 +6,6 @@ import { usePB } from "../config/pocketbase";
 import AuthEmail from "../views/auth/AuthEmail";
 import OAuthButton from "../views/auth/OAuthButton";
 import { Button } from "../components";
-import Container from "../views/app/Container";
 import Card from "../views/app/Card";
 
 const Auth: Component = () => {
@@ -27,11 +26,8 @@ const Auth: Component = () => {
   });
 
   return (
-    <Container class="bg-charcoal-500 w-screen h-screen flex flex-col items-center justify-center">
+    <div class="flex-1 h-full flex flex-col items-center justify-center">
       <Card class="w-[90vw] max-w-80 flex flex-col items-center pb-5">
-        <h1 style={{ "font-family": "Audiowide" }} class="mb-3 text-dark-slate-gray-800">
-          Progressa
-        </h1>
         <Show
           when={!emailLogin()}
           fallback={
@@ -52,7 +48,7 @@ const Auth: Component = () => {
           </Button>
         </Show>
       </Card>
-    </Container>
+    </div>
   );
 };
 
