@@ -14,6 +14,8 @@ import (
 	"github.com/pocketbase/pocketbase/tools/hook"
 )
 
+var Version = "dev"
+
 //go:embed ui/dist/*
 var embeddedFiles embed.FS
 

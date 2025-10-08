@@ -59,8 +59,7 @@ function Content() {
 function App() {
   return (
     <Route path="/" component={AppLayout}>
-      <Route path="/" component={Profile} />
-      <Route path="/sessions" component={Sessions} />
+      <Route path="/" component={Sessions} />
       <Route path="/profile" component={Profile} />
       <Route path="/log" component={LogSession} />
     </Route>

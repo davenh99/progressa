@@ -19,7 +19,7 @@ const Profile: Component = () => {
   return (
     <>
       <Header>
-        <h1 class="text-2xl font-bold">Profile</h1>
+        <h1 class="text-xl font-bold">Profile</h1>
       </Header>
       <Container class="space-y-4">
         <Card class="flex flex-col">

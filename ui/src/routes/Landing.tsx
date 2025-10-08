@@ -7,7 +7,7 @@ const Landing: Component = () => {
   return (
     <div class="flex-1 overflow-y-auto text-dark-slate-gray-900 space-y-3 max-w-150">
       <div class="flex flex-col items-center text-center">
-        <h1 style={{ "font-family": "Audiowide" }} class="text-dark-slate-gray-800 mb-2">
+        <h1 style={{ "font-family": "Audiowide" }} class="text-dark-slate-gray-800 mb-2 text-5xl">
           Progressa
         </h1>
         <h2 class="mb-2">Advanced workout tracking for in-depth analysis</h2>
@@ -22,7 +22,7 @@ const Landing: Component = () => {
         </div>
       </div>
       <Card>
-        <h2 class="mb-2">Progressa for mobile</h2>
+        <h2 class="mb-2 text-center">Progressa for mobile</h2>
         <p>
           Progressa is available for any device with a web browser. For convenience, it can be downloaded as
           an app on any device.{" "}

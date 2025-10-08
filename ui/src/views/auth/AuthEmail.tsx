@@ -1,6 +1,7 @@
 import { Component, createSignal, Show, JSX } from "solid-js";
 import { usePB } from "../../config/pocketbase";
 import { Button, Input } from "../../components";
+import { useNavigate } from "@solidjs/router";
 
 const AuthEmail: Component = () => {
   const [email, setEmail] = createSignal("");
@@ -11,6 +12,7 @@ const AuthEmail: Component = () => {
   const [isLoading, setIsLoading] = createSignal(false);
   const [isCreatingAccount, setIsCreatingAccount] = createSignal(false);
   const { login, signUp } = usePB();
+  const navigate = useNavigate();
 
   const handleSubmit: JSX.EventHandlerUnion<HTMLFormElement, SubmitEvent> = async (e) => {
     e.preventDefault();
@@ -28,8 +30,10 @@ const AuthEmail: Component = () => {
 
       if (isCreatingAccount()) {
         await signUp(email(), username(), password(), passwordConfirm());
+        navigate("/");
       } else {
         await login(email() ?? username(), password());
+        navigate("/");
       }
     } catch (err: any) {
       setError(err.message);
