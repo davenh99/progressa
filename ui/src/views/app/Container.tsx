@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Container: ParentComponent<Props> = (props) => {
-  const classes = `flex-1  text-dark-slate-gray-900 ${props.noPadding ? "" : "py-4 px-[3vw]"} ${
+  const classes = `flex-1 text-dark-slate-gray-900 ${props.noPadding ? "" : "py-4 px-[3vw]"} ${
     props.class ?? ""
   }`;
 

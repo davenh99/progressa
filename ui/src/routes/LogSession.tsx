@@ -123,7 +123,7 @@ const LogSession: Component = () => {
             <LogSessionNav />
 
             <Tabs.Content value="exercises" class="flex flex-1 overflow-hidden">
-              <Container class="pb-30">
+              <Container class="pb-30 overflow-y-auto">
                 <h2>Exercises</h2>
                 <SessionExerciseList
                   sessionExercises={session.session?.expand?.sessionExercises_via_session ?? []}
@@ -134,7 +134,7 @@ const LogSession: Component = () => {
             </Tabs.Content>
 
             <Tabs.Content value="meals-sleep">
-              <Container class="space-y-4 pb-30">
+              <Container class="space-y-4 pb-30 overflow-y-auto">
                 <Card>
                   <h2>Meals</h2>
                   <SessionMealList
@@ -156,7 +156,7 @@ const LogSession: Component = () => {
             </Tabs.Content>
 
             <Tabs.Content value="settings">
-              <Container class="space-y-2 pb-30">
+              <Container class="space-y-2 pb-30 overflow-y-auto">
                 <h2 class="mb-4">Session Settings</h2>
 
                 <div>
