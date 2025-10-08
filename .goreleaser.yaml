@@ -34,8 +34,8 @@ release:
 
 archives:
   - id: progressa_archive
-    builds: [progressa_build]
-    format: zip
+    ids: [progressa_build]
+    formats: zip
     files:
       - src: dist/pb_migrations/*
         dst: pb_migrations/
