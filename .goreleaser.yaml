@@ -37,6 +37,8 @@ archives:
     builds: [progressa_build]
     format: zip
     files:
+      - src: dist/pb_migrations/*
+        dst: pb_migrations/
       - LICENSE.md
       - CHANGELOG.md
 

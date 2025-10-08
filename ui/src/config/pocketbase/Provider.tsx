@@ -5,9 +5,11 @@ import { createStore } from "solid-js/store";
 import { PBContext } from "./context";
 import { User } from "../../../Types";
 
-const apiUrl = import.meta.env.VITE_PUBLIC_API_URL
-  ? import.meta.env.VITE_PUBLIC_API_URL
-  : "http://127.0.0.1:8090";
+const apiUrl =
+  import.meta.env.VITE_PUBLIC_API_URL ||
+  (window.location.origin.includes("localhost") || window.location.origin.includes("127.0.0.1")
+    ? "http://127.0.0.1:8090"
+    : window.location.origin);
 
 export const PBProvider: ParentComponent = (props) => {
   const pb = new PocketBase(apiUrl);
