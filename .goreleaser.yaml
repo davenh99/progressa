@@ -31,8 +31,6 @@ builds:
 
 release:
   draft: true
-  notes:
-    use: changelog
 
 archives:
   - id: progressa_archive
