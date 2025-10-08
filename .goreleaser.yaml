@@ -3,3 +3,52 @@ version: 2
 project_name: progressa
 
 dist: .builds
+
+before:
+  hooks:
+    - npm --prefix=./ui ci
+    - npm --prefix=./ui run build
+    - go mod tidy
+
+builds:
+  - id: progressa_build
+    main: ./main.go
+    binary: progressa
+    ldflags:
+      - -s -w -X main.Version={{ .Version }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+release:
+  draft: true
+  notes:
+    use: changelog
+
+archives:
+  - id: progressa_archive
+    builds: [progressa_build]
+    format: zip
+    files:
+      - LICENSE.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  use: git
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
