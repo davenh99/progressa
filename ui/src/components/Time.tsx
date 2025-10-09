@@ -30,24 +30,27 @@ export const DataTime: Component<Props> = (props) => {
   return (
     <div class="px-1 flex items-center">
       <NumberInput
-        width="1.2rem"
+        width="1.8rem"
+        maxValue={999}
+        minValue={0}
         inputProps={{
           value: minutes(),
           onInput: (e) => {
             const raw = parseInt(e.currentTarget.value) || 0;
-            const clamped = Math.max(0, raw);
+            const clamped = Math.max(0, Math.min(raw, 999));
             setMinutes(clamped);
 
             if (clamped !== raw) {
               e.currentTarget.value = clamped.toString();
             }
           },
-          min: 0,
         }}
       />
       <p>:</p>
       <NumberInput
         width="1.2rem"
+        maxValue={59}
+        minValue={0}
         inputProps={{
           value: seconds().toString().padStart(2, "0"),
           onInput: (e) => {
@@ -59,8 +62,6 @@ export const DataTime: Component<Props> = (props) => {
               e.currentTarget.value = clamped.toString();
             }
           },
-          min: 0,
-          max: 59,
         }}
       />
     </div>

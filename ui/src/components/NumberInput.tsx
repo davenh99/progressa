@@ -13,7 +13,7 @@ interface ExtraProps {
   label?: string;
   width?: string;
   inputProps?: InputProps;
-  saveFunc: (v: number) => Promise<any>;
+  saveFunc?: (v: number) => Promise<any>;
 }
 
 type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
