@@ -20,30 +20,18 @@ type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, NumberFieldRootProps<T>>;
 
 export const NumberInput: Component<InputRootProps> = (props) => {
-  const [local, others] = splitProps(props, [
-    "label",
-    "class",
-    "width",
-    "inputProps",
-    "saveFunc",
-    "onRawValueChange",
-  ]);
-
-  const inputClasses = `input outline-none text-right my-0 ${local.inputProps?.class ?? ""}`;
+  const [local, others] = splitProps(props, ["label", "class", "width", "inputProps", "saveFunc"]);
 
   const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
 
-  const handleChange = (v: number) => {
-    local.onRawValueChange?.(v);
-    debouncedSave()?.(v);
+  const handleChange = (v: string) => {
+    debouncedSave()?.(Number(v));
   };
 
+  const inputClasses = `input outline-none text-right my-0 ${local.inputProps?.class ?? ""}`;
+
   return (
-    <NumberField
-      onRawValueChange={handleChange}
-      class={`flex flex-row space-x-1 ${local.class ?? ""}`}
-      {...others}
-    >
+    <NumberField onChange={handleChange} class={`flex flex-row space-x-1 ${local.class ?? ""}`} {...others}>
       <Show when={local.label}>
         <NumberField.Label>{local.label}</NumberField.Label>
       </Show>
