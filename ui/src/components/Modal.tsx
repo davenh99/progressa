@@ -1,8 +1,9 @@
-import { createSignal, ParentComponent, Show } from "solid-js";
+import { createSignal, ParentComponent, Show, useContext } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { Button } from "./";
 import LoadFullScreen from "../views/app/LoadFullScreen";
+import { ModalContext } from "./modalContext";
 
 interface Props {
   setModalVisible: (v: boolean) => void;
@@ -23,10 +24,12 @@ export const Modal: ParentComponent<Props> = (props) => {
       >
         <div
           class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
-            w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col`}
+              w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div class="flex flex-col flex-1 overflow-y-hidden">{props.children}</div>
+          <div class="flex flex-col flex-1 overflow-y-hidden">
+            <ModalContext.Provider value={{ loading, setLoading }}>{props.children}</ModalContext.Provider>
+          </div>
           <div class="w-full flex justify-end space-x-2">
             <Button onClick={() => props.setModalVisible(false)} class="mt-3">
               Cancel
@@ -54,3 +57,13 @@ export const Modal: ParentComponent<Props> = (props) => {
 };
 
 export default Modal;
+
+export function useModalLoading() {
+  const context = useContext(ModalContext);
+
+  if (!context) {
+    throw new Error("useModal must be used within a Modal");
+  }
+
+  return context;
+}

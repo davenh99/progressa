@@ -5,7 +5,7 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
 import { Session, SessionExercise } from "../../../Types";
-import { Button, Checkbox, Modal, TagArea, TextArea } from "../../components";
+import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
@@ -39,36 +39,59 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
 
   return (
     <Modal saveFunc={save} setModalVisible={props.setModalVisible}>
+      <ModalContent exercise={exercise} setExercise={setExercise} parentProps={props} />
+    </Modal>
+  );
+};
+
+export default ExerciseMoreModal;
+
+interface ModalProps {
+  exercise: any;
+  setExercise: SetStoreFunction<any>;
+  parentProps: Props;
+}
+
+const ModalContent: Component<ModalProps> = (props) => {
+  const { setLoading } = useModalLoading();
+
+  return (
+    <>
       <h2 class="pb-2">Exercise Options</h2>
       <Checkbox
-        checked={exercise.isWarmup}
-        onChange={(v) => setExercise("isWarmup", v)}
+        checked={props.exercise.isWarmup}
+        onChange={(v) => props.setExercise("isWarmup", v)}
         label="Mark as warmup"
       />
       <TextArea
         class="my-2"
         label="Notes"
         placeholder="Feeling strong..."
-        value={exercise.notes}
-        onInput={(e) => setExercise("notes", e.currentTarget.value)}
+        value={props.exercise.notes}
+        onInput={(e) => props.setExercise("notes", e.currentTarget.value)}
       />
       <TagArea
-        tags={exercise.expand?.tags ?? []}
+        tags={props.exercise.expand?.tags ?? []}
         setTags={(tags) => {
-          setExercise("expand", "tags", tags);
-          setExercise(
+          props.setExercise("expand", "tags", tags);
+          props.setExercise(
             "tags",
             tags.map((t) => t.id)
           );
         }}
         modelName="sessionExercises"
-        recordID={exercise.id}
+        recordID={props.exercise.id}
       />
       <div class="flex flex-col mt-3">
         <Button
           variant="text"
           class="flex flex-row items-center space-x-1"
-          onClick={() => props.addDropSet().then(() => props.setModalVisible(false))}
+          onClick={async () => {
+            setLoading(true);
+            await props.parentProps.addDropSet();
+            props.parentProps.setModalVisible(false);
+            setLoading(false);
+          }}
         >
           <Plus size={16} />
           <p>Add Drop Set</p>
@@ -76,7 +99,12 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
         <Button
           variant="text"
           class="flex flex-row items-center space-x-1"
-          onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}
+          onClick={async () => {
+            setLoading(true);
+            await props.parentProps.duplicateRow();
+            props.parentProps.setModalVisible(false);
+            setLoading(false);
+          }}
         >
           <Copy size={16} />
           <p>Duplicate</p>
@@ -85,15 +113,18 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
           variant="text"
           variantColor="bad"
           class="flex flex-row items-center space-x-1"
-          onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}
+          onClick={async () => {
+            setLoading(true);
+            await props.parentProps.deleteRow();
+            props.parentProps.setModalVisible(false);
+            setLoading(false);
+          }}
         >
           <Delete size={16} />
           <p>Delete</p>
         </Button>
       </div>
       <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
-    </Modal>
+    </>
   );
 };
-
-export default ExerciseMoreModal;

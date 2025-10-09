@@ -7,7 +7,7 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { SessionMeal, Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import { Button, DataInput, DataNumberInput, IconButton } from "../../components";
+import { Button, Input, NumberInput, IconButton } from "../../components";
 import CopyMealModal from "../meals/CopyMealModal";
 import { SESSION_MEAL_EXPAND } from "../../config/constants";
 import { extractMealData } from "../../methods/sessionMeal";
@@ -40,15 +40,15 @@ export const SessionMealList: Component<Props> = (props) => {
     const newMeals = props.meals.filter((_, ind) => ind !== index);
 
     try {
-      props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
       await pb.collection("sessionMeals").delete(props.meals[index].id);
-
       await updateRecord(
         "sessions",
         props.sessionID,
         "mealsOrder",
         newMeals.map((r) => r.id)
       );
+
+      props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
     } catch (e) {
       console.log(e);
     }
@@ -88,9 +88,12 @@ export const SessionMealList: Component<Props> = (props) => {
 
   const addRowAtIndex = async (index: number, duplicateInd?: number, createData?: { [k: string]: any }) => {
     if (createData) {
-      const record = await pb.collection<SessionMeal>("sessionMeals").create(createData, {
-        expand: SESSION_MEAL_EXPAND,
-      });
+      const record = await pb.collection<SessionMeal>("sessionMeals").create(
+        { ...createData, session: props.sessionID },
+        {
+          expand: SESSION_MEAL_EXPAND,
+        }
+      );
 
       await insertRowAndSync(index + 1, record);
     } else if (duplicateInd !== undefined) {
@@ -103,7 +106,7 @@ export const SessionMealList: Component<Props> = (props) => {
   };
 
   const addMeal = async (mealToCopy?: SessionMeal) => {
-    const data = mealToCopy ? extractMealData(mealToCopy) : { session: props.sessionID, name: "Meal" };
+    const data = mealToCopy ? extractMealData(mealToCopy) : { name: "Meal" };
 
     addRowAtIndex(props.meals.length, undefined, data);
     setShowCopyMeal(false);
@@ -114,13 +117,13 @@ export const SessionMealList: Component<Props> = (props) => {
       header: "name",
       accessorKey: "name",
       cell: (ctx) => (
-        <DataInput
+        <Input
           noPadding
           noBackground
-          value={ctx.getValue() as string}
-          onChange={(v) =>
-            props.setSession("session", "expand", "sessionMeals_via_session", ctx.row.index, "name", v)
-          }
+          value={props.meals[ctx.row.index].name}
+          onChange={(v) => {
+            props.setSession("session", "expand", "sessionMeals_via_session", ctx.row.index, "name", v);
+          }}
           saveFunc={(v) => saveRow(ctx.row.original.id, "name", v)}
         />
       ),
@@ -130,7 +133,7 @@ export const SessionMealList: Component<Props> = (props) => {
       accessorKey: "kj",
       cell: (ctx) => (
         <div class="flex flex-row justify-end space-x-1">
-          <DataNumberInput
+          <NumberInput
             rawValue={ctx.getValue() as number}
             onRawValueChange={(v) =>
               props.setSession(
@@ -154,7 +157,7 @@ export const SessionMealList: Component<Props> = (props) => {
       accessorKey: "gramsProtein",
       cell: (ctx) => (
         <div class="flex flex-row justify-end space-x-1">
-          <DataNumberInput
+          <NumberInput
             rawValue={ctx.getValue() as number}
             onRawValueChange={(v) =>
               props.setSession(
@@ -269,14 +272,14 @@ export const SessionMealList: Component<Props> = (props) => {
       <Show when={showCopyMeal()}>
         <CopyMealModal setModalVisible={(v) => setShowCopyMeal(v)} addMeal={addMeal} />
       </Show>
-      <Show when={showMoreMeal() && selectedMealInd() >= 0}>
+      <Show when={showMoreMeal() && selectedMealInd() >= 0 && selectedMealInd() < props.meals.length}>
         <MealMoreModal
           sessionID={props.sessionID}
           setSession={props.setSession}
           setModalVisible={setShowMoreMeal}
           initialMeal={props.meals[selectedMealInd()]}
-          deleteRow={() => deleteRow(selectedMealInd())}
-          duplicateRow={() => addRowAtIndex(selectedMealInd(), selectedMealInd())}
+          deleteRow={async () => await deleteRow(selectedMealInd())}
+          duplicateRow={async () => await addRowAtIndex(selectedMealInd(), selectedMealInd())}
         />
       </Show>
     </div>

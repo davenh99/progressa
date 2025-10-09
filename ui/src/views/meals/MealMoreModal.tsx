@@ -4,7 +4,7 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
 import { SessionMeal, Session } from "../../../Types";
-import { Button, Input, NumberInput, Modal, TagArea, TextArea } from "../../components";
+import { Button, Input, NumberInput, Modal, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
@@ -37,102 +37,125 @@ export const MealMoreModal: Component<Props> = (props) => {
 
   return (
     <Modal saveFunc={save} setModalVisible={() => props.setModalVisible(false)}>
-      <div class="overflow-y-auto space-y-1">
-        <h2 class="pb-2">Meal Options</h2>
-        <Input label="Name" value={meal.name} onChange={(v) => setMeal("name", v)} />
-        <TextArea
-          label="Description"
-          placeholder="My go-to lunch..."
-          value={meal.description}
-          onInput={(e) => setMeal("description", e.currentTarget.value)}
-        />
-        <div class="flex space-x-1">
-          <NumberInput
-            label="Energy"
-            rawValue={meal.kj}
-            class="flex-1 justify-between"
-            width="3.5rem"
-            onRawValueChange={(v) => setMeal("kj", v)}
-            inputProps={{
-              class: "rounded-sm bg-charcoal-600 pr-0.5",
-            }}
-          />
-          <p class="w-4">kj</p>
-        </div>
-        <div class="flex space-x-1">
-          <NumberInput
-            label="Protein"
-            class="flex-1 justify-between"
-            width="3.5rem"
-            rawValue={meal.gramsProtein}
-            onRawValueChange={(v) => setMeal("gramsProtein", v)}
-            inputProps={{
-              class: "rounded-sm bg-charcoal-600 pr-0.5",
-            }}
-          />
-          <p class="w-4">g</p>
-        </div>
-        <div class="flex space-x-1">
-          <NumberInput
-            label="Carbohydrates"
-            class="flex-1 justify-between"
-            width="3.5rem"
-            rawValue={meal.gramsCarbohydrate}
-            onRawValueChange={(v) => setMeal("gramsCarbohydrate", v)}
-            inputProps={{
-              class: "rounded-sm bg-charcoal-600 pr-0.5",
-            }}
-          />
-          <p class="w-4">g</p>
-        </div>
-        <div class="flex space-x-1 mb-1.5">
-          <NumberInput
-            label="Fats"
-            class="flex-1 justify-between"
-            width="3.5rem"
-            rawValue={meal.gramsFat}
-            onRawValueChange={(v) => setMeal("gramsFat", v)}
-            inputProps={{
-              class: "rounded-sm bg-charcoal-600 pr-0.5",
-            }}
-          />
-          <p class="w-4">g</p>
-        </div>
-        <TagArea
-          tags={meal.expand.tags ?? []}
-          setTags={(tags) => {
-            setMeal("expand", "tags", tags);
-            setMeal(
-              "tags",
-              tags.map((t) => t.id)
-            );
-          }}
-          modelName="sessionMeals"
-          recordID={meal.id}
-        />
-        <div class="flex flex-col mt-3">
-          <Button
-            variant="text"
-            class="flex flex-row items-center space-x-1"
-            onClick={() => props.duplicateRow().then(() => props.setModalVisible(false))}
-          >
-            <Copy size={16} />
-            <p>Duplicate</p>
-          </Button>
-          <Button
-            variant="text"
-            variantColor="bad"
-            class="flex flex-row items-center space-x-1"
-            onClick={() => props.deleteRow().then(() => props.setModalVisible(false))}
-          >
-            <Delete size={16} />
-            <p>Delete</p>
-          </Button>
-        </div>
-        <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
-      </div>
+      <ModalContent meal={meal} setMeal={setMeal} parentProps={props} />
     </Modal>
   );
 };
 
 export default MealMoreModal;
+
+interface ModalProps {
+  meal: any;
+  setMeal: SetStoreFunction<any>;
+  parentProps: Props;
+}
+
+const ModalContent: Component<ModalProps> = (props) => {
+  const { setLoading } = useModalLoading();
+  return (
+    <div class="overflow-y-auto space-y-1">
+      <h2 class="pb-2">Meal Options</h2>
+      <Input label="Name" value={props.meal.name} onChange={(v) => props.setMeal("name", v)} />
+      <TextArea
+        label="Description"
+        placeholder="My go-to lunch..."
+        value={props.meal.description}
+        onInput={(e) => props.setMeal("description", e.currentTarget.value)}
+      />
+      <div class="flex space-x-1">
+        <NumberInput
+          label="Energy"
+          rawValue={props.meal.kj}
+          class="flex-1 justify-between"
+          width="3.5rem"
+          onRawValueChange={(v) => props.setMeal("kj", v)}
+          inputProps={{
+            class: "rounded-sm bg-charcoal-600 pr-0.5",
+          }}
+        />
+        <p class="w-4">kj</p>
+      </div>
+      <div class="flex space-x-1">
+        <NumberInput
+          label="Protein"
+          class="flex-1 justify-between"
+          width="3.5rem"
+          rawValue={props.meal.gramsProtein}
+          onRawValueChange={(v) => props.setMeal("gramsProtein", v)}
+          inputProps={{
+            class: "rounded-sm bg-charcoal-600 pr-0.5",
+          }}
+        />
+        <p class="w-4">g</p>
+      </div>
+      <div class="flex space-x-1">
+        <NumberInput
+          label="Carbohydrates"
+          class="flex-1 justify-between"
+          width="3.5rem"
+          rawValue={props.meal.gramsCarbohydrate}
+          onRawValueChange={(v) => props.setMeal("gramsCarbohydrate", v)}
+          inputProps={{
+            class: "rounded-sm bg-charcoal-600 pr-0.5",
+          }}
+        />
+        <p class="w-4">g</p>
+      </div>
+      <div class="flex space-x-1 mb-1.5">
+        <NumberInput
+          label="Fats"
+          class="flex-1 justify-between"
+          width="3.5rem"
+          rawValue={props.meal.gramsFat}
+          onRawValueChange={(v) => props.setMeal("gramsFat", v)}
+          inputProps={{
+            class: "rounded-sm bg-charcoal-600 pr-0.5",
+          }}
+        />
+        <p class="w-4">g</p>
+      </div>
+      <TagArea
+        tags={props.meal.expand.tags ?? []}
+        setTags={(tags) => {
+          props.setMeal("expand", "tags", tags);
+          props.setMeal(
+            "tags",
+            tags.map((t) => t.id)
+          );
+        }}
+        modelName="sessionMeals"
+        recordID={props.meal.id}
+      />
+      <div class="flex flex-col mt-3">
+        <Button
+          variant="text"
+          class="flex flex-row items-center space-x-1"
+          onClick={async () => {
+            setLoading(true);
+            await props.parentProps.duplicateRow();
+            props.parentProps.setModalVisible(false);
+            setLoading(false);
+          }}
+        >
+          <Copy size={16} />
+          <p>Duplicate</p>
+        </Button>
+        <Button
+          variant="text"
+          variantColor="bad"
+          class="flex flex-row items-center space-x-1"
+          onClick={async () => {
+            setLoading(true);
+            await props.parentProps.deleteRow();
+            props.parentProps.setModalVisible(false);
+            setLoading(false);
+          }}
+        >
+          <Delete size={16} />
+          <p>Delete</p>
+        </Button>
+      </div>
+      <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
+    </div>
+  );
+};

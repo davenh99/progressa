@@ -4,14 +4,14 @@ import { createStore } from "solid-js/store";
 import { useSearchParams } from "@solidjs/router";
 
 import { useAuthPB } from "../config/pocketbase";
-import { DataInput, DataTextArea, TagArea, DataSleepQualitySelector, Button, DateInput } from "../components";
+import { Input, DataTextArea, TagArea, DataSleepQualitySelector, Button, DateInput } from "../components";
 import Container from "../views/app/Container";
 import type { SleepQuality, Session, SessionCreateData } from "../../Types";
 import Loading from "../views/app/Loading";
 import LogSessionNav from "../views/session/LogSessionNav";
 import { ClientResponseError } from "pocketbase";
 import Header from "../views/app/Header";
-import { DataNumberInput } from "../components/NumberInput";
+import { NumberInput } from "../components/NumberInput";
 import Card from "../views/app/Card";
 import { SESSION_EXPAND } from "../config/constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
@@ -161,7 +161,7 @@ const LogSession: Component = () => {
 
                 <div>
                   <h3>Session name</h3>
-                  <DataInput
+                  <Input
                     value={session.session?.name ?? "Workout"}
                     onChange={(v) => setSession("session", "name", v)}
                     saveFunc={(v) => sessionUpdate("name", v)}
@@ -171,7 +171,7 @@ const LogSession: Component = () => {
                 <div class="flex flex-row items-center">
                   <h3 class="mr-2">Your weight this day</h3>
                   <div class="bg-charcoal-600 rounded-sm flex flex-row p-1">
-                    <DataNumberInput
+                    <NumberInput
                       rawValue={session.session?.userWeight ?? user.weight}
                       onRawValueChange={(v) => setSession("session", "userWeight", Number(v))}
                       saveFunc={(v) => updateWeight(v as number)}

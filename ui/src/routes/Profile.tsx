@@ -4,7 +4,7 @@ import Logout from "lucide-solid/icons/log-out";
 
 import { useAuthPB } from "../config/pocketbase";
 import { getAge } from "../methods/getAge";
-import { Button, DataDateInput, DataNumberInput } from "../components";
+import { Button, DataDateInput, NumberInput } from "../components";
 import Container from "../views/app/Container";
 import Header from "../views/app/Header";
 import Card from "../views/app/Card";
@@ -32,7 +32,7 @@ const Profile: Component = () => {
           <div class="flex flex-col space-y-2 mt-3">
             <p>Email: {user.email}</p>
             <div class="flex flex-row space-x-1">
-              <DataNumberInput
+              <NumberInput
                 label="Height:"
                 class="flex-1 justify-between"
                 width="3.5rem"
@@ -46,7 +46,7 @@ const Profile: Component = () => {
               <p class="w-4">cm</p>
             </div>
             <div class="flex flex-row space-x-1">
-              <DataNumberInput
+              <NumberInput
                 label="Weight:"
                 class="flex-1 justify-between"
                 width="3.5rem"

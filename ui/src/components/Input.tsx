@@ -50,6 +50,7 @@ interface ExtraProps {
   noPadding?: boolean;
   noBackground?: boolean;
   inputProps?: InputProps;
+  saveFunc?: (v: string) => Promise<any>;
 }
 
 type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
@@ -64,10 +65,23 @@ export const Input: Component<InputRootProps> = (props) => {
     "noBackground",
     "inputProps",
     "labelPosition",
+    "saveFunc",
+    "onChange",
   ]);
 
+  const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
+
+  const handleChange = (v: string) => {
+    local.onChange?.(v);
+    debouncedSave()?.(v);
+  };
+
   return (
-    <TextField class={inputRoot({ labelPosition: local.labelPosition, class: local.class })} {...others}>
+    <TextField
+      class={inputRoot({ labelPosition: local.labelPosition, class: local.class })}
+      {...others}
+      onChange={handleChange}
+    >
       <Show when={local.label}>
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
@@ -81,25 +95,6 @@ export const Input: Component<InputRootProps> = (props) => {
         {...local.inputProps}
       />
     </TextField>
-  );
-};
-
-interface DataProps extends InputRootProps {
-  saveFunc: (v: string) => Promise<any>;
-}
-
-export const DataInput: Component<DataProps> = (props) => {
-  const [local, others] = splitProps(props, ["onChange", "saveFunc"]);
-  const debouncedSave = createMemo(() => debounce(local.saveFunc));
-
-  return (
-    <Input
-      onChange={(v) => {
-        props.onChange?.(v);
-        debouncedSave()(v);
-      }}
-      {...others}
-    />
   );
 };
 

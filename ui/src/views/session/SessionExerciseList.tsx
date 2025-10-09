@@ -7,7 +7,7 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
-import { Button, DataSelect, IconButton, DataTime, DataNumberInput, RPESelect } from "../../components";
+import { Button, DataSelect, IconButton, DataTime, NumberInput, RPESelect } from "../../components";
 import { DraggableRow } from "./SessionExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
@@ -73,7 +73,6 @@ export const SessionExerciseList: Component<Props> = (props) => {
       const delPromises = indices.map((index) =>
         pb.collection("sessionExercises").delete(props.sessionExercises[index].id)
       );
-      props.setSession("session", "expand", "sessionExercises_via_session", newRows);
       await Promise.all(delPromises);
       await updateRecord(
         "sessions",
@@ -81,6 +80,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
         "exercisesOrder",
         newRows.map((r) => r.id)
       );
+
+      props.setSession("session", "expand", "sessionExercises_via_session", newRows);
     } catch (e) {
       console.log(e);
     }
@@ -224,7 +225,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
               when={ctx.row.original.expand?.exercise?.defaultMeasurementType === "8ldlgtjjvy3ircl"}
               fallback={
                 <div class="flex flex-row space-x-1">
-                  <DataNumberInput
+                  <NumberInput
                     rawValue={ctx.row.original.measurementNumeric || 0}
                     onRawValueChange={(v) =>
                       props.setSession(
@@ -263,7 +264,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
     {
       accessorKey: "addedWeight",
       cell: (ctx) => (
-        <DataNumberInput
+        <NumberInput
           rawValue={ctx.getValue() as number}
           onRawValueChange={(v) =>
             props.setSession(
@@ -400,21 +401,29 @@ export const SessionExerciseList: Component<Props> = (props) => {
           addSessionExercise={addSessionExercise}
         />
       </Show>
-      <Show when={showMoreExercise() && selectedExerciseInd() >= 0}>
+      <Show
+        when={
+          showMoreExercise() &&
+          selectedExerciseInd() >= 0 &&
+          selectedExerciseInd() < props.sessionExercises.length
+        }
+      >
         <ExerciseMoreModal
           sessionID={props.sessionID}
           setSession={props.setSession}
           setModalVisible={setShowMoreExercise}
           initialExercise={props.sessionExercises[selectedExerciseInd()]}
-          deleteRow={() => deleteRows(getSupersetInds(selectedExerciseInd(), props.sessionExercises))}
-          duplicateRow={() =>
-            addRowsAtIndex(
+          deleteRow={async () =>
+            await deleteRows(getSupersetInds(selectedExerciseInd(), props.sessionExercises))
+          }
+          duplicateRow={async () =>
+            await addRowsAtIndex(
               selectedExerciseInd(),
               getSupersetInds(selectedExerciseInd(), props.sessionExercises)
             )
           }
-          addDropSet={() =>
-            addRowsAtIndex(
+          addDropSet={async () =>
+            await addRowsAtIndex(
               selectedExerciseInd(),
               undefined,
               getDropsetAddData(props.sessionExercises[selectedExerciseInd()])

@@ -13,18 +13,37 @@ interface ExtraProps {
   label?: string;
   width?: string;
   inputProps?: InputProps;
+  saveFunc: (v: number) => Promise<any>;
 }
 
 type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, NumberFieldRootProps<T>>;
 
 export const NumberInput: Component<InputRootProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "width", "inputProps"]);
+  const [local, others] = splitProps(props, [
+    "label",
+    "class",
+    "width",
+    "inputProps",
+    "saveFunc",
+    "onRawValueChange",
+  ]);
 
   const inputClasses = `input outline-none text-right my-0 ${local.inputProps?.class ?? ""}`;
 
+  const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
+
+  const handleChange = (v: number) => {
+    local.onRawValueChange?.(v);
+    debouncedSave()?.(v);
+  };
+
   return (
-    <NumberField class={`flex flex-row space-x-1 ${local.class ?? ""}`} {...others}>
+    <NumberField
+      onRawValueChange={handleChange}
+      class={`flex flex-row space-x-1 ${local.class ?? ""}`}
+      {...others}
+    >
       <Show when={local.label}>
         <NumberField.Label>{local.label}</NumberField.Label>
       </Show>
@@ -34,25 +53,6 @@ export const NumberInput: Component<InputRootProps> = (props) => {
         {...local.inputProps}
       />
     </NumberField>
-  );
-};
-
-interface DataProps extends InputRootProps {
-  saveFunc: (v: number) => Promise<any>;
-}
-
-export const DataNumberInput: Component<DataProps> = (props) => {
-  const [local, others] = splitProps(props, ["onRawValueChange", "saveFunc"]);
-  const debouncedSave = createMemo(() => debounce(local.saveFunc));
-
-  return (
-    <NumberInput
-      onRawValueChange={(v) => {
-        local.onRawValueChange?.(v);
-        debouncedSave()(v);
-      }}
-      {...others}
-    />
   );
 };
 
