@@ -29,9 +29,9 @@ export const SiteLayout: ParentComponent = (props) => {
 
       <Footer class="text-xs">
         <p>version 0.1</p>
-        {/* <A class="underline" href="/">
+        <A class="underline" href="/privacy">
           Privacy Policy
-        </A> */}
+        </A>
         <A class="underline" href="https://github.com/davenh99/progressa">
           <i class="fa-brands fa-github"></i> Source Code
         </A>

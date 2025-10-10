@@ -9,8 +9,9 @@ import { ThemeProvider } from "./config/theme";
 import AppLayout from "./views/app/AppLayout";
 import LoadFullScreen from "./views/app/LoadFullScreen";
 import SiteLayout from "./views/app/SiteLayout";
-import Landing from "./routes/Landing";
 
+const Landing = lazy(() => import("./routes/Landing"));
+const Privacy = lazy(() => import("./routes/Privacy"));
 const NotFound = lazy(() => import("./routes/NotFound"));
 const Auth = lazy(() => import("./routes/Auth"));
 const LogSession = lazy(() => import("./routes/LogSession"));
@@ -70,6 +71,7 @@ function Site() {
   return (
     <Route path="/" component={SiteLayout}>
       <Route path="/" component={Landing} />
+      <Route path="/privacy" component={Privacy} />
       <Route path="/auth" component={Auth} />
     </Route>
   );
