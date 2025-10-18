@@ -31,7 +31,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
       const updatedSession = await getSessionByID(props.sessionID);
       props.setSession({ session: updatedSession });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

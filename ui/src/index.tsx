@@ -2,6 +2,7 @@
 import { lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
+import { toaster } from "@kobalte/core/toast";
 
 import "./index.css";
 import { PBProvider, usePB } from "./config/pocketbase";
@@ -17,6 +18,8 @@ const Auth = lazy(() => import("./routes/Auth"));
 const LogSession = lazy(() => import("./routes/LogSession"));
 const Sessions = lazy(() => import("./routes/Sessions"));
 const Profile = lazy(() => import("./routes/Profile"));
+import { Toaster } from "./config/toaster";
+import { Toast } from "./config/toaster/";
 
 const root = document.getElementById("root");
 
@@ -26,11 +29,26 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
+window.onerror = (msg) => {
+  toaster.show((props) => <Toast {...props} title="JS Error" msg={String(msg)} />);
+};
+
+window.onunhandledrejection = (event) => {
+  toaster.show((props) => <Toast {...props} title="Unhandled Promise" msg={String(event.reason)} />);
+};
+
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  originalConsoleError(...args);
+  toaster.show((props) => <Toast {...props} title="Error" msg={args.map(String).join(" ")} />);
+};
+
 render(
   () => (
     <PBProvider>
       <ThemeProvider>
         <Content />
+        <Toaster />
       </ThemeProvider>
     </PBProvider>
   ),

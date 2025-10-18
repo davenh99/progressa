@@ -48,7 +48,7 @@ const LogSession: Component = () => {
         .create(createData, { expand: SESSION_EXPAND });
       setSession({ session: newSession });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

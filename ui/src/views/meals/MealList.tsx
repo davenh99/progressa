@@ -57,7 +57,7 @@ export const MealList: Component<Props> = (props) => {
 
       setMeals(meals);
     } catch (e) {
-      console.log("get meals error: ", e);
+      console.error("get meals error: ", e);
     }
   };
 

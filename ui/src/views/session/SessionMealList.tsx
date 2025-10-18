@@ -50,7 +50,7 @@ export const SessionMealList: Component<Props> = (props) => {
 
       props.setSession("session", "expand", "sessionMeals_via_session", newMeals);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

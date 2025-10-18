@@ -61,7 +61,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
             await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
             props.setTags([...props.tags, createdTag]);
           } else {
-            console.log(e);
+            console.error(e);
           }
         }
       }
@@ -74,7 +74,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       await updateFn(props.modelName, props.recordID, "tags-", t.id);
       props.setTags((props.tags || []).filter((tag) => tag.id !== t.id));
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

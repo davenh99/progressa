@@ -37,7 +37,7 @@ export const SessionList: Component = (props) => {
 
       setSessions(sessions);
     } catch (e) {
-      console.log("get sessions error: ", e);
+      console.error("get sessions error: ", e);
     }
   };
 

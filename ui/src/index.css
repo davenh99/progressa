@@ -7,6 +7,8 @@
 
   font-size: 16px;
   margin: 0;
+
+  --viewport-padding: 16px;
 }
 
 @font-face {
@@ -117,4 +119,44 @@ input::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
+}
+
+/* Toast styles */
+@keyframes hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(calc(100% + var(--viewport-padding)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes swipeOut {
+  from {
+    transform: translateX(var(--kb-toast-swipe-end-x));
+  }
+  to {
+    transform: translateX(calc(100% + var(--viewport-padding)));
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-hide {
+  animation: hide 100ms ease-in;
+}
+
+.animate-swipeOut {
+  animation: swipeOut 100ms ease-out;
 }

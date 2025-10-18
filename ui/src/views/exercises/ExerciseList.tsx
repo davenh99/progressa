@@ -56,7 +56,7 @@ export const ExerciseList: Component<Props> = (props) => {
 
       setExercises(exercises);
     } catch (e) {
-      console.log("get exercises error: ", e);
+      console.error("get exercises error: ", e);
     }
   };
 

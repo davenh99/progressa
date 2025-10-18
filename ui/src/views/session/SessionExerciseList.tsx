@@ -83,7 +83,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
 
       props.setSession("session", "expand", "sessionExercises_via_session", newRows);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
