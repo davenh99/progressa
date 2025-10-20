@@ -10,23 +10,19 @@ import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/el
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 
-import { DataTime } from "../../components";
-import { DraggingState, Session, SessionExercise } from "../../../Types";
-import { SetStoreFunction } from "solid-js/store";
+import { DraggingState, RoutineExercise, SessionExercise } from "../../../Types";
 import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
+import { JSX } from "solid-js";
 
 interface DraggableRowProps {
-  row: RowType<SessionExercise>;
+  row: RowType<SessionExercise | RoutineExercise>;
   firstOfGroup: boolean;
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
   getGroupInds: () => number[];
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
-  getSupersetParent: (index: number) => SessionExercise;
-  setSession: SetStoreFunction<{
-    session: Session | null;
-  }>;
+  timeInput: JSX.Element;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -53,7 +49,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           return false;
         }
         // only allowing sessionExercises to be dropped on me
-        return source.data.isSessionExerciseRow as boolean;
+        return source.data.isExerciseRow as boolean;
       },
       getIsSticky() {
         return true;
@@ -64,7 +60,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         if (props.lastOfSuperset) allowedEdges.push("bottom");
 
         return attachClosestEdge(
-          { id: props.row.original.id, ind: props.row.index, isSessionExerciseRow: true },
+          { id: props.row.original.id, ind: props.row.index, isExerciseRow: true },
           { element, input, allowedEdges }
         );
       },
@@ -103,7 +99,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return {
           id: props.row.original.id,
           ind: props.row.index,
-          isSessionExerciseRow: true,
+          isExerciseRow: true,
         };
       },
       onGenerateDragPreview({ nativeSetDragImage }) {
@@ -146,7 +142,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         return {
           id: props.row.original.id,
           ind: props.row.index,
-          isSessionExerciseRow: true,
+          isExerciseRow: true,
           isGroup: true,
           groupInds,
         };
@@ -243,22 +239,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           </div>
           <Show when={props.lastOfSuperset}>
             <div class="flex flex-row justify-around">
-              <div class="rounded-sm bg-dark-slate-gray-800/50">
-                <DataTime
-                  value={props.row.original.restAfter}
-                  onValueChange={(v) =>
-                    props.setSession(
-                      "session",
-                      "expand",
-                      "sessionExercises_via_session",
-                      props.row.index,
-                      "restAfter",
-                      v
-                    )
-                  }
-                  saveFunc={(v: number) => props.saveRow(props.row.original.id, "restAfter", v)}
-                />
-              </div>
+              <div class="rounded-sm bg-dark-slate-gray-800/50">{props.timeInput}</div>
             </div>
           </Show>
         </div>

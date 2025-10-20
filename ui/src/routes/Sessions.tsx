@@ -11,7 +11,7 @@ const Sessions: Component = () => {
       <Header>
         <div class="flex justify-between items-start">
           <h1 class="text-xl font-bold">Your Workout Sessions</h1>
-          <Button href="/log" class="whitespace-nowrap ml-4 text-black">
+          <Button href="/log" class="whitespace-nowrap ml-4">
             Log workout
           </Button>
         </div>

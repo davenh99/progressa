@@ -1,7 +1,8 @@
 import { ParentComponent } from "solid-js";
 import { A, useLocation } from "@solidjs/router";
 import Log from "lucide-solid/icons/pencil-line";
-import ClipboardList from "lucide-solid/icons/clipboard-list";
+import Routine from "lucide-solid/icons/notebook-text";
+import History from "lucide-solid/icons/history";
 import User from "lucide-solid/icons/user";
 
 export const AppLayout: ParentComponent = (props) => {
@@ -27,8 +28,12 @@ export const AppLayout: ParentComponent = (props) => {
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-charcoal-100/80 py-4 space-y-6">
         <A href="/" class={linkClasses("/")}>
-          <ClipboardList size={24} class={iconClasses("/")} />
+          <History size={24} class={iconClasses("/")} />
           <p>History</p>
+        </A>
+        <A href="/routines" class={linkClasses("/routines")}>
+          <Routine size={24} class={iconClasses("/routines")} />
+          <p>Routines</p>
         </A>
         <A
           href="/log"
@@ -55,10 +60,15 @@ export const AppLayout: ParentComponent = (props) => {
       <nav
         class="sm:hidden fixed bottom-3 left-1/2 -translate-x-1/2
          bg-charcoal-100/50 flex justify-between
-         py-2.5 px-5 space-x-[12vw] rounded-full backdrop-blur-xs"
+         py-2.5 px-5 space-x-[7vw]  rounded-full backdrop-blur-xs"
       >
         <A href="/" class="flex flex-col items-center">
-          <ClipboardList size={30} class={iconClasses("/")} />
+          <History size={30} class={iconClasses("/")} />
+          <p class="text-xs">History</p>
+        </A>
+        <A href="/routines" class="flex flex-col items-center">
+          <Routine size={30} />
+          <p class="text-xs">Routines</p>
         </A>
         <A
           href="/log"
@@ -70,9 +80,11 @@ export const AppLayout: ParentComponent = (props) => {
           }}
         >
           <Log size={30} class={iconClasses("/log")} />
+          <p class="text-xs">Log</p>
         </A>
         <A href="/profile" class="flex flex-col items-center">
           <User size={30} class={iconClasses("/profile")} />
+          <p class="text-xs">Profile</p>
         </A>
       </nav>
     </div>

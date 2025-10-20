@@ -37,12 +37,18 @@ export interface Exercise {
   description: string;
   bodyweight: boolean;
   defaultMeasurementType: string;
-  allowedMeasurementTypes: string;
+  defaultMeasurementType2: string;
+  defaultMeasurementType3: string;
+  allowedMeasurementTypes: string[];
+  allowedMeasurementTypes2: string[];
+  allowedMeasurementTypes3: string[];
   public: boolean;
   usersSaved: string[];
   createdBy: string;
   expand?: {
     defaultMeasurementType?: MeasurementType;
+    defaultMeasurementType2?: MeasurementType;
+    defaultMeasurementType3?: MeasurementType;
     exerciseVariations_via_exercise?: ExerciseVariation[];
   };
 }
@@ -84,7 +90,7 @@ export interface SessionExerciseCreateData {
   perceivedEffort: number; // 0 - 100
 }
 
-export interface SessionExercise extends SessionExerciseCreateData {
+interface RoutineOrSessionExercise {
   id: string;
   notes: string;
   tags: string[];
@@ -92,15 +98,23 @@ export interface SessionExercise extends SessionExerciseCreateData {
   restAfter: number;
   isWarmup: boolean;
   measurementNumeric?: number;
+  measurement2Numeric?: number;
+  measurement3Numeric?: number;
   measurementValue?: string;
+  measurement2Value?: string;
+  measurement3Value?: string;
   supersetParent?: string;
   expand?: {
     exercise?: Exercise;
     variation?: ExerciseVariation;
     measurementValue?: MeasurementValue;
+    measurement2Value?: MeasurementValue;
+    measurement3Value?: MeasurementValue;
     tags?: Tag[];
   };
 }
+
+export type SessionExercise = SessionExerciseCreateData & RoutineOrSessionExercise;
 
 export interface Tag {
   id: string;
@@ -127,3 +141,26 @@ export interface SessionMeal extends SessionMealCreateData {
     tags: Tag[];
   };
 }
+
+export interface RoutineCreateData {
+  name: string;
+  user: string;
+  description: string;
+  exercisesOrder: string[] | null;
+}
+
+export interface Routine extends RoutineCreateData {
+  id: string;
+  expand?: {
+    tags?: Tag[];
+    routineExercises_via_routine?: RoutineExercise[];
+  };
+}
+
+export interface RoutineExerciseCreateData {
+  exercise: string;
+  routine: string;
+  variation?: string;
+}
+
+export type RoutineExercise = RoutineExerciseCreateData & RoutineOrSessionExercise;

@@ -1,6 +1,6 @@
-import { SessionExercise } from "../../Types";
+import { RoutineExercise, SessionExercise } from "../../Types";
 
-export const getSupersetInds = (index: number, data: SessionExercise[]) => {
+export const getSupersetInds = (index: number, data: (SessionExercise | RoutineExercise)[]) => {
   const inds = [index];
   const sessionExerciseId = data[index].id;
 
@@ -13,7 +13,7 @@ export const getSupersetInds = (index: number, data: SessionExercise[]) => {
   return inds;
 };
 
-export const getGroupInds = (index: number, data: SessionExercise[]) => {
+export const getGroupInds = (index: number, data: (SessionExercise | RoutineExercise)[]) => {
   const inds = [];
   const exerciseId = data[index].exercise;
 

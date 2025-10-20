@@ -4,32 +4,32 @@ import Plus from "lucide-solid/icons/plus";
 import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
-import { Session, SessionExercise } from "../../../Types";
+import { Routine, RoutineExercise } from "../../../Types";
 import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
-  initialExercise: SessionExercise;
-  sessionID: string;
-  setSession: SetStoreFunction<{
-    session: Session | null;
+  initialExercise: RoutineExercise;
+  routineId: string;
+  setRoutine: SetStoreFunction<{
+    routine: Routine | null;
   }>;
   deleteRow: () => Promise<void>;
   duplicateRow: () => Promise<void>;
   addDropSet: () => Promise<void>;
 }
 
-export const ExerciseMoreModal: Component<Props> = (props) => {
+export const RoutineExerciseMoreModal: Component<Props> = (props) => {
   const [exercise, setExercise] = createStore(JSON.parse(JSON.stringify(props.initialExercise)));
-  const { pb, getSessionByID } = useAuthPB();
+  const { pb, getRoutineByID } = useAuthPB();
 
   const save = async () => {
     try {
-      await pb.collection("sessionExercises").update(exercise.id, exercise);
+      await pb.collection("routineExercises").update(exercise.id, exercise);
       // lazy way to refresh the session for now. could also set the state.
-      const updatedSession = await getSessionByID(props.sessionID);
-      props.setSession({ session: updatedSession });
+      const updatedSession = await getRoutineByID(props.routineId);
+      props.setRoutine({ routine: updatedSession });
     } catch (e) {
       console.error(e);
     }
@@ -44,7 +44,7 @@ export const ExerciseMoreModal: Component<Props> = (props) => {
   );
 };
 
-export default ExerciseMoreModal;
+export default RoutineExerciseMoreModal;
 
 interface ModalProps {
   exercise: any;

@@ -1,43 +1,71 @@
-import { ParentComponent, splitProps, createMemo } from "solid-js";
+import { ParentComponent, splitProps, createMemo, ValidComponent } from "solid-js";
 import { A } from "@solidjs/router";
 import { ButtonRootProps, Button as KobalteButton } from "@kobalte/core/button";
+import { tv } from "tailwind-variants";
+import { PolymorphicProps } from "@kobalte/core";
 
-interface Props extends ButtonRootProps {
+type BaseProps<T extends ValidComponent = "button" | "A"> = PolymorphicProps<T, ButtonRootProps<T>>;
+
+interface Props extends BaseProps {
   onClick?: () => void;
   href?: string;
-  class?: string;
-  variant?: "text";
+  variant?: "text" | "solid";
   variantColor?: "good" | "bad" | "neutral";
 }
 
+const button = tv({
+  base: "font-bold active:opacity-80",
+  variants: {
+    variant: {
+      text: "px-1",
+      solid: "rounded-md px-3 py-1 border-1",
+    },
+    variantColor: {
+      good: "text-green-400",
+      bad: "text-red-400",
+      neutral: "text-charcoal-800",
+    },
+  },
+  compoundVariants: [
+    {
+      variant: "solid",
+      variantColor: "good",
+      class: "bg-green-400/20",
+    },
+    {
+      variant: "solid",
+      variantColor: "bad",
+      class: "bg-red-400/20",
+    },
+    {
+      variant: "solid",
+      variantColor: "neutral",
+      class: "bg-charcoal-800/20",
+    },
+  ],
+  defaultVariants: {
+    variant: "solid",
+    variantColor: "neutral",
+  },
+});
+
 export const Button: ParentComponent<Props> = (props) => {
-  const [local, others] = splitProps(props, ["children", "href", "onClick", "class", "variant"]);
+  const [local, others] = splitProps(props, [
+    "children",
+    "href",
+    "onClick",
+    "class",
+    "variant",
+    "variantColor",
+  ]);
 
-  const classes = createMemo(() => {
-    const baseClass = `font-bold active:opacity-80 ${local.class ?? ""}`;
-
-    if (props.variant === "text") {
-      const extendedClass = `${baseClass} px-1`;
-      switch (props.variantColor) {
-        case "good":
-          return `${extendedClass} text-green-400`;
-        case "bad":
-          return `${extendedClass} text-red-400`;
-        default:
-          return `${extendedClass} text-charcoal-800`;
-      }
-    } else {
-      const extendedClass = `${baseClass} rounded-md px-3 py-1 text-charcoal-300 border-1`;
-      switch (props.variantColor) {
-        case "good":
-          return `${extendedClass} bg-green-400/20 text-green-400`;
-        case "bad":
-          return `${extendedClass} bg-red-400/20 text-red-400`;
-        default:
-          return `${extendedClass} bg-charcoal-800/20 text-charcoal-800`;
-      }
-    }
-  });
+  const classes = createMemo(() =>
+    button({
+      variant: local.variant,
+      variantColor: local.variantColor,
+      class: local.class as string,
+    })
+  );
 
   return (
     <KobalteButton

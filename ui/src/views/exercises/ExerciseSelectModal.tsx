@@ -8,7 +8,7 @@ import { ExerciseVariationList } from "./ExerciseVariationList";
 
 interface Props {
   setModalVisible: (v: boolean) => void;
-  addSessionExercise: (exerciseID: string, variationID?: string) => Promise<void>;
+  addExercise: (exerciseID: string, variationID?: string) => Promise<void>;
 }
 
 export const ExerciseSelectModal: Component<Props> = (props) => {
@@ -27,7 +27,7 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
                 setVariations(exercise.expand?.exerciseVariations_via_exercise ?? []);
                 setSelectedExercise(exercise);
               } else {
-                props.addSessionExercise(exercise.id);
+                props.addExercise(exercise.id);
               }
             }}
           />
@@ -43,7 +43,7 @@ export const ExerciseSelectModal: Component<Props> = (props) => {
           onClick={(v) => {
             const sel = selectedExercise();
             if (sel) {
-              props.addSessionExercise(sel.id, v.id);
+              props.addExercise(sel.id, v.id);
             }
           }}
         />

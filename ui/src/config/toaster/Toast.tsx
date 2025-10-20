@@ -22,7 +22,7 @@ export const Toast: Component<Props> = (props) => {
       <div class={`flex items-start w-full`}>
         <div>
           <KToast.Title>{local.title}</KToast.Title>
-          <KToast.Description>{local.msg}</KToast.Description>
+          <KToast.Description class="text-sm">{local.msg}</KToast.Description>
         </div>
         <KToast.CloseButton class={`shrink-0 ml-auto`}>
           <X size={16} />
