@@ -17,7 +17,7 @@ export const Toast: Component<Props> = (props) => {
         rounded-md p-2 bg-charcoal-500 data-[opened]:animate-slideIn data-[closed]:animate-hide
         data-[swipe=move]:translate-x-[var(--kb-toast-swipe-move-x)] data-[swipe=cancel]:translate-x-0
         data-[swipe=cancel]:transition-transform data-[swipe=cancel]:duration-200 data-[swipe=cancel]:ease-out
-        data-[swipe=end]:animate-swipeOut text-dark-slate-gray-900`}
+        data-[swipe=end]:animate-swipeOut text-dark-slate-gray-900 shadow-md shadow-charcoal-400`}
     >
       <div class={`flex items-start w-full`}>
         <div>

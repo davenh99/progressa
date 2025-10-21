@@ -89,7 +89,7 @@ export const RoutineList: Component<Props> = (props) => {
         />
       </div>
       <div class="mt-4">
-        <div>
+        <div class="space-y-2">
           <For each={table.getRowModel().rows}>
             {(row) => (
               <div
@@ -98,7 +98,7 @@ export const RoutineList: Component<Props> = (props) => {
               >
                 <For each={row.getVisibleCells()}>
                   {(cell) => {
-                    const classes = `p-1 ${cell.column.getIndex() === 0 ? "flex-1" : ""}`;
+                    const classes = `p-1 flex items-center ${cell.column.getIndex() === 0 ? "flex-1" : ""}`;
 
                     return (
                       <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>

@@ -1,4 +1,4 @@
-import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { Component, For, Show, createEffect, createMemo, createSignal } from "solid-js";
 import {
   attachClosestEdge,
   extractClosestEdge,
@@ -30,6 +30,12 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let groupRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
+  const measurementHeader = createMemo(
+    () => props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"
+  );
+  const measurementHeaderClass = createMemo(() =>
+    measurementHeader().length > 5 ? "text-sm flex-2" : "flex-2"
+  );
 
   createEffect(() => {
     if (!props.firstOfSuperset && !props.lastOfSuperset) return;
@@ -199,11 +205,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           {/* column headers */}
           <div class="w-full flex flex-row justify-between mt-1 text-center">
             <p class="flex-2">set</p>
-            <p class="flex-2">
-              {props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"}
-            </p>
+            <p class={measurementHeaderClass()}>{measurementHeader()}</p>
             <p class="flex-2">+kg</p>
-            <p class="flex-2">rpe</p>
+            <Show when={"perceivedEffort" in props.row.original}>
+              <p class="flex-2">rpe</p>
+            </Show>
             <p class="flex-1"> </p>
           </div>
         </Show>
