@@ -25,7 +25,7 @@ export const NumberInput: Component<InputRootProps> = (props) => {
   const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
 
   const handleChange = (v: string) => {
-    debouncedSave()?.(Number(v));
+    debouncedSave()?.(Number(v.replace(/,/g, '')));
   };
 
   const inputClasses = `input outline-none text-right my-0 ${local.inputProps?.class ?? ""}`;
