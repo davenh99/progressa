@@ -1,17 +1,17 @@
 import { Component, createEffect, Show } from "solid-js";
+import { createStore } from "solid-js/store";
 import ArrowLeft from "lucide-solid/icons/arrow-left";
+import { useNavigate, useSearchParams } from "@solidjs/router";
+import { ClientResponseError } from "pocketbase";
 
 import Container from "../views/app/Container";
 import Header from "../views/app/Header";
 import { Button, DataTextArea, Input } from "../components";
 import RoutineList from "../views/routines/RoutineList";
 import RoutineExerciseList from "../views/routines/RoutineExerciseList";
-import { useSearchParams } from "@solidjs/router";
 import { Routine, RoutineCreateData } from "../../Types";
-import { createStore } from "solid-js/store";
 import { useAuthPB } from "../config/pocketbase";
-import { ROUTINE_EXPAND } from "../config/constants";
-import { ClientResponseError } from "pocketbase";
+import { ROUTINE_EXPAND } from "../../constants";
 
 type SearchParams = {
   routineId: string;
@@ -21,6 +21,7 @@ const Routines: Component = () => {
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
   const [routine, setRoutine] = createStore<{ routine: Routine | null }>({ routine: null });
   const { pb, user, updateRecord, getRoutineByID } = useAuthPB();
+  const navigate = useNavigate();
 
   const createRoutine = async () => {
     const createData: RoutineCreateData = {
@@ -79,7 +80,7 @@ const Routines: Component = () => {
             when={routine.routine != null && !!searchParams.routineId}
             fallback={<h1 class="text-xl font-bold">Your Routines</h1>}
           >
-            <Button variant="text" onClick={() => setSearchParams({ routineId: "" })}>
+            <Button variant="text" onClick={() => navigate(-1)}>
               <ArrowLeft />
             </Button>
             <h1 class="text-xl font-bold">{routine.routine?.name}</h1>

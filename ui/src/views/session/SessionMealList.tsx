@@ -9,7 +9,7 @@ import { SessionMeal, Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, Input, NumberInput, IconButton } from "../../components";
 import CopyMealModal from "../meals/CopyMealModal";
-import { SESSION_MEAL_EXPAND } from "../../config/constants";
+import { SESSION_MEAL_EXPAND } from "../../../constants";
 import { extractMealData } from "../../methods/sessionMeal";
 import { DraggableRow } from "./SessionMealDraggableRow";
 import MealMoreModal from "../meals/MealMoreModal";

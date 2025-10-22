@@ -11,7 +11,7 @@ import { Button, DataSelect, IconButton, DataTime, NumberInput, RPESelect } from
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
-import { SESSION_EXERCISE_EXPAND } from "../../config/constants";
+import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import SessionExerciseMoreModal from "./SessionExerciseMoreModal";
 import RoutineSelectModal from "../routines/RoutineSelectModal";
 
@@ -95,20 +95,6 @@ export const SessionExerciseList: Component<Props> = (props) => {
     ).catch(console.error);
   };
 
-  const buildCreateData = (row: SessionExercise, supersetParent?: string) => ({
-    user: user.id,
-    exercise: row.exercise,
-    session: row.session,
-    variation: row.variation,
-    perceivedEffort: row.perceivedEffort,
-    addedWeight: row.addedWeight,
-    restAfter: row.restAfter,
-    isWarmup: row.isWarmup,
-    measurementNumeric: row.measurementNumeric,
-    measurementValue: row.measurementValue,
-    ...(supersetParent ? { supersetParent } : {}),
-  });
-
   const insertRowsAndSync = async (index: number, records: SessionExercise[]) => {
     const newRows = [...props.sessionExercises];
     newRows.splice(index, 0, ...records);
@@ -123,41 +109,6 @@ export const SessionExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addRowsAtIndex = async (
-    index: number,
-    duplicateInds?: number[],
-    createData?: SessionExerciseCreateData
-  ) => {
-    if (createData) {
-      const record = await pb.collection<SessionExercise>("sessionExercises").create(createData, {
-        expand: SESSION_EXERCISE_EXPAND,
-      });
-
-      await insertRowsAndSync(index + 1, [record]);
-    } else if (duplicateInds?.length) {
-      pb.autoCancellation(false);
-
-      const parentRecord = await pb
-        .collection<SessionExercise>("sessionExercises")
-        .create(buildCreateData(props.sessionExercises[duplicateInds[0]]), {
-          expand: SESSION_EXERCISE_EXPAND,
-        });
-
-      const childPromises = duplicateInds.slice(1).map((ind) =>
-        pb
-          .collection<SessionExercise>("sessionExercises")
-          .create(buildCreateData(props.sessionExercises[ind], parentRecord.id), {
-            expand: SESSION_EXERCISE_EXPAND,
-          })
-      );
-
-      const allRecords = [parentRecord, ...(await Promise.all(childPromises))];
-      pb.autoCancellation(true);
-
-      await insertRowsAndSync(index + duplicateInds.length, allRecords);
-    }
-  };
-
   const addSessionExercise = async (exerciseID: string, variationID?: string) => {
     const data: SessionExerciseCreateData = {
       user: user.id,
@@ -167,16 +118,60 @@ export const SessionExerciseList: Component<Props> = (props) => {
       perceivedEffort: 0,
     };
 
-    addRowsAtIndex(props.sessionExercises.length, undefined, data);
+    const record = await pb.collection<SessionExercise>("sessionExercises").create(data, {
+      expand: SESSION_EXERCISE_EXPAND,
+    });
+
+    await insertRowsAndSync(props.sessionExercises.length + 1, [record]);
     setShowCreateSessionExercise(false);
   };
 
-  const addRoutine = async (routine: Routine) => {
-    const data = {};
+  const addDropset = async (index: number) => {
+    const data = getDropsetAddData(props.sessionExercises[index]);
 
-    // addRowsAtIndex(props.sessionExercises.length, undefined);
-    console.error("routine not added, not implemented");
-    setShowAddRoutine(false);
+    const record = await pb.collection<SessionExercise>("sessionExercises").create(data, {
+      expand: SESSION_EXERCISE_EXPAND,
+    });
+
+    await insertRowsAndSync(index + 1, [record]);
+    setShowCreateSessionExercise(false);
+  };
+
+  const duplicateRow = async (index: number) => {
+    try {
+      const newSession = await pb.send<Session>(`/session/duplicateRow`, {
+        method: "POST",
+        headers: {
+          Accept: "text/plain",
+        },
+        body: {
+          recordId: props.sessionExercises[index].id,
+          rowIndex: index,
+        },
+      });
+      props.setSession({ session: newSession });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const importFromRoutine = async (routine: Routine, index: number) => {
+    try {
+      const newSession = await pb.send<Session>(`/session/importRoutine`, {
+        method: "POST",
+        headers: {
+          Accept: "text/plain",
+        },
+        body: {
+          importRoutineId: routine.id,
+          insertRecordId: props.sessionID,
+          insertIndex: index,
+        },
+      });
+      props.setSession({ session: newSession });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const columns = createMemo<ColumnDef<SessionExercise>[]>(() => [
@@ -415,7 +410,10 @@ export const SessionExerciseList: Component<Props> = (props) => {
         />
       </Show>
       <Show when={showAddRoutine()}>
-        <RoutineSelectModal setModalVisible={setShowAddRoutine} addRoutine={addRoutine} />
+        <RoutineSelectModal
+          setModalVisible={setShowAddRoutine}
+          addRoutine={(r) => importFromRoutine(r, props.sessionExercises.length)}
+        />
       </Show>
       <Show
         when={
@@ -432,19 +430,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
           deleteRow={async () =>
             await deleteRows(getSupersetInds(selectedExerciseInd(), props.sessionExercises))
           }
-          duplicateRow={async () =>
-            await addRowsAtIndex(
-              selectedExerciseInd(),
-              getSupersetInds(selectedExerciseInd(), props.sessionExercises)
-            )
-          }
-          addDropSet={async () =>
-            await addRowsAtIndex(
-              selectedExerciseInd(),
-              undefined,
-              getDropsetAddData(props.sessionExercises[selectedExerciseInd()])
-            )
-          }
+          duplicateRow={async () => await duplicateRow(selectedExerciseInd())}
+          addDropSet={async () => await addDropset(selectedExerciseInd())}
         />
       </Show>
     </div>

@@ -9,7 +9,7 @@ import { Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Ty
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { Button, DataSelect, DataTime, IconButton, NumberInput } from "../../components";
-import { SESSION_EXERCISE_EXPAND } from "../../config/constants";
+import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import { getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
 import RoutineSelectModal from "./RoutineSelectModal";
@@ -110,19 +110,6 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     ).catch(console.error);
   };
 
-  const buildCreateData = (row: RoutineExercise, supersetParent?: string) => ({
-    user: user.id,
-    exercise: row.exercise,
-    routine: row.routine,
-    variation: row.variation,
-    addedWeight: row.addedWeight,
-    restAfter: row.restAfter,
-    isWarmup: row.isWarmup,
-    measurementNumeric: row.measurementNumeric,
-    measurementValue: row.measurementValue,
-    ...(supersetParent ? { supersetParent } : {}),
-  });
-
   const insertRowsAndSync = async (index: number, records: RoutineExercise[]) => {
     const newRows = [...props.routineExercises];
     newRows.splice(index, 0, ...records);
@@ -137,58 +124,66 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addRowsAtIndex = async (
-    index: number,
-    duplicateInds?: number[],
-    createData?: RoutineExerciseCreateData
-  ) => {
-    if (createData) {
-      const record = await pb.collection<RoutineExercise>("routineExercises").create(createData, {
-        expand: SESSION_EXERCISE_EXPAND,
-      });
-
-      await insertRowsAndSync(index + 1, [record]);
-    } else if (duplicateInds?.length) {
-      pb.autoCancellation(false);
-
-      const parentRecord = await pb
-        .collection<RoutineExercise>("routineExercises")
-        .create(buildCreateData(props.routineExercises[duplicateInds[0]]), {
-          expand: SESSION_EXERCISE_EXPAND,
-        });
-
-      const childPromises = duplicateInds.slice(1).map((ind) =>
-        pb
-          .collection<RoutineExercise>("routineExercises")
-          .create(buildCreateData(props.routineExercises[ind], parentRecord.id), {
-            expand: SESSION_EXERCISE_EXPAND,
-          })
-      );
-
-      const allRecords = [parentRecord, ...(await Promise.all(childPromises))];
-      pb.autoCancellation(true);
-
-      await insertRowsAndSync(index + duplicateInds.length, allRecords);
-    }
-  };
-
   const addRoutineExercise = async (exerciseID: string, variationID?: string) => {
     const data: RoutineExerciseCreateData = {
       routine: props.routineId,
       variation: variationID || undefined,
       exercise: exerciseID,
     };
+    const record = await pb.collection<RoutineExercise>("routineExercises").create(data, {
+      expand: SESSION_EXERCISE_EXPAND,
+    });
 
-    addRowsAtIndex(props.routineExercises.length, undefined, data);
+    await insertRowsAndSync(props.routineExercises.length + 1, [record]);
     setShowCreateRoutineExercise(false);
   };
 
-  const addRoutine = async (routine: Routine) => {
-    const data = {};
+  const addDropset = async (index: number) => {
+    const data = getDropsetAddData(props.routineExercises[index]);
 
-    // addRowsAtIndex(props.sessionExercises.length, undefined);
-    console.error("routine not added, not implemented");
-    setShowAddRoutine(false);
+    const record = await pb.collection<RoutineExercise>("routineExercises").create(data, {
+      expand: SESSION_EXERCISE_EXPAND,
+    });
+
+    await insertRowsAndSync(index + 1, [record]);
+    setShowCreateRoutineExercise(false);
+  };
+
+  const duplicateRow = async (index: number) => {
+    try {
+      const newRoutine = await pb.send<Routine>(`/routine/duplicateRow`, {
+        method: "POST",
+        headers: {
+          Accept: "text/plain",
+        },
+        body: {
+          recordId: props.routineExercises[index].id,
+          rowIndex: index,
+        },
+      });
+      props.setRoutine({ routine: newRoutine });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const importFromRoutine = async (routine: Routine, index: number) => {
+    try {
+      const newRoutine = await pb.send<Routine>(`/routine/importRoutine`, {
+        method: "POST",
+        headers: {
+          Accept: "text/plain",
+        },
+        body: {
+          importRoutineId: routine.id,
+          insertRecordId: props.routineId,
+          insertIndex: index,
+        },
+      });
+      props.setRoutine({ routine: newRoutine });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const columns = createMemo<ColumnDef<RoutineExercise>[]>(() => [
@@ -408,7 +403,10 @@ export const RoutineExerciseList: Component<Props> = (props) => {
         />
       </Show>
       <Show when={showAddRoutine()}>
-        <RoutineSelectModal setModalVisible={setShowAddRoutine} addRoutine={addRoutine} />
+        <RoutineSelectModal
+          setModalVisible={setShowAddRoutine}
+          addRoutine={(r) => importFromRoutine(r, props.routineExercises.length)}
+        />
       </Show>
       <Show
         when={
@@ -425,19 +423,8 @@ export const RoutineExerciseList: Component<Props> = (props) => {
           deleteRow={async () =>
             await deleteRows(getSupersetInds(selectedExerciseInd(), props.routineExercises))
           }
-          duplicateRow={async () =>
-            await addRowsAtIndex(
-              selectedExerciseInd(),
-              getSupersetInds(selectedExerciseInd(), props.routineExercises)
-            )
-          }
-          addDropSet={async () =>
-            await addRowsAtIndex(
-              selectedExerciseInd(),
-              undefined,
-              getDropsetAddData(props.routineExercises[selectedExerciseInd()])
-            )
-          }
+          duplicateRow={async () => await duplicateRow(selectedExerciseInd())}
+          addDropSet={async () => await addDropset(selectedExerciseInd())}
         />
       </Show>
     </div>

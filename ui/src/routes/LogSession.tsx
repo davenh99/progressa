@@ -13,7 +13,7 @@ import { ClientResponseError } from "pocketbase";
 import Header from "../views/app/Header";
 import { NumberInput } from "../components/NumberInput";
 import Card from "../views/app/Card";
-import { SESSION_EXPAND } from "../config/constants";
+import { SESSION_EXPAND } from "../../constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
 import { SessionMealList } from "../views/session/SessionMealList";
 

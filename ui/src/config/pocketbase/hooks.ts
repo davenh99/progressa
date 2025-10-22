@@ -2,7 +2,7 @@ import { useContext } from "solid-js";
 import { PBContext } from "./context";
 import { Routine, Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
-import { ROUTINE_EXPAND, SESSION_EXPAND } from "../constants";
+import { ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
 import { sortSessionExercises } from "../../methods/sessionExercise";
 import { sortMeals } from "../../methods/sessionMeal";
 

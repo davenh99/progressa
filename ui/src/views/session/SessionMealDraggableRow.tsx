@@ -12,7 +12,7 @@ import { flexRender, type Row } from "@tanstack/solid-table";
 
 import { DraggingState, SessionMeal, Session } from "../../../Types";
 import { SetStoreFunction } from "solid-js/store";
-import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
+import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../../constants";
 
 interface DraggableRowProps {
   row: Row<SessionMeal>;

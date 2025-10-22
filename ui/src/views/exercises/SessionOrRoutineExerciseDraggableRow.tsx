@@ -11,7 +11,7 @@ import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 
 import { DraggingState, RoutineExercise, SessionExercise } from "../../../Types";
-import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../config/constants";
+import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../../constants";
 import { JSX } from "solid-js";
 
 interface DraggableRowProps {
@@ -237,7 +237,9 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           <div class="flex w-full text-center">
             <For each={props.row.getVisibleCells()}>
               {(cell) => {
-                const classes = `py-1 ${cell.column.id === "more" ? "flex-1" : "flex-2"}`;
+                const classes = `py-1 flex flex-col items-center ${
+                  cell.column.id === "more" ? "flex-1" : "flex-2"
+                }`;
 
                 return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
               }}
