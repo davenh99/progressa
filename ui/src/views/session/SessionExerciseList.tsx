@@ -28,7 +28,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   const [showAddRoutine, setShowAddRoutine] = createSignal(false);
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
-  const { pb, user, updateRecord } = useAuthPB();
+  const { pb, user, updateRecord, sessionToSortedExercisesAndMeals } = useAuthPB();
 
   const setNumbers = createMemo(() => {
     const setNumbers = [];
@@ -142,17 +142,19 @@ export const SessionExerciseList: Component<Props> = (props) => {
       const newSession = await pb.send<Session>(`/session/duplicateRow`, {
         method: "POST",
         headers: {
-          Accept: "text/plain",
+          Accept: "application/json",
         },
         body: {
           recordId: props.sessionExercises[index].id,
           rowIndex: index,
         },
       });
-      props.setSession({ session: newSession });
+      props.setSession({ session: sessionToSortedExercisesAndMeals(newSession) });
     } catch (e) {
       console.error(e);
     }
+
+    setShowMoreExercise(false);
   };
 
   const importFromRoutine = async (routine: Routine, index: number) => {
@@ -160,7 +162,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       const newSession = await pb.send<Session>(`/session/importRoutine`, {
         method: "POST",
         headers: {
-          Accept: "text/plain",
+          Accept: "application/json",
         },
         body: {
           importRoutineId: routine.id,
@@ -168,10 +170,12 @@ export const SessionExerciseList: Component<Props> = (props) => {
           insertIndex: index,
         },
       });
-      props.setSession({ session: newSession });
+      props.setSession({ session: sessionToSortedExercisesAndMeals(newSession) });
     } catch (e) {
       console.error(e);
     }
+
+    setShowAddRoutine(false);
   };
 
   const columns = createMemo<ColumnDef<SessionExercise>[]>(() => [

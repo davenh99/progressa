@@ -4,6 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"log"
+	"progressa/core/routes"
 	"progressa/utils"
 
 	"github.com/pocketbase/pocketbase"
@@ -37,6 +38,13 @@ func main() {
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
 		TemplateLang: migratecmd.TemplateLangJS,
 		Automigrate:  env == "development",
+	})
+
+	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
+		routesHandler := routes.NewHandler(app)
+		routesHandler.RegisterRoutes(se)
+
+		return se.Next()
 	})
 
 	app.OnServe().Bind(&hook.Handler[*core.ServeEvent]{

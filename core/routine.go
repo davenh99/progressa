@@ -8,7 +8,6 @@ import (
 )
 
 var ROUTINE_EXPANDS = []string{
-	"tags",
 	"routineExercises_via_routine.exercise.defaultMeasurementType.measurementValues_via_measurementType",
 	"routineExercises_via_routine.exercise.defaultMeasurementType2.measurementValues_via_measurementType",
 	"routineExercises_via_routine.exercise.defaultMeasurementType3.measurementValues_via_measurementType",

@@ -158,5 +158,15 @@ export function useAuthPB() {
     }
   };
 
-  return { pb, user, logout, getSessions, updateRecord, getSessionByDate, getSessionByID, getRoutineByID };
+  return {
+    pb,
+    user,
+    logout,
+    getSessions,
+    updateRecord,
+    getSessionByDate,
+    getSessionByID,
+    getRoutineByID,
+    sessionToSortedExercisesAndMeals,
+  };
 }

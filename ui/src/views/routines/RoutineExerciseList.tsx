@@ -29,7 +29,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
   const [showAddRoutine, setShowAddRoutine] = createSignal(false);
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
-  const { pb, user, updateRecord } = useAuthPB();
+  const { pb, updateRecord } = useAuthPB();
 
   const setNumbers = createMemo(() => {
     const setNumbers = [];
@@ -47,20 +47,6 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     return setNumbers;
   });
 
-  const getSupersetParent = (index: number, data: RoutineExercise[]): RoutineExercise => {
-    if (!data[index].supersetParent) {
-      return data[index];
-    } else {
-      for (const row of data.slice(0, index + 1).reverse()) {
-        if (row.id === data[index].supersetParent) {
-          return row;
-        }
-      }
-    }
-    // we'll return this is we can't find a parent, although this would mean there's a big problem...
-    return data[index];
-  };
-
   const saveRow = async (recordID: string, field: string, newVal: any) => {
     try {
       await updateRecord("routineExercises", recordID, field, newVal);
@@ -74,7 +60,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
 
     try {
       const delPromises = indices.map((index) =>
-        pb.collection("sessionExercises").delete(props.routineExercises[index].id)
+        pb.collection("routineExercises").delete(props.routineExercises[index].id)
       );
       await Promise.all(delPromises);
       await updateRecord(
@@ -103,7 +89,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
 
     // send the updated list to 'exercisesOrder'
     updateRecord(
-      "sessions",
+      "routines",
       props.routineId,
       "exercisesOrder",
       newRows.map((r) => r.id)
@@ -117,7 +103,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     props.setRoutine("routine", "expand", "routineExercises_via_routine", newRows);
 
     await updateRecord(
-      "sessions",
+      "routines",
       props.routineId,
       "exercisesOrder",
       newRows.map((r) => r.id)
@@ -154,7 +140,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       const newRoutine = await pb.send<Routine>(`/routine/duplicateRow`, {
         method: "POST",
         headers: {
-          Accept: "text/plain",
+          Accept: "application/json",
         },
         body: {
           recordId: props.routineExercises[index].id,
@@ -165,6 +151,8 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     } catch (e) {
       console.error(e);
     }
+
+    setShowMoreExercise(false);
   };
 
   const importFromRoutine = async (routine: Routine, index: number) => {
@@ -172,7 +160,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       const newRoutine = await pb.send<Routine>(`/routine/importRoutine`, {
         method: "POST",
         headers: {
-          Accept: "text/plain",
+          Accept: "application/json",
         },
         body: {
           importRoutineId: routine.id,
@@ -184,6 +172,8 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     } catch (e) {
       console.error(e);
     }
+
+    setShowAddRoutine(false);
   };
 
   const columns = createMemo<ColumnDef<RoutineExercise>[]>(() => [

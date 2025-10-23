@@ -20,7 +20,7 @@ var SESSION_EXPANDS = []string{
 	"sessionMeals_via_session.tags",
 }
 
-func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload) (*core.Record, error) {
+func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload, userId string) (*core.Record, error) {
 	routineExercises, err := app.FindRecordsByFilter(
 		"routineExercises",
 		"routine = {:routineId}",
@@ -49,7 +49,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload)
 	for _, re := range routineExercises {
 		record := core.NewRecord(sessionExercisesCollection)
 
-		copyRoutineExerciseToSessionExercise(record, re, payload.InsertRecordId)
+		copyRoutineExerciseToSessionExercise(record, re, payload.InsertRecordId, userId)
 
 		newRecords = append(newRecords, record)
 	}
@@ -95,7 +95,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload)
 	return session, nil
 }
 
-func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload) (*core.Record, error) {
+func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId string) (*core.Record, error) {
 	parentSessionExercise, err := app.FindRecordById("sessionExercises", payload.RecordId)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload) (*core.R
 		}
 
 		newParentRecord := core.NewRecord(collection)
-		duplicateSessionExercise(newParentRecord, parentSessionExercise, nil)
+		duplicateSessionExercise(newParentRecord, parentSessionExercise, nil, userId)
 
 		if err := txApp.Save(newParentRecord); err != nil {
 			return err
@@ -127,7 +127,7 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload) (*core.R
 
 		for _, childRecord := range childSessionExercises {
 			newChildRecord := core.NewRecord(collection)
-			duplicateSessionExercise(newChildRecord, childRecord, &newParentRecord.Id)
+			duplicateSessionExercise(newChildRecord, childRecord, &newParentRecord.Id, userId)
 
 			if err := txApp.Save(newChildRecord); err != nil {
 				return err
@@ -199,9 +199,9 @@ func updateSessionExercisesOrder(app core.App, sessionId string, insertIndex int
 	return app.Save(sessionRecord)
 }
 
-func copyRoutineExerciseToSessionExercise(dst *core.Record, src *core.Record, sessionId string) {
+func copyRoutineExerciseToSessionExercise(dst *core.Record, src *core.Record, sessionId string, userId string) {
 	dst.Set("exercise", src.Get("exercise"))
-	dst.Set("user", src.Get("user"))
+	dst.Set("user", userId)
 	dst.Set("session", sessionId)
 	dst.Set("variation", src.Get("variation"))
 	dst.Set("notes", src.Get("notes"))
@@ -218,8 +218,8 @@ func copyRoutineExerciseToSessionExercise(dst *core.Record, src *core.Record, se
 	dst.Set("perceivedEffort", src.Get("perceivedEffort"))
 }
 
-func duplicateSessionExercise(dst *core.Record, src *core.Record, parentId *string) {
-	dst.Set("user", src.Get("user"))
+func duplicateSessionExercise(dst *core.Record, src *core.Record, parentId *string, userId string) {
+	dst.Set("user", userId)
 	dst.Set("exercise", src.Get("exercise"))
 	dst.Set("session", src.Get("session"))
 	dst.Set("variation", src.Get("variation"))

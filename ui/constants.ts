@@ -11,7 +11,6 @@ export const SESSION_EXPAND =
   "sessionMeals_via_session.tags";
 
 export const ROUTINE_EXPAND =
-  "tags, " +
   "routineExercises_via_routine.exercise.defaultMeasurementType.measurementValues_via_measurementType, " +
   "routineExercises_via_routine.exercise.defaultMeasurementType2.measurementValues_via_measurementType, " +
   "routineExercises_via_routine.exercise.defaultMeasurementType3.measurementValues_via_measurementType, " +
