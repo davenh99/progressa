@@ -3,7 +3,7 @@ import { PBContext } from "./context";
 import { Routine, Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
 import { ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
-import { sortSessionExercises } from "../../methods/sessionExercise";
+import { sortSessionOrRoutineExercises } from "../../methods/sessionExercise";
 import { sortMeals } from "../../methods/sessionMeal";
 
 const BaseSignUpData = {
@@ -97,10 +97,21 @@ export function useAuthPB() {
     }
   };
 
+  const routineToSortedExercises = (routine: Routine) => {
+    const newRoutine = { ...routine };
+    if (newRoutine.expand?.routineExercises_via_routine) {
+      newRoutine.expand.routineExercises_via_routine = sortSessionOrRoutineExercises(
+        newRoutine.expand.routineExercises_via_routine ?? [],
+        newRoutine.exercisesOrder ?? []
+      );
+    }
+    return newRoutine;
+  };
+
   const sessionToSortedExercisesAndMeals = (session: Session) => {
     const newSession = { ...session };
     if (newSession.expand?.sessionExercises_via_session) {
-      newSession.expand.sessionExercises_via_session = sortSessionExercises(
+      newSession.expand.sessionExercises_via_session = sortSessionOrRoutineExercises(
         newSession.expand.sessionExercises_via_session ?? [],
         newSession.exercisesOrder ?? []
       );
@@ -148,7 +159,9 @@ export function useAuthPB() {
 
   const getRoutineByID = async (id: string): Promise<Routine | null> => {
     try {
-      return await pb.collection<Routine>("routines").getOne(id, { expand: ROUTINE_EXPAND });
+      return routineToSortedExercises(
+        await pb.collection<Routine>("routines").getOne(id, { expand: ROUTINE_EXPAND })
+      );
     } catch (e) {
       if (e instanceof ClientResponseError && e.status === 404) {
         return null;
@@ -168,5 +181,6 @@ export function useAuthPB() {
     getSessionByID,
     getRoutineByID,
     sessionToSortedExercisesAndMeals,
+    routineToSortedExercises,
   };
 }

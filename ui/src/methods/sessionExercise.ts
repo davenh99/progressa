@@ -58,7 +58,10 @@ export const getDropsetAddData = (sessionExercise: SessionExercise) => {
   };
 };
 
-export const sortSessionExercises = (sessionExercises: SessionExercise[], order: string[]) => {
+export const sortSessionOrRoutineExercises = <T extends SessionExercise | RoutineExercise>(
+  sessionExercises: T[],
+  order: string[]
+): T[] => {
   const itemsMap = new Map(sessionExercises.map((item) => [item.id, item]));
 
   const orderedItems = order.map((id) => itemsMap.get(id)).filter((item) => item !== undefined);

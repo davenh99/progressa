@@ -29,7 +29,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
   const [showAddRoutine, setShowAddRoutine] = createSignal(false);
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
-  const { pb, updateRecord } = useAuthPB();
+  const { pb, updateRecord, routineToSortedExercises } = useAuthPB();
 
   const setNumbers = createMemo(() => {
     const setNumbers = [];
@@ -147,7 +147,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
           rowIndex: index,
         },
       });
-      props.setRoutine({ routine: newRoutine });
+      props.setRoutine({ routine: routineToSortedExercises(newRoutine) });
     } catch (e) {
       console.error(e);
     }
@@ -168,7 +168,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
           insertIndex: index,
         },
       });
-      props.setRoutine({ routine: newRoutine });
+      props.setRoutine({ routine: routineToSortedExercises(newRoutine) });
     } catch (e) {
       console.error(e);
     }

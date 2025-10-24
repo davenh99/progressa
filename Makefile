@@ -7,6 +7,9 @@ test:
 serve: build
 	@cd dist; ./progressa serve
 
+serve-test: build
+	@cd dist; ./progressa serve --dir="./test_pb_data"
+
 build-ui:
 	@cd ui && npm run build
 
