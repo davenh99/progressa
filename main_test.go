@@ -45,7 +45,7 @@ func setupTestApp(t testing.TB) *tests.TestApp {
 }
 
 func TestRoutineDuplicateRowEndpoint(t *testing.T) {
-	endpoint := "/session/importRoutine"
+	endpoint := "/routine/duplicateRow"
 	userToken, err := generateToken("users", "test@test.com")
 	if err != nil {
 		t.Fatal(err)
@@ -87,48 +87,6 @@ func TestRoutineDuplicateRowEndpoint(t *testing.T) {
 }
 
 func TestRoutineImportRoutineEndpoint(t *testing.T) {
-	endpoint := "/session/duplicateRow"
-	userToken, err := generateToken("users", "test@test.com")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	scenarios := []tests.ApiScenario{
-		{
-			Name:            "try with different http method, e.g. GET",
-			Method:          http.MethodGet,
-			URL:             endpoint,
-			ExpectedStatus:  404,
-			ExpectedContent: []string{"\"data\":{}"},
-			TestAppFactory:  setupTestApp,
-		},
-		{
-			Name:            "try as guest (aka. no Authorization header)",
-			Method:          http.MethodGet,
-			URL:             endpoint,
-			ExpectedStatus:  404,
-			ExpectedContent: []string{"\"data\":{}"},
-			TestAppFactory:  setupTestApp,
-		},
-		{
-			Name:   "try as authenticated app user",
-			Method: http.MethodPost,
-			URL:    endpoint,
-			Headers: map[string]string{
-				"Authorization": userToken,
-			},
-			ExpectedStatus:  200,
-			ExpectedContent: []string{"\"data\":{}"},
-			TestAppFactory:  setupTestApp,
-		},
-	}
-
-	for _, scenario := range scenarios {
-		scenario.Test(t)
-	}
-}
-
-func TestSessionDuplicateRowEndpoint(t *testing.T) {
 	endpoint := "/routine/importRoutine"
 	userToken, err := generateToken("users", "test@test.com")
 	if err != nil {
@@ -170,8 +128,50 @@ func TestSessionDuplicateRowEndpoint(t *testing.T) {
 	}
 }
 
-func TestSessionImportRoutineEndpoint(t *testing.T) {
+func TestSessionDuplicateRowEndpoint(t *testing.T) {
 	endpoint := "/session/duplicateRow"
+	userToken, err := generateToken("users", "test@test.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	scenarios := []tests.ApiScenario{
+		{
+			Name:            "try with different http method, e.g. GET",
+			Method:          http.MethodGet,
+			URL:             endpoint,
+			ExpectedStatus:  404,
+			ExpectedContent: []string{"\"data\":{}"},
+			TestAppFactory:  setupTestApp,
+		},
+		{
+			Name:            "try as guest (aka. no Authorization header)",
+			Method:          http.MethodGet,
+			URL:             endpoint,
+			ExpectedStatus:  404,
+			ExpectedContent: []string{"\"data\":{}"},
+			TestAppFactory:  setupTestApp,
+		},
+		{
+			Name:   "try as authenticated app user",
+			Method: http.MethodPost,
+			URL:    endpoint,
+			Headers: map[string]string{
+				"Authorization": userToken,
+			},
+			ExpectedStatus:  200,
+			ExpectedContent: []string{"\"data\":{}"},
+			TestAppFactory:  setupTestApp,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		scenario.Test(t)
+	}
+}
+
+func TestSessionImportRoutineEndpoint(t *testing.T) {
+	endpoint := "/session/importRoutine"
 	userToken, err := generateToken("users", "test@test.com")
 	if err != nil {
 		t.Fatal(err)
