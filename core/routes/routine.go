@@ -17,9 +17,9 @@ func (h *RoutesHandler) importRoutineIntoRoutine(e *core.RequestEvent) error {
 		return e.BadRequestError("bad payload", err)
 	}
 
-	expandedRoutine, err := c.ImportRoutineIntoRoutine(h.app, &payload)
+	expandedRoutine, err, msg := c.ImportRoutineIntoRoutine(h.app, &payload)
 	if err != nil {
-		return e.InternalServerError("", err)
+		return e.InternalServerError(msg, err)
 	}
 
 	return e.JSON(http.StatusOK, expandedRoutine)
@@ -33,9 +33,9 @@ func (h *RoutesHandler) duplicateRoutineRow(e *core.RequestEvent) error {
 		return e.BadRequestError("bad payload", err)
 	}
 
-	expandedRoutine, err := c.DuplicateRoutineRow(h.app, &payload)
+	expandedRoutine, err, msg := c.DuplicateRoutineRow(h.app, &payload)
 	if err != nil {
-		return e.InternalServerError("", err)
+		return e.InternalServerError(msg, err)
 	}
 
 	return e.JSON(http.StatusOK, expandedRoutine)

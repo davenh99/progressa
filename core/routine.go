@@ -18,7 +18,7 @@ var ROUTINE_EXPANDS = []string{
 	"routineExercises_via_routine.tags",
 }
 
-func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload) (*core.Record, error) {
+func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload) (*core.Record, error, string) {
 	routineExercises, err := app.FindRecordsByFilter(
 		"routineExercises",
 		"routine = {:routineId}",
@@ -28,7 +28,7 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 		dbx.Params{"routineId": payload.ImportRoutineId},
 	)
 	if err != nil {
-		return nil, err
+		return nil, err, "couldn't find matching routine"
 	}
 
 	// map ids to inds for easier lookup later
@@ -41,13 +41,13 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 
 	routineExercisesCollection, err := app.FindCollectionByNameOrId("routineExercises")
 	if err != nil {
-		return nil, err
+		return nil, err, "couldn't find routineExercises collection"
 	}
 
 	for _, re := range routineExercises {
 		record := core.NewRecord(routineExercisesCollection)
 
-		copyRoutineExercise(record, re, payload.InsertRecordId)
+		copyRoutineExercise(record, re, payload.SessionOrRoutineId)
 
 		newRecords = append(newRecords, record)
 	}
@@ -73,30 +73,30 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 			newIds[i] = rec.Id
 		}
 
-		if err := updateRoutineExercisesOrder(txApp, payload.InsertRecordId, payload.InsertIndex, newIds); err != nil {
+		if err := updateRoutineExercisesOrder(txApp, payload.SessionOrRoutineId, payload.InsertIndex, newIds); err != nil {
 			return err
 		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, err, "problem saving new records"
 	}
 
-	routine, err := app.FindRecordById("routine", payload.InsertRecordId)
+	routine, err := app.FindRecordById("routines", payload.SessionOrRoutineId)
 	if err != nil {
-		return nil, err
+		return nil, err, "couldn't find new routine"
 	}
 
 	app.ExpandRecord(routine, ROUTINE_EXPANDS, nil)
 
-	return routine, nil
+	return routine, nil, ""
 }
 
-func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.Record, error) {
-	parentRoutineExercise, err := app.FindRecordById("routineExercises", payload.RecordId)
+func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.Record, error, string) {
+	parentRoutineExercise, err := app.FindRecordById("routineExercises", payload.ExerciseRowId)
 	if err != nil {
-		return nil, err
+		return nil, err, "couldn't find parentRoutineExercise"
 	}
 	childRoutineExercises, err := app.FindRecordsByFilter(
 		"routineExercises",
@@ -104,10 +104,10 @@ func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.R
 		"",
 		9999,
 		0,
-		dbx.Params{"recordId": payload.RecordId},
+		dbx.Params{"recordId": payload.ExerciseRowId},
 	)
 	if err != nil {
-		return nil, err
+		return nil, err, "problem finding child records"
 	}
 
 	err = app.RunInTransaction(func(txApp core.App) error {
@@ -145,17 +145,17 @@ func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.R
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, err, "problem copying records"
 	}
 
-	routine, err := app.FindRecordById("routines", payload.RecordId)
+	routine, err := app.FindRecordById("routines", parentRoutineExercise.GetString("routine"))
 	if err != nil {
-		return nil, err
+		return nil, err, "couldn't find new record"
 	}
 
 	app.ExpandRecord(routine, ROUTINE_EXPANDS, nil)
 
-	return routine, nil
+	return routine, nil, ""
 }
 
 func updateRoutineExercisesOrder(app core.App, routineId string, insertIndex int, newIds []string) error {

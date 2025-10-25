@@ -49,7 +49,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 	for _, re := range routineExercises {
 		record := core.NewRecord(sessionExercisesCollection)
 
-		copyRoutineExerciseToSessionExercise(record, re, payload.InsertRecordId, userId)
+		copyRoutineExerciseToSessionExercise(record, re, payload.SessionOrRoutineId, userId)
 
 		newRecords = append(newRecords, record)
 	}
@@ -75,7 +75,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 			newIds[i] = rec.Id
 		}
 
-		if err := updateSessionExercisesOrder(txApp, payload.InsertRecordId, payload.InsertIndex, newIds); err != nil {
+		if err := updateSessionExercisesOrder(txApp, payload.SessionOrRoutineId, payload.InsertIndex, newIds); err != nil {
 			return err
 		}
 
@@ -85,7 +85,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 		return nil, err
 	}
 
-	session, err := app.FindRecordById("sessions", payload.InsertRecordId)
+	session, err := app.FindRecordById("sessions", payload.SessionOrRoutineId)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 }
 
 func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId string) (*core.Record, error) {
-	parentSessionExercise, err := app.FindRecordById("sessionExercises", payload.RecordId)
+	parentSessionExercise, err := app.FindRecordById("sessionExercises", payload.ExerciseRowId)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId s
 		"",
 		9999,
 		0,
-		dbx.Params{"recordId": payload.RecordId},
+		dbx.Params{"recordId": payload.ExerciseRowId},
 	)
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId s
 		return nil, err
 	}
 
-	session, err := app.FindRecordById("sessions", payload.RecordId)
+	session, err := app.FindRecordById("sessions", parentSessionExercise.GetString("session"))
 	if err != nil {
 		return nil, err
 	}

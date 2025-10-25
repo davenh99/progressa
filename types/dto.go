@@ -1,12 +1,12 @@
 package types
 
 type DuplicatePayload struct {
-	RecordId string `json:"recordId"`
-	RowIndex int    `json:"rowIndex"`
+	ExerciseRowId string `json:"exerciseRowId"`
+	RowIndex      int    `json:"rowIndex"`
 }
 
 type ImportRoutinePayload struct {
-	ImportRoutineId string `json:"importRoutineId"`
-	InsertRecordId  string `json:"insertRecordId"`
-	InsertIndex     int    `json:"insertIndex"`
+	ImportRoutineId    string `json:"importRoutineId"`
+	SessionOrRoutineId string `json:"sessionOrRoutineId"`
+	InsertIndex        int    `json:"insertIndex"`
 }

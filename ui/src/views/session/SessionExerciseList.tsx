@@ -145,7 +145,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
           Accept: "application/json",
         },
         body: {
-          recordId: props.sessionExercises[index].id,
+          exerciseRowId: props.sessionExercises[index].id,
           rowIndex: index,
         },
       });
@@ -166,7 +166,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
         },
         body: {
           importRoutineId: routine.id,
-          insertRecordId: props.sessionID,
+          sessionOrRoutineId: props.sessionID,
           insertIndex: index,
         },
       });
