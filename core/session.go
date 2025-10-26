@@ -1,6 +1,8 @@
 package core
 
 import (
+	"encoding/json"
+	"fmt"
 	"progressa/types"
 
 	"github.com/pocketbase/dbx"
@@ -168,17 +170,9 @@ func updateSessionExercisesOrder(app core.App, sessionId string, insertIndex int
 
 	// Parse existing exercisesOrder
 	var exercisesOrder []string
-	if raw := sessionRecord.Get("exercisesOrder"); raw != nil {
-		switch v := raw.(type) {
-		case []any:
-			for _, id := range v {
-				if s, ok := id.(string); ok {
-					exercisesOrder = append(exercisesOrder, s)
-				}
-			}
-		case []string:
-			exercisesOrder = v
-		}
+	raw := sessionRecord.GetString("exercisesOrder")
+	if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
+		fmt.Println("couldn't unmarshal exercisesOrder string:", err)
 	}
 
 	// Clamp index

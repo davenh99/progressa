@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"progressa/core/routes"
@@ -10,32 +11,39 @@ import (
 
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tests"
+	"github.com/stretchr/testify/assert"
 )
 
 const testDataDir = "./dist/test_pb_data"
 
+type MockSessionOrRoutineExercise struct {
+	Id             string `json:"id"`
+	Exercise       string `json:"exercise"`
+	SupersetParent string `json:"supersetParent"`
+}
+
 type MockSessionExpand struct {
-	SessionExercises_via_session []string `json:"sessionExercises_via_session"`
+	SessionExercises_via_session []MockSessionOrRoutineExercise `json:"sessionExercises_via_session"`
 }
 
 type MockRoutineExpand struct {
-	RoutineExercises_via_routine []string `json:"routineExercises_via_routine"`
+	RoutineExercises_via_routine []MockSessionOrRoutineExercise `json:"routineExercises_via_routine"`
 }
 
 type MockSessionResponse struct {
-	ExercisesOrder string            `json:"exercisesOrder"`
+	ExercisesOrder []string          `json:"exercisesOrder"`
 	Expand         MockSessionExpand `json:"expand"`
 }
 
 type MockRoutineResponse struct {
-	ExercisesOrder string            `json:"exercisesOrder"`
+	ExercisesOrder []string          `json:"exercisesOrder"`
 	Expand         MockRoutineExpand `json:"expand"`
 }
 
 func generateToken(collectionNameOrId string, email string) (string, error) {
 	app, err := tests.NewTestApp(testDataDir)
 	if err != nil {
-		return "", err
+		return "", err // t.Log(string(b))
 	}
 	defer app.Cleanup()
 
@@ -97,23 +105,130 @@ func createTestImportRoutineBody(importRoutineId string, insertRecordId string, 
 }
 
 func verfiySessionResponse(t testing.TB, res *http.Response, expected MockSessionResponse) {
-	// b, err := io.ReadAll(res.Body)
-	// defer res.Body.Close()
-	// if err != nil {
-	// 	t.Error("Error reading request body")
-	// 	return
-	// }
-	// t.Log(string(b))
+	defer res.Body.Close()
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Error("Error reading request body")
+		return
+	}
+
+	var body MockSessionResponse
+	if err := json.Unmarshal(b, &body); err != nil {
+		t.Errorf("Error unmarshalling JSON: %v", err)
+		return
+	}
+
+	if len(expected.Expand.SessionExercises_via_session) != len(body.Expand.SessionExercises_via_session) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected received exercises to have length %d, got length %d",
+			len(expected.Expand.SessionExercises_via_session),
+			len(body.Expand.SessionExercises_via_session),
+		)
+	}
+
+	if len(expected.Expand.SessionExercises_via_session) != len(body.ExercisesOrder) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected received exercisesOrder to have length %d, got length %d",
+			len(expected.Expand.SessionExercises_via_session),
+			len(body.ExercisesOrder),
+		)
+	}
+
+	receivedItemsSorted := []MockSessionOrRoutineExercise{}
+	receivedItemsIdMap := map[string]MockSessionOrRoutineExercise{}
+
+	for _, item := range body.Expand.SessionExercises_via_session {
+		receivedItemsIdMap[item.Id] = item
+	}
+	// sort the received sessionOrRoutine exercises by the received exercisesOrder
+	// then it should match the order of the expected
+	for _, id := range body.ExercisesOrder {
+		item, ok := receivedItemsIdMap[id]
+		if !ok {
+			t.Errorf("unexpected exercise id in ExercisesOrder: %s", id)
+			continue
+		}
+		receivedItemsSorted = append(receivedItemsSorted, item)
+	}
+
+	if len(expected.Expand.SessionExercises_via_session) != len(receivedItemsSorted) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected sorted items to have length %d, got length %d",
+			len(expected.Expand.SessionExercises_via_session),
+			len(receivedItemsSorted),
+		)
+	}
+
+	for i, se := range expected.Expand.SessionExercises_via_session {
+		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+	}
 }
 
 func verfiyRoutineResponse(t testing.TB, res *http.Response, expected MockRoutineResponse) {
-	// b, err := io.ReadAll(res.Body)
-	// defer res.Body.Close()
-	// if err != nil {
-	// 	t.Error("Error reading request body")
-	// 	return
-	// }
-	// t.Log(string(b))
+	defer res.Body.Close()
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Error("Error reading request body")
+		return
+	}
+
+	var body MockRoutineResponse
+	if err := json.Unmarshal(b, &body); err != nil {
+		t.Errorf("Error unmarshalling JSON: %v", err)
+		return
+	}
+
+	if len(expected.Expand.RoutineExercises_via_routine) != len(body.Expand.RoutineExercises_via_routine) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected received exercises to have length %d, got length %d",
+			len(expected.Expand.RoutineExercises_via_routine),
+			len(body.Expand.RoutineExercises_via_routine),
+		)
+	}
+
+	if len(expected.Expand.RoutineExercises_via_routine) != len(body.ExercisesOrder) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected received exercisesOrder to have length %d, got length %d",
+			len(expected.Expand.RoutineExercises_via_routine),
+			len(body.ExercisesOrder),
+		)
+	}
+
+	receivedItemsSorted := []MockSessionOrRoutineExercise{}
+	receivedItemsIdMap := map[string]MockSessionOrRoutineExercise{}
+
+	for _, item := range body.Expand.RoutineExercises_via_routine {
+		receivedItemsIdMap[item.Id] = item
+	}
+	// sort the received sessionOrRoutine exercises by the received exercisesOrder
+	// then it should match the order of the expected
+	for _, id := range body.ExercisesOrder {
+		item, ok := receivedItemsIdMap[id]
+		if !ok {
+			t.Errorf("unexpected exercise id in ExercisesOrder: %s", id)
+			continue
+		}
+		receivedItemsSorted = append(receivedItemsSorted, item)
+	}
+
+	if len(expected.Expand.RoutineExercises_via_routine) != len(receivedItemsSorted) {
+		t.Logf("Got body: %v", body)
+		t.Fatalf(
+			"expected sorted items to have length %d, got length %d",
+			len(expected.Expand.RoutineExercises_via_routine),
+			len(receivedItemsSorted),
+		)
+	}
+	for i, se := range expected.Expand.RoutineExercises_via_routine {
+		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+	}
 }
 
 func TestRoutineDuplicateRowEndpoint(t *testing.T) {
@@ -150,7 +265,15 @@ func TestRoutineDuplicateRowEndpoint(t *testing.T) {
 			ExpectedContent: []string{"collectionId"},
 			TestAppFactory:  setupTestApp,
 			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
-				expected := MockRoutineResponse{}
+				expected := MockRoutineResponse{
+					Expand: MockRoutineExpand{
+						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
+							{Exercise: "73repeater00000", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
+						},
+					},
+				}
 				verfiyRoutineResponse(t, res, expected)
 			},
 		},
@@ -195,7 +318,15 @@ func TestRoutineImportRoutineEndpoint(t *testing.T) {
 			ExpectedContent: []string{"collectionId"},
 			TestAppFactory:  setupTestApp,
 			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
-				expected := MockRoutineResponse{}
+				expected := MockRoutineResponse{
+					Expand: MockRoutineExpand{
+						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
+							{Exercise: "73repeater00000", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: ""},
+						},
+					},
+				}
 				verfiyRoutineResponse(t, res, expected)
 			},
 		},
@@ -240,7 +371,16 @@ func TestSessionDuplicateRowEndpoint(t *testing.T) {
 			ExpectedContent: []string{"collectionId"},
 			TestAppFactory:  setupTestApp,
 			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
-				expected := MockSessionResponse{}
+				expected := MockSessionResponse{
+					Expand: MockSessionExpand{
+						SessionExercises_via_session: []MockSessionOrRoutineExercise{
+							{Exercise: "70vlzfveuudrmax", SupersetParent: ""},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv"},
+							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: ""},
+						},
+					},
+				}
 				verfiySessionResponse(t, res, expected)
 			},
 		},
@@ -285,7 +425,13 @@ func TestSessionImportRoutineEndpoint(t *testing.T) {
 			ExpectedContent: []string{"collectionId"},
 			TestAppFactory:  setupTestApp,
 			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
-				expected := MockSessionResponse{}
+				expected := MockSessionResponse{
+					Expand: MockSessionExpand{
+						SessionExercises_via_session: []MockSessionOrRoutineExercise{
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: ""},
+						},
+					},
+				}
 				verfiySessionResponse(t, res, expected)
 			},
 		},
