@@ -54,7 +54,7 @@ export const getDropsetAddData = (sessionExercise: SessionExercise) => {
     isWarmup,
     measurementNumeric,
     measurementValue,
-    supersetParent: sessionExercise.id,
+    supersetParent: sessionExercise.supersetParent || sessionExercise.id,
   };
 };
 

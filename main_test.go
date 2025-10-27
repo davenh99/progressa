@@ -17,9 +17,12 @@ import (
 const testDataDir = "./dist/test_pb_data"
 
 type MockSessionOrRoutineExercise struct {
-	Id             string `json:"id"`
-	Exercise       string `json:"exercise"`
-	SupersetParent string `json:"supersetParent"`
+	Id                 string  `json:"id"`
+	Exercise           string  `json:"exercise"`
+	SupersetParent     string  `json:"supersetParent"`
+	Notes              string  `json:"notes"`
+	MeasurementNumeric float64 `json:"measurementNumeric"`
+	ParendInd          int
 }
 
 type MockSessionExpand struct {
@@ -164,7 +167,18 @@ func verfiySessionResponse(t testing.TB, res *http.Response, expected MockSessio
 
 	for i, se := range expected.Expand.SessionExercises_via_session {
 		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
-		assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+		if se.SupersetParent != "?" {
+			assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+		} else {
+			assert.Equal(
+				t,
+				expected.Expand.SessionExercises_via_session[se.ParendInd].Id,
+				receivedItemsSorted[i].SupersetParent,
+				fmt.Sprintf("failed at ind %d", i),
+			)
+		}
+		assert.Equal(t, se.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, se.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d", i))
 	}
 }
 
@@ -225,9 +239,21 @@ func verfiyRoutineResponse(t testing.TB, res *http.Response, expected MockRoutin
 			len(receivedItemsSorted),
 		)
 	}
-	for i, se := range expected.Expand.RoutineExercises_via_routine {
-		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
-		assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+
+	for i, re := range expected.Expand.RoutineExercises_via_routine {
+		assert.Equal(t, re.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
+		if re.SupersetParent != "?" {
+			assert.Equal(t, re.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+		} else {
+			assert.Equal(
+				t,
+				expected.Expand.RoutineExercises_via_routine[re.ParendInd].Id,
+				receivedItemsSorted[i].SupersetParent,
+				fmt.Sprintf("failed at ind %d", i),
+			)
+		}
+		assert.Equal(t, re.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, re.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d", i))
 	}
 }
 
@@ -268,9 +294,36 @@ func TestRoutineDuplicateRowEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "73repeater00000", SupersetParent: ""},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
+							{Exercise: "73repeater00000", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+						},
+					},
+				}
+				verfiyRoutineResponse(t, res, expected)
+			},
+		},
+		{
+			Name:            "try duplicate row with dropset",
+			Method:          http.MethodPost,
+			URL:             endpoint,
+			Body:            createTestDuplicateRowBody("trnqakxgfyp1qdc", 1),
+			Headers:         map[string]string{"Authorization": userToken},
+			ExpectedStatus:  200,
+			ExpectedContent: []string{"collectionId"},
+			TestAppFactory:  setupTestApp,
+			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
+				expected := MockRoutineResponse{
+					Expand: MockRoutineExpand{
+						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
+							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 30},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 20},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 4},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 4},
+							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}
@@ -321,9 +374,34 @@ func TestRoutineImportRoutineEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "73repeater00000", SupersetParent: ""},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: ""},
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: ""},
+							{Exercise: "73repeater00000", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
+							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
+						},
+					},
+				}
+				verfiyRoutineResponse(t, res, expected)
+			},
+		},
+		{
+			Name:            "try import routine with supersets into routine with 1 exercise at end",
+			Method:          http.MethodPost,
+			URL:             endpoint,
+			Body:            createTestImportRoutineBody("ju66888fbla85hi", "zkwbnif3qomyuyd", 1),
+			Headers:         map[string]string{"Authorization": userToken},
+			ExpectedStatus:  200,
+			ExpectedContent: []string{"collectionId"},
+			TestAppFactory:  setupTestApp,
+			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
+				expected := MockRoutineResponse{
+					Expand: MockRoutineExpand{
+						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "hehe", MeasurementNumeric: 1},
+							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 2},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 2},
+							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}
@@ -374,10 +452,34 @@ func TestSessionDuplicateRowEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "70vlzfveuudrmax", SupersetParent: ""},
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv"},
-							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: ""},
-							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: ""},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
+							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+						},
+					},
+				}
+				verfiySessionResponse(t, res, expected)
+			},
+		},
+		{
+			Name:            "try duplicate exercise row with dropsets",
+			Method:          http.MethodPost,
+			URL:             endpoint,
+			Body:            createTestDuplicateRowBody("n488qowbocakkqv", 2),
+			Headers:         map[string]string{"Authorization": userToken},
+			ExpectedStatus:  200,
+			ExpectedContent: []string{"collectionId"},
+			TestAppFactory:  setupTestApp,
+			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
+				expected := MockSessionResponse{
+					Expand: MockSessionExpand{
+						SessionExercises_via_session: []MockSessionOrRoutineExercise{
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+							{Exercise: "70vlzfveuudrmax", SupersetParent: "?", Notes: "", MeasurementNumeric: 4, ParendInd: 2},
+							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
 						},
 					},
 				}
@@ -428,7 +530,33 @@ func TestSessionImportRoutineEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: ""},
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
+						},
+					},
+				}
+				verfiySessionResponse(t, res, expected)
+			},
+		},
+		{
+			Name:            "try import routine with dropsets into session with 2 exercises",
+			Method:          http.MethodPost,
+			URL:             endpoint,
+			Body:            createTestImportRoutineBody("ju66888fbla85hi", "ty5tm38yvydssc1", 1),
+			Headers:         map[string]string{"Authorization": userToken},
+			ExpectedStatus:  200,
+			ExpectedContent: []string{"collectionId"},
+			TestAppFactory:  setupTestApp,
+			AfterTestFunc: func(t testing.TB, app *tests.TestApp, res *http.Response) {
+				expected := MockSessionResponse{
+					Expand: MockSessionExpand{
+						SessionExercises_via_session: []MockSessionOrRoutineExercise{
+							{Exercise: "b5wjd65ifgrjt9p", SupersetParent: "", Notes: "", MeasurementNumeric: 7},
+							{Exercise: "b5wjd65ifgrjt9p", SupersetParent: "", Notes: "yo", MeasurementNumeric: 0},
+							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 3},
+							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 3},
+							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}
