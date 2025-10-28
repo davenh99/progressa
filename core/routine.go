@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"progressa/types"
+	"slices"
 
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -39,6 +40,9 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 		routineExercisesIdInds[re.Id] = i
 	}
 
+	// map new ids to old ids for later
+	oldToNewIdsMap := map[string]string{}
+
 	newRecords := []*core.Record{}
 
 	routineExercisesCollection, err := app.FindCollectionByNameOrId("routineExercises")
@@ -54,25 +58,59 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 		newRecords = append(newRecords, record)
 	}
 
-	// fill in the superset parents afterwards
+	// fill in the superset parents afterwards. is this correct, are the ids safe to use before 'app.Save(record)'?
 	for ind, re := range routineExercises {
 		if re.Get("supersetParent") != nil {
-			supersetParent := newRecords[routineExercisesIdInds[re.Get("supersetParent").(string)]].Get("id")
+			supersetParent := newRecords[routineExercisesIdInds[re.Get("supersetParent").(string)]].Id
 			newRecords[ind].Set("supersetParent", supersetParent)
 		}
 	}
 
 	err = app.RunInTransaction(func(txApp core.App) error {
-		for _, record := range newRecords {
+		for i, record := range newRecords {
 			if err := txApp.Save(record); err != nil {
 				return err
 			}
+			// routineExercises is in same order as newRecords
+			oldToNewIdsMap[routineExercises[i].Id] = record.Id
 		}
 
 		// collect new exercise IDs
 		newIds := make([]string, len(newRecords))
 		for i, rec := range newRecords {
 			newIds[i] = rec.Id
+		}
+
+		// must sort the newIDs by the position of the old ones from 'exercisesOrder'
+		importRoutine, err := app.FindRecordById("routines", payload.ImportRoutineId)
+		if err != nil {
+			return err
+		}
+
+		// get the old exercisesOrder
+		var exercisesOrder []string
+		raw := importRoutine.GetString("exercisesOrder")
+		if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
+			app.Logger().Error("couldn't unmarshal exercisesOrder string")
+		}
+
+		// map new ids to positions
+		newIdPositions := map[string]int{}
+		for i, id := range exercisesOrder {
+			newId := oldToNewIdsMap[id]
+			newIdPositions[newId] = i
+		}
+
+		if len(newIdPositions) != len(newIds) {
+			app.Logger().Error("not all old ids were found in exercisesOrder when importing routine")
+			return fmt.Errorf("some ids missing in exercisesOrder mapping: %v", newIds)
+		}
+
+		// drop the new Ids in where they belong
+		sortedNewIds := make([]string, len(newIds))
+		for _, id := range newIds {
+			position := newIdPositions[id]
+			sortedNewIds[position] = id
 		}
 
 		if err := updateRoutineExercisesOrder(txApp, payload.SessionOrRoutineId, payload.InsertIndex, newIds); err != nil {
@@ -82,7 +120,7 @@ func ImportRoutineIntoRoutine(app core.App, payload *types.ImportRoutinePayload)
 		return nil
 	})
 	if err != nil {
-		return nil, err, "problem saving new records"
+		return nil, err, fmt.Sprintf("problem saving new records: %v", err)
 	}
 
 	routine, err := app.FindRecordById("routines", payload.SessionOrRoutineId)
@@ -112,6 +150,8 @@ func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.R
 		return nil, err, "problem finding child records"
 	}
 
+	insertIndex := payload.RowIndex + len(childRoutineExercises)
+
 	err = app.RunInTransaction(func(txApp core.App) error {
 		collection, err := app.FindCollectionByNameOrId("routineExercises")
 		if err != nil {
@@ -125,6 +165,13 @@ func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.R
 			return err
 		}
 
+		// map new ids to old ids for later
+		oldToNewIdsMap := map[string]string{}
+		oldToNewIdsMap[parentRoutineExercise.Id] = newParentRecord.Id
+
+		// collect new IDs (parent + children)
+		newIds := []string{newParentRecord.Id}
+
 		for _, childRecord := range childRoutineExercises {
 			newChildRecord := core.NewRecord(collection)
 			duplicateRoutineExercise(newChildRecord, childRecord, &newParentRecord.Id)
@@ -132,22 +179,64 @@ func DuplicateRoutineRow(app core.App, payload *types.DuplicatePayload) (*core.R
 			if err := txApp.Save(newChildRecord); err != nil {
 				return err
 			}
+
+			oldToNewIdsMap[childRecord.Id] = newChildRecord.Id
+			newIds = append(newIds, newChildRecord.Id)
 		}
 
-		// collect new IDs (parent + children)
-		newIds := []string{newParentRecord.Id}
-		for _, childRecord := range childRoutineExercises {
-			newIds = append(newIds, childRecord.Id)
+		// must sort the newIDs by the position of the old ones from 'exercisesOrder'
+		routine, err := app.FindRecordById("routines", parentRoutineExercise.GetString("routine"))
+		if err != nil {
+			return err
 		}
 
-		if err := updateRoutineExercisesOrder(txApp, parentRoutineExercise.GetString("routine"), payload.RowIndex, newIds); err != nil {
+		// get the old exercisesOrder
+		var exercisesOrder []string
+		raw := routine.GetString("exercisesOrder")
+		if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
+			app.Logger().Error("couldn't unmarshal exercisesOrder string")
+		}
+
+		// map new ids to positions
+		newIdPositions := map[string]int{}
+		// need to keep track of minimum index of dropset ids, to adjust later
+		minInd := -1
+		for i, id := range exercisesOrder {
+			newId := oldToNewIdsMap[id]
+
+			if slices.Contains(newIds, newId) {
+				newIdPositions[newId] = i
+				if minInd < 0 || i < minInd {
+					minInd = i
+				}
+			}
+		}
+
+		if len(newIdPositions) != len(newIds) {
+			app.Logger().Error("not all old ids were found in exercisesOrder when duplicating row")
+			return fmt.Errorf("some ids missing in exercisesOrder mapping: %v", newIds)
+		}
+
+		// drop the new Ids in where they belong
+		sortedNewIds := make([]string, len(newIds))
+		for _, id := range newIds {
+			position := newIdPositions[id]
+			// adjust position by min ind
+			sortedNewIds[position-minInd] = id
+		}
+
+		// fmt.Printf("map: %v\n", oldToNewIdsMap)
+		// fmt.Printf("pos: %v\n", newIdPositions)
+		// fmt.Printf("sort: %v\n", sortedNewIds)
+
+		if err := updateRoutineExercisesOrder(txApp, parentRoutineExercise.GetString("routine"), insertIndex, newIds); err != nil {
 			return err
 		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, err, "problem copying records"
+		return nil, err, fmt.Sprintf("problem copying records: %v", err)
 	}
 
 	routine, err := app.FindRecordById("routines", parentRoutineExercise.GetString("routine"))
@@ -170,7 +259,7 @@ func updateRoutineExercisesOrder(app core.App, routineId string, insertIndex int
 	var exercisesOrder []string
 	raw := routineRecord.GetString("exercisesOrder")
 	if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
-		fmt.Println("couldn't unmarshal exercisesOrder string:", err)
+		app.Logger().Error("couldn't unmarshal exercisesOrder string")
 	}
 
 	// Clamp index
@@ -182,9 +271,9 @@ func updateRoutineExercisesOrder(app core.App, routineId string, insertIndex int
 
 	// Insert new IDs
 	updatedOrder := make([]string, 0, len(exercisesOrder)+len(newIds))
-	updatedOrder = append(updatedOrder, exercisesOrder[:insertIndex]...)
+	updatedOrder = append(updatedOrder, exercisesOrder[:insertIndex+1]...)
 	updatedOrder = append(updatedOrder, newIds...)
-	updatedOrder = append(updatedOrder, exercisesOrder[insertIndex:]...)
+	updatedOrder = append(updatedOrder, exercisesOrder[insertIndex+1:]...)
 
 	// Save back
 	routineRecord.Set("exercisesOrder", updatedOrder)

@@ -172,7 +172,7 @@ func verfiySessionResponse(t testing.TB, res *http.Response, expected MockSessio
 		} else {
 			assert.Equal(
 				t,
-				expected.Expand.SessionExercises_via_session[se.ParendInd].Id,
+				receivedItemsSorted[se.ParendInd].Id,
 				receivedItemsSorted[i].SupersetParent,
 				fmt.Sprintf("failed at ind %d", i),
 			)
@@ -247,7 +247,7 @@ func verfiyRoutineResponse(t testing.TB, res *http.Response, expected MockRoutin
 		} else {
 			assert.Equal(
 				t,
-				expected.Expand.RoutineExercises_via_routine[re.ParendInd].Id,
+				receivedItemsSorted[re.ParendInd].Id,
 				receivedItemsSorted[i].SupersetParent,
 				fmt.Sprintf("failed at ind %d", i),
 			)
@@ -396,7 +396,7 @@ func TestRoutineImportRoutineEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "hehe", MeasurementNumeric: 1},
+							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
 							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
 							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 2},
