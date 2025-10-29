@@ -1,9 +1,10 @@
 package core
 
 import (
-	"encoding/json"
+	"cmp"
 	"fmt"
 	"progressa/types"
+	"slices"
 
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -35,19 +36,23 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 		return nil, err
 	}
 
+	// sort so parents always come before children, so their ids exist when we want to link them to children.
+	slices.SortFunc(routineExercises, func(a *core.Record, b *core.Record) int {
+		return cmp.Compare(len(a.GetString("supersetParent")), len(b.GetString("supersetParent")))
+	})
+
 	// map ids to inds for easier lookup later
 	routineExercisesIdInds := map[string]int{}
 	for i, re := range routineExercises {
 		routineExercisesIdInds[re.Id] = i
 	}
 
-	newRecords := []*core.Record{}
-
 	sessionExercisesCollection, err := app.FindCollectionByNameOrId("sessionExercises")
 	if err != nil {
 		return nil, err
 	}
 
+	newRecords := []*core.Record{}
 	for _, re := range routineExercises {
 		record := core.NewRecord(sessionExercisesCollection)
 
@@ -56,19 +61,23 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 		newRecords = append(newRecords, record)
 	}
 
-	// fill in the superset parents afterwards
-	for ind, re := range routineExercises {
-		if re.Get("supersetParent") != nil {
-			supersetParent := newRecords[routineExercisesIdInds[re.Get("supersetParent").(string)]].Get("id")
-			newRecords[ind].Set("supersetParent", supersetParent)
-		}
-	}
+	// map new ids to old ids for later
+	oldToNewIdsMap := map[string]string{}
 
 	err = app.RunInTransaction(func(txApp core.App) error {
-		for _, record := range newRecords {
+		for i, record := range newRecords {
+			if routineExercises[i].Get("supersetParent") != nil {
+				// get the new id, it will exist by now
+				newSupersetParent := oldToNewIdsMap[routineExercises[i].GetString("supersetParent")]
+				record.Set("supersetParent", newSupersetParent)
+			}
+
 			if err := txApp.Save(record); err != nil {
 				return err
 			}
+
+			// routineExercises is in same order as newRecords
+			oldToNewIdsMap[routineExercises[i].Id] = record.Id
 		}
 
 		// collect new exercise IDs
@@ -77,7 +86,12 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 			newIds[i] = rec.Id
 		}
 
-		if err := updateSessionExercisesOrder(txApp, payload.SessionOrRoutineId, payload.InsertIndex, newIds); err != nil {
+		sortedNewIds, err := sortNewIds(app, "routines", oldToNewIdsMap, newIds, payload.ImportRoutineId)
+		if err != nil {
+			return err
+		}
+
+		if err := updateSessionOrRoutineExercisesOrder(txApp, "sessions", payload.SessionOrRoutineId, payload.InsertIndex, sortedNewIds); err != nil {
 			return err
 		}
 
@@ -92,7 +106,10 @@ func ImportRoutineIntoSession(app core.App, payload *types.ImportRoutinePayload,
 		return nil, err
 	}
 
-	app.ExpandRecord(session, SESSION_EXPANDS, nil)
+	errs := app.ExpandRecord(session, SESSION_EXPANDS, nil)
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("problem expanding records: %v", errs)
+	}
 
 	return session, nil
 }
@@ -127,22 +144,31 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId s
 			return err
 		}
 
+		// map new ids to old ids for later
+		oldToNewIdsMap := map[string]string{}
+		oldToNewIdsMap[parentSessionExercise.Id] = newParentRecord.Id
+
+		// collect new IDs (parent + children)
+		newIds := []string{newParentRecord.Id}
+
 		for _, childRecord := range childSessionExercises {
 			newChildRecord := core.NewRecord(collection)
-			duplicateSessionExercise(newChildRecord, childRecord, &newParentRecord.Id, userId)
+			duplicateRoutineExercise(newChildRecord, childRecord, &newParentRecord.Id)
 
 			if err := txApp.Save(newChildRecord); err != nil {
 				return err
 			}
+
+			oldToNewIdsMap[childRecord.Id] = newChildRecord.Id
+			newIds = append(newIds, newChildRecord.Id)
 		}
 
-		// collect new IDs (parent + children)
-		newIds := []string{newParentRecord.Id}
-		for _, childRecord := range childSessionExercises {
-			newIds = append(newIds, childRecord.Id)
+		sortedNewIds, err := sortNewIds(app, "routines", oldToNewIdsMap, newIds, parentSessionExercise.GetString("session"))
+		if err != nil {
+			return err
 		}
 
-		if err := updateSessionExercisesOrder(txApp, parentSessionExercise.GetString("session"), payload.RowIndex, newIds); err != nil {
+		if err := updateSessionOrRoutineExercisesOrder(txApp, "sessions", parentSessionExercise.GetString("session"), payload.RowIndex, sortedNewIds); err != nil {
 			return err
 		}
 
@@ -157,40 +183,12 @@ func DuplicateSessionRow(app core.App, payload *types.DuplicatePayload, userId s
 		return nil, err
 	}
 
-	app.ExpandRecord(session, SESSION_EXPANDS, nil)
+	errs := app.ExpandRecord(session, SESSION_EXPANDS, nil)
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("problem expanding records: %v", errs)
+	}
 
 	return session, nil
-}
-
-func updateSessionExercisesOrder(app core.App, sessionId string, insertIndex int, newIds []string) error {
-	sessionRecord, err := app.FindRecordById("sessions", sessionId)
-	if err != nil {
-		return err
-	}
-
-	// Parse existing exercisesOrder
-	var exercisesOrder []string
-	raw := sessionRecord.GetString("exercisesOrder")
-	if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
-		fmt.Println("couldn't unmarshal exercisesOrder string:", err)
-	}
-
-	// Clamp index
-	if insertIndex < 0 {
-		insertIndex = 0
-	} else if insertIndex > len(exercisesOrder) {
-		insertIndex = len(exercisesOrder)
-	}
-
-	// Insert new IDs
-	updatedOrder := make([]string, 0, len(exercisesOrder)+len(newIds))
-	updatedOrder = append(updatedOrder, exercisesOrder[:insertIndex]...)
-	updatedOrder = append(updatedOrder, newIds...)
-	updatedOrder = append(updatedOrder, exercisesOrder[insertIndex:]...)
-
-	// Save back
-	sessionRecord.Set("exercisesOrder", updatedOrder)
-	return app.Save(sessionRecord)
 }
 
 func copyRoutineExerciseToSessionExercise(dst *core.Record, src *core.Record, sessionId string, userId string) {

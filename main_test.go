@@ -166,19 +166,19 @@ func verfiySessionResponse(t testing.TB, res *http.Response, expected MockSessio
 	}
 
 	for i, se := range expected.Expand.SessionExercises_via_session {
-		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, se.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d (exerciseId)", i))
 		if se.SupersetParent != "?" {
-			assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+			assert.Equal(t, se.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d (setparent)", i))
 		} else {
 			assert.Equal(
 				t,
 				receivedItemsSorted[se.ParendInd].Id,
 				receivedItemsSorted[i].SupersetParent,
-				fmt.Sprintf("failed at ind %d", i),
+				fmt.Sprintf("failed at ind %d (setparent)", i),
 			)
 		}
-		assert.Equal(t, se.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d", i))
-		assert.Equal(t, se.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, se.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d (notes)", i))
+		assert.Equal(t, se.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d (measurement)", i))
 	}
 }
 
@@ -241,19 +241,19 @@ func verfiyRoutineResponse(t testing.TB, res *http.Response, expected MockRoutin
 	}
 
 	for i, re := range expected.Expand.RoutineExercises_via_routine {
-		assert.Equal(t, re.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, re.Exercise, receivedItemsSorted[i].Exercise, fmt.Sprintf("failed at ind %d (exerciseId)", i))
 		if re.SupersetParent != "?" {
-			assert.Equal(t, re.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d", i))
+			assert.Equal(t, re.SupersetParent, receivedItemsSorted[i].SupersetParent, fmt.Sprintf("failed at ind %d (setparent)", i))
 		} else {
 			assert.Equal(
 				t,
 				receivedItemsSorted[re.ParendInd].Id,
 				receivedItemsSorted[i].SupersetParent,
-				fmt.Sprintf("failed at ind %d", i),
+				fmt.Sprintf("failed at ind %d (setparent)", i),
 			)
 		}
-		assert.Equal(t, re.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d", i))
-		assert.Equal(t, re.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d", i))
+		assert.Equal(t, re.Notes, receivedItemsSorted[i].Notes, fmt.Sprintf("failed at ind %d (notes)", i))
+		assert.Equal(t, re.MeasurementNumeric, receivedItemsSorted[i].MeasurementNumeric, fmt.Sprintf("failed at ind %d (measurement)", i))
 	}
 }
 
