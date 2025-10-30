@@ -4,7 +4,16 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
 import { SessionMeal, Session } from "../../../Types";
-import { Button, Input, NumberInput, Modal, TagArea, TextArea, useModalLoading } from "../../components";
+import {
+  Button,
+  Input,
+  NumberInput,
+  Modal,
+  TagArea,
+  TextArea,
+  useModalLoading,
+  Checkbox,
+} from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
@@ -45,8 +54,8 @@ export const MealMoreModal: Component<Props> = (props) => {
 export default MealMoreModal;
 
 interface ModalProps {
-  meal: any;
-  setMeal: SetStoreFunction<any>;
+  meal: SessionMeal;
+  setMeal: SetStoreFunction<SessionMeal>;
   parentProps: Props;
 }
 
@@ -55,6 +64,7 @@ const ModalContent: Component<ModalProps> = (props) => {
   return (
     <div class="overflow-y-auto space-y-1">
       <h2 class="pb-2">Meal Options</h2>
+      <Checkbox checked={props.meal.saved} onChange={(v) => props.setMeal("saved", v)} label="Save meal" />
       <Input label="Name" value={props.meal.name} onChange={(v) => props.setMeal("name", v)} />
       <TextArea
         label="Description"

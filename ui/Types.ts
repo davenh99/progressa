@@ -137,6 +137,7 @@ export interface SessionMealCreateData {
 
 export interface SessionMeal extends SessionMealCreateData {
   id: string;
+  saved: boolean;
   expand: {
     tags: Tag[];
   };

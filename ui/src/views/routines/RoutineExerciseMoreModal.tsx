@@ -47,8 +47,8 @@ export const RoutineExerciseMoreModal: Component<Props> = (props) => {
 export default RoutineExerciseMoreModal;
 
 interface ModalProps {
-  exercise: any;
-  setExercise: SetStoreFunction<any>;
+  exercise: RoutineExercise;
+  setExercise: SetStoreFunction<RoutineExercise>;
   parentProps: Props;
 }
 

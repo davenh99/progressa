@@ -51,7 +51,7 @@ export const MealList: Component<Props> = (props) => {
   const getData = async () => {
     try {
       const meals = await pb.collection<SessionMeal>("sessionMeals").getFullList({
-        filter: `session.user = '${user.id}' && name != ''`,
+        filter: `session.user = '${user.id}' && name != '' && saved = true`,
         sort: "name",
       });
 

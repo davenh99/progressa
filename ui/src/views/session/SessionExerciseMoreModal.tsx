@@ -47,8 +47,8 @@ export const SessionExerciseMoreModal: Component<Props> = (props) => {
 export default SessionExerciseMoreModal;
 
 interface ModalProps {
-  exercise: any;
-  setExercise: SetStoreFunction<any>;
+  exercise: SessionExercise;
+  setExercise: SetStoreFunction<SessionExercise>;
   parentProps: Props;
 }
 
