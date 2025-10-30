@@ -12,6 +12,21 @@ migrate(
         b: true,
         d: "Stength endurance protocol. 7 seconds hang, 3 seconds off",
       },
+      {
+        id: "walking00000000",
+        n: "Walking",
+        mType: "distancekm00000",
+        mType2: "8ldlgtjjvy3ircl",
+        b: true,
+        d: "Walking, hiking, whatever",
+      },
+      {
+        id: "badminton000000",
+        n: "Badminton",
+        mType: "8ldlgtjjvy3ircl",
+        b: true,
+        d: "Playing badminton",
+      },
     ];
 
     for (const e of newExercises) {
