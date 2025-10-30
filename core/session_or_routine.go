@@ -35,12 +35,6 @@ func ImportRoutine(
 		return cmp.Compare(len(a.GetString("supersetParent")), len(b.GetString("supersetParent")))
 	})
 
-	// map ids to inds for easier lookup later
-	routineExercisesIdInds := map[string]int{}
-	for i, re := range routineExercises {
-		routineExercisesIdInds[re.Id] = i
-	}
-
 	// map new ids to old ids for later
 	oldToNewIdsMap := map[string]string{}
 
