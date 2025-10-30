@@ -17,15 +17,18 @@ import { SESSION_EXPAND } from "../../constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
 import { SessionMealList } from "../views/session/SessionMealList";
 
-type SearchParams = {
-  date: string;
+export type LogSessionTab = "exercises" | "meals" | "settings";
+
+export type LogSessionSearchParams = {
+  date?: string;
+  tab?: LogSessionTab;
 };
 
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(false);
   const [session, setSession] = createStore<{ session: Session | null }>({ session: null });
   const { pb, user, updateRecord, getSessionByDate } = useAuthPB();
-  const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
+  const [searchParams, setSearchParams] = useSearchParams<LogSessionSearchParams>();
 
   const createSession = async () => {
     if (!searchParams.date) {
@@ -119,7 +122,11 @@ const LogSession: Component = () => {
             </div>
           }
         >
-          <Tabs class="w-full flex-1 flex flex-col overflow-hidden">
+          <Tabs
+            class="w-full flex-1 flex flex-col overflow-hidden"
+            value={searchParams.tab ?? "exercises"}
+            onChange={(v) => setSearchParams({ tab: v })}
+          >
             <LogSessionNav />
 
             <Tabs.Content value="exercises" class="flex flex-1 overflow-hidden">
@@ -133,7 +140,7 @@ const LogSession: Component = () => {
               </Container>
             </Tabs.Content>
 
-            <Tabs.Content value="meals-sleep">
+            <Tabs.Content value="meals">
               <Container class="space-y-4 pb-30 overflow-y-auto">
                 <Card>
                   <h2>Meals</h2>

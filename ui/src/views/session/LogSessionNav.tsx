@@ -1,8 +1,11 @@
+import { NavigateOptions } from "@solidjs/router";
 import { Component, ParentComponent } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import Dumbbell from "lucide-solid/icons/dumbbell";
 import Utensils from "lucide-solid/icons/utensils";
 import Settings from "lucide-solid/icons/settings";
+
+import { LogSessionSearchParams, LogSessionTab } from "../../routes/LogSession";
 
 export const LogSessionNav: Component = () => {
   return (
@@ -11,7 +14,7 @@ export const LogSessionNav: Component = () => {
         <TabTrigger value="exercises" label="Exercises">
           <Dumbbell size={30} />
         </TabTrigger>
-        <TabTrigger value="meals-sleep" label="Meals">
+        <TabTrigger value="meals" label="Meals">
           <Utensils size={30} />
         </TabTrigger>
         <TabTrigger value="settings" label="Settings">
@@ -27,7 +30,7 @@ export default LogSessionNav;
 
 interface TabTriggerProps {
   label: string;
-  value: string;
+  value: LogSessionTab;
 }
 
 const TabTrigger: ParentComponent<TabTriggerProps> = (props) => {
