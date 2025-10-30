@@ -11,11 +11,29 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 )
 
+type Config struct {
+	MainCollection         string
+	ExerciseRowCollection  string
+	ExerciseRowParentField string
+}
+
+var configs = map[types.CollectionType]Config{
+	"session": {
+		MainCollection:         "sessions",
+		ExerciseRowCollection:  "sessionExercises",
+		ExerciseRowParentField: "session",
+	},
+	"routine": {
+		MainCollection:         "routines",
+		ExerciseRowCollection:  "routineExercises",
+		ExerciseRowParentField: "routine",
+	},
+}
+
 func ImportRoutine(
 	app core.App,
 	payload *types.ImportRoutinePayload,
-	intoChildCollection *core.Collection,
-	intoParentCollection string,
+	collectionType types.CollectionType,
 	copyFields []string,
 ) (error, string) {
 	routineExercises, err := app.FindRecordsByFilter(
@@ -28,6 +46,13 @@ func ImportRoutine(
 	)
 	if err != nil {
 		return err, "couldn't find matching routine"
+	}
+
+	cfg := configs[collectionType]
+
+	collection, err := app.FindCollectionByNameOrId(cfg.ExerciseRowCollection)
+	if err != nil {
+		return err, "couldn't find exercise row collection"
 	}
 
 	// sort so parents always come before children, so their ids exist when we want to link them to children.
@@ -43,19 +68,12 @@ func ImportRoutine(
 		newIds := []string{}
 
 		for _, re := range routineExercises {
-			record := core.NewRecord(intoChildCollection)
+			record := core.NewRecord(collection)
 			for _, f := range copyFields {
 				record.Set(f, re.Get(f))
 			}
 
-			// if the field doesn't exist it will be nil not empty string
-			if record.Get("routine") != nil {
-				record.Set("routine", payload.SessionOrRoutineId)
-			} else if record.Get("session") != nil {
-				record.Set("session", payload.SessionOrRoutineId)
-			} else {
-				return fmt.Errorf("no field found to attach child records to")
-			}
+			record.Set(cfg.ExerciseRowParentField, payload.SessionOrRoutineId)
 
 			if re.Get("supersetParent") != nil {
 				// get the new id, it will exist by now
@@ -78,7 +96,7 @@ func ImportRoutine(
 			return err
 		}
 
-		if err := updateSessionOrRoutineExercisesOrder(txApp, intoParentCollection, payload.SessionOrRoutineId, payload.InsertIndex, sortedNewIds); err != nil {
+		if err := updateSessionOrRoutineExercisesOrder(txApp, cfg.MainCollection, payload.SessionOrRoutineId, payload.InsertIndex, sortedNewIds); err != nil {
 			return err
 		}
 
@@ -91,13 +109,15 @@ func ImportRoutine(
 	return nil, ""
 }
 
-func DuplicateExerciseRow(app core.App, payload *types.DuplicatePayload, parentCollection string, childCollection string) (error, string) {
-	parentExercise, err := app.FindRecordById(childCollection, payload.ExerciseRowId)
+func DuplicateExerciseRow(app core.App, payload *types.DuplicatePayload, collectionType types.CollectionType) (error, string) {
+	cfg := configs[collectionType]
+
+	parentExercise, err := app.FindRecordById(cfg.ExerciseRowCollection, payload.ExerciseRowId)
 	if err != nil {
 		return err, "couldn't find parentExercise"
 	}
 	childExercises, err := app.FindRecordsByFilter(
-		childCollection,
+		cfg.ExerciseRowCollection,
 		"supersetParent = {:recordId}",
 		"",
 		9999,
@@ -111,7 +131,7 @@ func DuplicateExerciseRow(app core.App, payload *types.DuplicatePayload, parentC
 	insertIndex := payload.RowIndex + len(childExercises)
 
 	err = app.RunInTransaction(func(txApp core.App) error {
-		collection, err := app.FindCollectionByNameOrId(childCollection)
+		collection, err := app.FindCollectionByNameOrId(cfg.ExerciseRowCollection)
 		if err != nil {
 			return err
 		}
@@ -142,22 +162,14 @@ func DuplicateExerciseRow(app core.App, payload *types.DuplicatePayload, parentC
 			newIds = append(newIds, newChildRecord.Id)
 		}
 
-		parentId := ""
+		parentId := parentExercise.GetString(cfg.ExerciseRowParentField)
 
-		if parentExercise.Get("routine") != nil {
-			parentId = parentExercise.GetString("routine")
-		} else if parentExercise.Get("session") != nil {
-			parentId = parentExercise.GetString("session")
-		} else {
-			return fmt.Errorf("could not find parent id")
-		}
-
-		sortedNewIds, err := sortNewIds(txApp, parentCollection, oldToNewIdsMap, newIds, parentId)
+		sortedNewIds, err := sortNewIds(txApp, cfg.MainCollection, oldToNewIdsMap, newIds, parentId)
 		if err != nil {
 			return err
 		}
 
-		if err := updateSessionOrRoutineExercisesOrder(txApp, parentCollection, parentId, insertIndex+1, sortedNewIds); err != nil {
+		if err := updateSessionOrRoutineExercisesOrder(txApp, cfg.MainCollection, parentId, insertIndex+1, sortedNewIds); err != nil {
 			return err
 		}
 

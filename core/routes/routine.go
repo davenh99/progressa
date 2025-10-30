@@ -45,13 +45,8 @@ func (h *RoutesHandler) importRoutineIntoRoutine(e *core.RequestEvent) error {
 		return e.BadRequestError("bad payload", err)
 	}
 
-	collection, err := h.app.FindCollectionByNameOrId("routineExercises")
-	if err != nil {
-		return e.InternalServerError("couldn't find routineExercises collection", err)
-	}
-
 	// import the routine
-	err, msg := c.ImportRoutine(h.app, &payload, collection, "routines", importRoutineCopyFields)
+	err, msg := c.ImportRoutine(h.app, &payload, types.ROUTINE, importRoutineCopyFields)
 	if err != nil {
 		return e.InternalServerError(msg, err)
 	}
@@ -85,7 +80,7 @@ func (h *RoutesHandler) duplicateRoutineRow(e *core.RequestEvent) error {
 	}
 
 	// duplicate the row
-	err, msg := c.DuplicateExerciseRow(h.app, &payload, "routines", "routineExercises")
+	err, msg := c.DuplicateExerciseRow(h.app, &payload, types.ROUTINE)
 	if err != nil {
 		return e.InternalServerError(msg, err)
 	}

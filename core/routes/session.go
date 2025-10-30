@@ -31,13 +31,8 @@ func (h *RoutesHandler) importRoutineIntoSession(e *core.RequestEvent) error {
 		return e.BadRequestError("bad payload", err)
 	}
 
-	collection, err := h.app.FindCollectionByNameOrId("sessionExercises")
-	if err != nil {
-		return e.InternalServerError("couldn't find sessionExercises collection", err)
-	}
-
 	// import the routine
-	err, msg := c.ImportRoutine(h.app, &payload, collection, "sessions", importRoutineCopyFields)
+	err, msg := c.ImportRoutine(h.app, &payload, types.SESSION, importRoutineCopyFields)
 	if err != nil {
 		return e.InternalServerError(msg, err)
 	}
@@ -70,7 +65,7 @@ func (h *RoutesHandler) duplicateSessionRow(e *core.RequestEvent) error {
 		return e.InternalServerError("could not find sessionExercises collection", err)
 	}
 
-	err, msg := c.DuplicateExerciseRow(h.app, &payload, "sessions", "sessionExercises")
+	err, msg := c.DuplicateExerciseRow(h.app, &payload, types.SESSION)
 	if err != nil {
 		return e.InternalServerError(msg, err)
 	}
