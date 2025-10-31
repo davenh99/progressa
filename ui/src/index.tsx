@@ -20,7 +20,7 @@ const Sessions = lazy(() => import("./routes/Sessions"));
 const Routines = lazy(() => import("./routes/Routines"));
 const Profile = lazy(() => import("./routes/Profile"));
 import { Toaster } from "./config/toaster";
-import { Toast } from "./config/toaster/";
+import { Toast } from "./config/toaster";
 
 const root = document.getElementById("root");
 
@@ -31,17 +31,21 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 window.onerror = (msg) => {
-  toaster.show((props) => <Toast {...props} title="JS Error" msg={String(msg)} />);
+  toaster.show((props) => <Toast {...props} variant="error" title="JS Error" msg={String(msg)} />);
 };
 
 window.onunhandledrejection = (event) => {
-  toaster.show((props) => <Toast {...props} title="Unhandled Promise" msg={String(event.reason)} />);
+  toaster.show((props) => (
+    <Toast {...props} variant="error" title="Unhandled Promise" msg={String(event.reason)} />
+  ));
 };
 
 const originalConsoleError = console.error;
 console.error = (...args) => {
   originalConsoleError(...args);
-  toaster.show((props) => <Toast {...props} title="Error" msg={args.map(String).join(" ")} />);
+  toaster.show((props) => (
+    <Toast {...props} variant="error" title="Error" msg={args.map(String).join(" ")} />
+  ));
 };
 
 render(
