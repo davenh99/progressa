@@ -80,8 +80,8 @@ interface MeasurementValueSelectProps {
   values?: MeasurementValue[];
   value?: MeasurementValue | null;
   valueNumeric?: number;
-  onValueChange: (v: any, key: string) => void;
-  saveFunc: (v: any, key: string) => Promise<void>;
+  onValueChange: (v: any) => void;
+  saveFunc: (v: any) => Promise<void>;
 }
 
 export const MeasurementValueSelect: Component<MeasurementValueSelectProps> = (props) => {
@@ -92,8 +92,8 @@ export const MeasurementValueSelect: Component<MeasurementValueSelectProps> = (p
         <DataSelect
           values={props.values ?? []}
           value={props.value ?? null}
-          onValueChange={(v) => props.onValueChange(v, props.key)}
-          saveFunc={(v) => props.saveFunc(v, props.key)}
+          onValueChange={(v) => props.onValueChange(v)}
+          saveFunc={(v) => props.saveFunc(v)}
         />
       }
     >
@@ -102,17 +102,17 @@ export const MeasurementValueSelect: Component<MeasurementValueSelectProps> = (p
         fallback={
           <div class="flex flex-row space-x-1">
             <NumberInput
-              rawValue={props.valueNumeric}
-              onRawValueChange={(v: any) => props.onValueChange(v, props.key)}
-              saveFunc={(v) => props.saveFunc(v, props.key)}
+              rawValue={props.valueNumeric ?? 0}
+              onRawValueChange={(v: any) => props.onValueChange(v)}
+              saveFunc={(v) => props.saveFunc(v)}
             />
           </div>
         }
       >
         <DataTime
           value={props.valueNumeric ?? 0}
-          onValueChange={(v: any) => props.onValueChange(v, props.key)}
-          saveFunc={(v) => props.saveFunc(v, props.key)}
+          onValueChange={(v: any) => props.onValueChange(v)}
+          saveFunc={(v) => props.saveFunc(v)}
         />
       </Show>
     </Show>

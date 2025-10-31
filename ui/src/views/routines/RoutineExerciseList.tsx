@@ -4,6 +4,7 @@ import { useAuthPB } from "../../config/pocketbase";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
+import Plus from "lucide-solid/icons/plus";
 
 import { Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
@@ -195,28 +196,69 @@ export const RoutineExerciseList: Component<Props> = (props) => {
           : "measurementValue",
       id: "measurement",
       cell: (ctx) => {
-        return (
+        const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType;
+        const key = mType?.numeric ? "measurementNumeric" : "measurementValue";
+
+        return mType ? (
           <MeasurementValueSelect
-            key={
-              ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric
-                ? "measurementNumeric"
-                : "measurementValue"
-            }
-            numeric={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric ?? false}
-            measurementType={ctx.row.original.expand?.exercise?.defaultMeasurementType}
-            onValueChange={(v, k) =>
+            value={ctx.row.original.expand?.measurementValue ?? null}
+            valueNumeric={ctx.row.original.measurementNumeric || 0}
+            key={key}
+            numeric={mType.numeric ?? false}
+            measurementType={mType.id}
+            onValueChange={(v) =>
               props.setRoutine(
                 "routine",
                 "expand",
                 "routineExercises_via_routine",
                 ctx.row.index,
                 "expand",
-                k as any,
+                key as any,
                 v ?? undefined
               )
             }
-            saveFunc={(v, k) => saveRow(ctx.row.original.id, k, v)}
+            saveFunc={(v) => saveRow(ctx.row.original.id, key, v)}
           />
+        ) : (
+          <></>
+        );
+      },
+    },
+    {
+      accessorFn: (row) =>
+        row.expand?.exercise?.expand?.defaultMeasurementType2?.numeric
+          ? "measurement2Numeric"
+          : "measurement2Value",
+      id: "measurement2",
+      cell: (ctx) => {
+        const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2;
+        const key = mType?.numeric ? "measurement2Numeric" : "measurement2Value";
+
+        return mType ? (
+          <MeasurementValueSelect
+            value={ctx.row.original.expand?.measurement2Value ?? null}
+            valueNumeric={ctx.row.original.measurement2Numeric || 0}
+            key={key}
+            numeric={mType.numeric ?? false}
+            measurementType={mType.id}
+            onValueChange={(v) =>
+              props.setRoutine(
+                "routine",
+                "expand",
+                "routineExercises_via_routine",
+                ctx.row.index,
+                "expand",
+                key as any,
+                v ?? undefined
+              )
+            }
+            saveFunc={(v) => {
+              console.log(`saving ${key} as ${v} for ${ctx.row.original.id}`);
+              return saveRow(ctx.row.original.id, key, v);
+            }}
+          />
+        ) : (
+          <></>
         );
       },
     },
@@ -346,11 +388,19 @@ export const RoutineExerciseList: Component<Props> = (props) => {
           )}
         </For>
       </div>
-      <Button variantColor="good" onClick={() => setShowCreateRoutineExercise(true)} class="mt-2">
-        Add Set
+      <Button
+        variantColor="good"
+        onClick={() => setShowCreateRoutineExercise(true)}
+        class="mt-2 flex items-center pl-1 pr-2"
+      >
+        <Plus size={20} /> Set
       </Button>
-      <Button variantColor="good" onClick={() => setShowAddRoutine(true)} class="mt-2">
-        Add Routine
+      <Button
+        variantColor="good"
+        onClick={() => setShowAddRoutine(true)}
+        class="mt-2 flex items-center pl-1 pr-2"
+      >
+        <Plus size={20} /> Routine
       </Button>
       <Show when={showCreateRoutineExercise()}>
         <ExerciseSelectModal

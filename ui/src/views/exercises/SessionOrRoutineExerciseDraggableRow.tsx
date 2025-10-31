@@ -36,6 +36,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const measurementHeaderClass = createMemo(() =>
     measurementHeader().length > 5 ? "text-sm flex-2" : "flex-2"
   );
+  const measurement2 = props.row.original.expand?.exercise?.expand?.defaultMeasurementType2;
+  const measurement2Header = createMemo(() => measurement2?.displayName ?? "?");
+  const measurement2HeaderClass = createMemo(() =>
+    measurement2Header().length > 5 ? "text-sm flex-2" : "flex-2"
+  );
 
   createEffect(() => {
     if (!props.firstOfSuperset && !props.lastOfSuperset) return;
@@ -206,6 +211,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           <div class="w-full flex flex-row justify-between mt-1 text-center">
             <p class="flex-2">set</p>
             <p class={measurementHeaderClass()}>{measurementHeader()}</p>
+            {measurement2 && <p class={measurement2HeaderClass()}>{measurement2Header()}</p>}
             <p class="flex-2">+kg</p>
             <Show when={"perceivedEffort" in props.row.original}>
               <p class="flex-2">rpe</p>
@@ -237,11 +243,16 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           <div class="flex w-full text-center">
             <For each={props.row.getVisibleCells()}>
               {(cell) => {
+                const rendered = flexRender(cell.column.columnDef.cell, cell.getContext());
+                if (!rendered || (Array.isArray(rendered) && rendered.length === 0)) {
+                  return null; // skip empty measurement2 cells
+                }
+
                 const classes = `py-1 flex flex-col items-center ${
                   cell.column.id === "more" ? "flex-1" : "flex-2"
                 }`;
 
-                return <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>;
+                return <div class={classes}>{rendered}</div>;
               }}
             </For>
           </div>

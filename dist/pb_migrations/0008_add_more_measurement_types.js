@@ -6,7 +6,7 @@ migrate(
     const newMeasurementTypes = [
       { id: "distancem000000", dn: "distance (m)", n: "distance (m)", num: true },
       { id: "distancekm00000", dn: "distance (km)", n: "distance (km)", num: true },
-      { id: "egdesizemm00000", dn: "edge size (mm)", n: "edge size (mm)", num: true },
+      { id: "egdesizemm00000", dn: "edge (mm)", n: "edge size (mm)", num: true },
     ];
 
     for (const m of newMeasurementTypes) {
