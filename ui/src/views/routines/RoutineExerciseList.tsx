@@ -8,7 +8,14 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import { Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
-import { Button, DataSelect, DataTime, IconButton, NumberInput } from "../../components";
+import {
+  Button,
+  DataSelect,
+  DataTime,
+  IconButton,
+  MeasurementValueSelect,
+  NumberInput,
+} from "../../components";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import { getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
@@ -189,68 +196,27 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       id: "measurement",
       cell: (ctx) => {
         return (
-          <Show
-            when={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
-            fallback={
-              <DataSelect
-                values={
-                  ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
-                    ?.measurementValues_via_measurementType ?? []
-                }
-                // TODO maybe we don't need to switch between null and undefined here?
-                value={ctx.row.original.expand?.measurementValue ?? null}
-                onValueChange={(v) =>
-                  props.setRoutine(
-                    "routine",
-                    "expand",
-                    "routineExercises_via_routine",
-                    ctx.row.index,
-                    "expand",
-                    "measurementValue",
-                    v ?? undefined
-                  )
-                }
-                saveFunc={(v: string) => saveRow(ctx.row.original.id, "measurementValue", v)}
-              />
+          <MeasurementValueSelect
+            key={
+              ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric
+                ? "measurementNumeric"
+                : "measurementValue"
             }
-          >
-            <Show
-              when={ctx.row.original.expand?.exercise?.defaultMeasurementType === "8ldlgtjjvy3ircl"}
-              fallback={
-                <div class="flex flex-row space-x-1">
-                  <NumberInput
-                    rawValue={ctx.row.original.measurementNumeric || 0}
-                    onRawValueChange={(v) =>
-                      props.setRoutine(
-                        "routine",
-                        "expand",
-                        "routineExercises_via_routine",
-                        ctx.row.index,
-                        "measurementNumeric",
-                        v as number
-                      )
-                    }
-                    saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
-                  />
-                </div>
-              }
-            >
-              <DataTime
-                value={ctx.row.original.measurementNumeric || 0}
-                onValueChange={(v) =>
-                  props.setRoutine(
-                    "routine",
-                    "expand",
-                    "routineExercises_via_routine",
-                    ctx.row.index,
-                    "measurementNumeric",
-                    v
-                  )
-                }
-                saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
-              />
-            </Show>
-          </Show>
+            numeric={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric ?? false}
+            measurementType={ctx.row.original.expand?.exercise?.defaultMeasurementType}
+            onValueChange={(v, k) =>
+              props.setRoutine(
+                "routine",
+                "expand",
+                "routineExercises_via_routine",
+                ctx.row.index,
+                "expand",
+                k as any,
+                v ?? undefined
+              )
+            }
+            saveFunc={(v, k) => saveRow(ctx.row.original.id, k, v)}
+          />
         );
       },
     },

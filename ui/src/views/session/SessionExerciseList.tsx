@@ -7,7 +7,15 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { Routine, Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
-import { Button, DataSelect, IconButton, DataTime, NumberInput, RPESelect } from "../../components";
+import {
+  Button,
+  DataSelect,
+  IconButton,
+  DataTime,
+  NumberInput,
+  RPESelect,
+  MeasurementValueSelect,
+} from "../../components";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
@@ -191,68 +199,27 @@ export const SessionExerciseList: Component<Props> = (props) => {
       id: "measurement",
       cell: (ctx) => {
         return (
-          <Show
-            when={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric}
-            fallback={
-              <DataSelect
-                values={
-                  ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
-                    ?.measurementValues_via_measurementType ?? []
-                }
-                // TODO maybe we don't need to switch between null and undefined here?
-                value={ctx.row.original.expand?.measurementValue ?? null}
-                onValueChange={(v) =>
-                  props.setSession(
-                    "session",
-                    "expand",
-                    "sessionExercises_via_session",
-                    ctx.row.index,
-                    "expand",
-                    "measurementValue",
-                    v ?? undefined
-                  )
-                }
-                saveFunc={(v: string) => saveRow(ctx.row.original.id, "measurementValue", v)}
-              />
+          <MeasurementValueSelect
+            key={
+              ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric
+                ? "measurementNumeric"
+                : "measurementValue"
             }
-          >
-            <Show
-              when={ctx.row.original.expand?.exercise?.defaultMeasurementType === "8ldlgtjjvy3ircl"}
-              fallback={
-                <div class="flex flex-row space-x-1">
-                  <NumberInput
-                    rawValue={ctx.row.original.measurementNumeric || 0}
-                    onRawValueChange={(v) =>
-                      props.setSession(
-                        "session",
-                        "expand",
-                        "sessionExercises_via_session",
-                        ctx.row.index,
-                        "measurementNumeric",
-                        v as number
-                      )
-                    }
-                    saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
-                  />
-                </div>
-              }
-            >
-              <DataTime
-                value={ctx.row.original.measurementNumeric || 0}
-                onValueChange={(v) =>
-                  props.setSession(
-                    "session",
-                    "expand",
-                    "sessionExercises_via_session",
-                    ctx.row.index,
-                    "measurementNumeric",
-                    v
-                  )
-                }
-                saveFunc={(v) => saveRow(ctx.row.original.id, "measurementNumeric", v)}
-              />
-            </Show>
-          </Show>
+            numeric={ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.numeric ?? false}
+            measurementType={ctx.row.original.expand?.exercise?.defaultMeasurementType}
+            onValueChange={(v, k) =>
+              props.setSession(
+                "session",
+                "expand",
+                "sessionExercises_via_session",
+                ctx.row.index,
+                "expand",
+                k as any,
+                v ?? undefined
+              )
+            }
+            saveFunc={(v, k) => saveRow(ctx.row.original.id, k, v)}
+          />
         );
       },
     },
