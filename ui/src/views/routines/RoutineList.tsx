@@ -71,7 +71,7 @@ export const RoutineList: Component<Props> = (props) => {
 
   return (
     <>
-      <div class="w-full flex justify-start items-center space-x-2">
+      <div class="w-full flex justify-start items-center space-x-2 sticky top-0 bg-charcoal-500/90 pt-3 pb-2 backdrop-blur-xs">
         <Button
           class="flex text-sm items-center pl-1 pr-2"
           variant="solid"
@@ -88,7 +88,7 @@ export const RoutineList: Component<Props> = (props) => {
           inputProps={{ placeholder: "Search Routines", class: "p-1 border-b-1 w-full" }}
         />
       </div>
-      <div class="mt-4">
+      <div class="mt-2">
         <div class="space-y-2">
           <For each={table.getRowModel().rows}>
             {(row) => (

@@ -16,7 +16,7 @@ const Sessions: Component = () => {
           </Button>
         </div>
       </Header>
-      <Container noPadding class="pb-25">
+      <Container class="pb-25 overflow-y-auto p-0">
         <SessionList />
       </Container>
     </>

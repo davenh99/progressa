@@ -87,7 +87,7 @@ const Routines: Component = () => {
           </Show>
         </div>
       </Header>
-      <Container class="pb-25">
+      <Container class="overflow-y-auto bg-charcoal-500 py-0 pb-25">
         <Show
           when={routine.routine != null && !!searchParams.routineId}
           fallback={

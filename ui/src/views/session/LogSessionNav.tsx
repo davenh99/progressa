@@ -1,11 +1,10 @@
-import { NavigateOptions } from "@solidjs/router";
 import { Component, ParentComponent } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import Dumbbell from "lucide-solid/icons/dumbbell";
 import Utensils from "lucide-solid/icons/utensils";
 import Settings from "lucide-solid/icons/settings";
 
-import { LogSessionSearchParams, LogSessionTab } from "../../routes/LogSession";
+import { LogSessionTab } from "../../routes/LogSession";
 
 export const LogSessionNav: Component = () => {
   return (
