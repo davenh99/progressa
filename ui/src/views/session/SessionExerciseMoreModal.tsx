@@ -56,7 +56,7 @@ const ModalContent: Component<ModalProps> = (props) => {
   const { setLoading } = useModalLoading();
 
   return (
-    <>
+    <div class="overflow-y-auto">
       <h2 class="pb-2">Exercise Options</h2>
       <Checkbox
         checked={props.exercise.isWarmup}
@@ -125,6 +125,6 @@ const ModalContent: Component<ModalProps> = (props) => {
         </Button>
       </div>
       <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
-    </>
+    </div>
   );
 };

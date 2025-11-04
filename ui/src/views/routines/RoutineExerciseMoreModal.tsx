@@ -27,9 +27,9 @@ export const RoutineExerciseMoreModal: Component<Props> = (props) => {
   const save = async () => {
     try {
       await pb.collection("routineExercises").update(exercise.id, exercise);
-      // lazy way to refresh the session for now. could also set the state.
-      const updatedSession = await getRoutineByID(props.routineId);
-      props.setRoutine({ routine: updatedSession });
+      // lazy way to refresh the routine for now. could also set the state.
+      const updatedRoutine = await getRoutineByID(props.routineId);
+      props.setRoutine({ routine: updatedRoutine });
     } catch (e) {
       console.error(e);
     }
@@ -56,7 +56,7 @@ const ModalContent: Component<ModalProps> = (props) => {
   const { setLoading } = useModalLoading();
 
   return (
-    <>
+    <div class="overflow-y-auto">
       <h2 class="pb-2">Exercise Options</h2>
       <Checkbox
         checked={props.exercise.isWarmup}
@@ -79,7 +79,7 @@ const ModalContent: Component<ModalProps> = (props) => {
             tags.map((t) => t.id)
           );
         }}
-        modelName="sessionExercises"
+        modelName="routineExercises"
         recordID={props.exercise.id}
       />
       <div class="flex flex-col mt-3">
@@ -125,6 +125,6 @@ const ModalContent: Component<ModalProps> = (props) => {
         </Button>
       </div>
       <div class="bg-dark-slate-gray-500 w-full h-[2px] my-2 rounded-full"></div>
-    </>
+    </div>
   );
 };
