@@ -49,12 +49,9 @@ func main() {
 
 	app.OnServe().Bind(&hook.Handler[*core.ServeEvent]{
 		Func: func(e *core.ServeEvent) error {
-			distFS, err := fs.Sub(embeddedFiles, "ui/dist")
-			if err != nil {
-				return err
+			if distFS, err := fs.Sub(embeddedFiles, "ui/dist"); err == nil {
+				e.Router.GET("/{path...}", apis.Static(distFS, true))
 			}
-
-			e.Router.GET("/{path...}", apis.Static(distFS, true))
 
 			return e.Next()
 		},
