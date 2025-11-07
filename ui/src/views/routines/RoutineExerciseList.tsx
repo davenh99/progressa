@@ -349,40 +349,50 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     <div class="flex flex-col items-center">
       <div class="w-full">
         <For each={table.getRowModel().rows}>
-          {(row) => (
-            <DraggableRow
-              row={row}
-              saveRow={saveRow}
-              groupTitle={groups()[row.index]}
-              firstOfGroup={row.index === 0 || groups()[row.index] !== groups()[row.index - 1]}
-              lastOfGroup={
-                row.index === props.routineExercises.length - 1 ||
-                groups()[row.index] !== groups()[row.index + 1]
-              }
-              firstOfSuperset={!row.original.supersetParent}
-              lastOfSuperset={
-                row.index === props.routineExercises.length - 1 ||
-                !props.routineExercises[row.index + 1].supersetParent
-              }
-              getGroupInds={() => getGroupInds(row.index, groups())}
-              timeInput={
-                <DataTime
-                  value={row.original.restAfter}
-                  onValueChange={(v) =>
-                    props.setRoutine(
-                      "routine",
-                      "expand",
-                      "routineExercises_via_routine",
-                      row.index,
-                      "restAfter",
-                      v
-                    )
-                  }
-                  saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
-                />
-              }
-            />
-          )}
+          {(row) => {
+            const firstOfGroup = row.index === 0 || groups()[row.index] !== groups()[row.index - 1];
+
+            return (
+              <DraggableRow
+                row={row}
+                saveRow={saveRow}
+                groupTitle={groups()[row.index]}
+                firstOfExercises={
+                  firstOfGroup ||
+                  row.index === 0 ||
+                  row.original.exercise !== props.routineExercises[row.index - 1].exercise ||
+                  row.original.variation !== props.routineExercises[row.index - 1].variation
+                }
+                firstOfGroup={firstOfGroup}
+                lastOfGroup={
+                  row.index === props.routineExercises.length - 1 ||
+                  groups()[row.index] !== groups()[row.index + 1]
+                }
+                firstOfSuperset={!row.original.supersetParent}
+                lastOfSuperset={
+                  row.index === props.routineExercises.length - 1 ||
+                  !props.routineExercises[row.index + 1].supersetParent
+                }
+                getGroupInds={() => getGroupInds(row.index, groups())}
+                timeInput={
+                  <DataTime
+                    value={row.original.restAfter}
+                    onValueChange={(v) =>
+                      props.setRoutine(
+                        "routine",
+                        "expand",
+                        "routineExercises_via_routine",
+                        row.index,
+                        "restAfter",
+                        v
+                      )
+                    }
+                    saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
+                  />
+                }
+              />
+            );
+          }}
         </For>
       </div>
       <Button

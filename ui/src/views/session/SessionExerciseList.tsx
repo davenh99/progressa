@@ -376,40 +376,50 @@ export const SessionExerciseList: Component<Props> = (props) => {
     <div class="flex flex-col items-center">
       <div class="w-full">
         <For each={table.getRowModel().rows}>
-          {(row) => (
-            <DraggableRow
-              row={row}
-              saveRow={saveRow}
-              groupTitle={groups()[row.index]}
-              firstOfGroup={row.index === 0 || groups()[row.index] !== groups()[row.index - 1]}
-              lastOfGroup={
-                row.index === props.sessionExercises.length - 1 ||
-                groups()[row.index] !== groups()[row.index + 1]
-              }
-              firstOfSuperset={!row.original.supersetParent}
-              lastOfSuperset={
-                row.index === props.sessionExercises.length - 1 ||
-                !props.sessionExercises[row.index + 1].supersetParent
-              }
-              getGroupInds={() => getGroupInds(row.index, groups())}
-              timeInput={
-                <DataTime
-                  value={row.original.restAfter}
-                  onValueChange={(v) =>
-                    props.setSession(
-                      "session",
-                      "expand",
-                      "sessionExercises_via_session",
-                      row.index,
-                      "restAfter",
-                      v
-                    )
-                  }
-                  saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
-                />
-              }
-            />
-          )}
+          {(row) => {
+            const firstOfGroup = row.index === 0 || groups()[row.index] !== groups()[row.index - 1];
+
+            return (
+              <DraggableRow
+                row={row}
+                saveRow={saveRow}
+                groupTitle={groups()[row.index]}
+                firstOfExercises={
+                  firstOfGroup ||
+                  row.index === 0 ||
+                  row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
+                  row.original.variation !== props.sessionExercises[row.index - 1].variation
+                }
+                firstOfGroup={firstOfGroup}
+                lastOfGroup={
+                  row.index === props.sessionExercises.length - 1 ||
+                  groups()[row.index] !== groups()[row.index + 1]
+                }
+                firstOfSuperset={!row.original.supersetParent}
+                lastOfSuperset={
+                  row.index === props.sessionExercises.length - 1 ||
+                  !props.sessionExercises[row.index + 1].supersetParent
+                }
+                getGroupInds={() => getGroupInds(row.index, groups())}
+                timeInput={
+                  <DataTime
+                    value={row.original.restAfter}
+                    onValueChange={(v) =>
+                      props.setSession(
+                        "session",
+                        "expand",
+                        "sessionExercises_via_session",
+                        row.index,
+                        "restAfter",
+                        v
+                      )
+                    }
+                    saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
+                  />
+                }
+              />
+            );
+          }}
         </For>
       </div>
       <Button

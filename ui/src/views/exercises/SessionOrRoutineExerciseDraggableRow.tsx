@@ -20,6 +20,7 @@ interface DraggableRowProps {
   lastOfGroup: boolean;
   firstOfSuperset: boolean;
   lastOfSuperset: boolean;
+  firstOfExercises: boolean;
   getGroupInds: () => number[];
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   timeInput: JSX.Element;
@@ -41,6 +42,11 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const measurement2Header = createMemo(() => measurement2?.displayName ?? "?");
   const measurement2HeaderClass = createMemo(() =>
     measurement2Header().length > 5 ? "text-sm flex-2" : "flex-2"
+  );
+  const exercisesTitle = createMemo(() =>
+    props.row.original.expand?.variation?.name
+      ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
+      : props.row.original.expand?.exercise?.name || ""
   );
 
   createEffect(() => {
@@ -202,10 +208,14 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       >
         <Show when={props.firstOfGroup}>
           {/* exercise name */}
-          <p class="font-bold">{props.groupTitle}</p>
-
+          <p class="font-bold mb-1">{props.groupTitle}</p>
+        </Show>
+        <Show when={props.firstOfExercises && props.groupTitle.includes("✕")}>
+          <p class="italic text-sm">{exercisesTitle()}</p>
+        </Show>
+        <Show when={props.firstOfExercises}>
           {/* column headers */}
-          <div class="w-full flex flex-row justify-between mt-1 text-center">
+          <div class="w-full flex flex-row justify-between text-center">
             <p class="flex-2">set</p>
             <p class={measurementHeaderClass()}>{measurementHeader()}</p>
             {measurement2 && <p class={measurement2HeaderClass()}>{measurement2Header()}</p>}
