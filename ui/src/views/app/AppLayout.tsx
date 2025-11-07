@@ -67,7 +67,7 @@ export const AppLayout: ParentComponent = (props) => {
           <p class="text-xs">History</p>
         </A>
         <A href="/routines" class="flex flex-col items-center">
-          <Routine size={30} />
+          <Routine size={30} class={iconClasses("/routines")} />
           <p class="text-xs">Routines</p>
         </A>
         <A

@@ -201,6 +201,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => {
         const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType;
         const key = mType?.numeric ? "measurementNumeric" : "measurementValue";
+        const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
           <MeasurementValueSelect
@@ -215,8 +216,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
                 "expand",
                 "sessionExercises_via_session",
                 ctx.row.index,
-                "expand",
-                key as any,
+                //@ts-ignore
+                ...path,
                 v ?? undefined
               )
             }
@@ -236,6 +237,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => {
         const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2;
         const key = mType?.numeric ? "measurement2Numeric" : "measurement2Value";
+        const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
           <MeasurementValueSelect
@@ -250,8 +252,8 @@ export const SessionExerciseList: Component<Props> = (props) => {
                 "expand",
                 "sessionExercises_via_session",
                 ctx.row.index,
-                "expand",
-                key as any,
+                //@ts-ignore
+                ...path,
                 v ?? undefined
               )
             }

@@ -35,7 +35,9 @@ export const RoutineExerciseMoreModal: Component<Props> = (props) => {
     }
   };
 
-  createEffect(() => setExercise(JSON.parse(JSON.stringify(props.initialExercise))));
+  createEffect(() => {
+    setExercise(JSON.parse(JSON.stringify(props.initialExercise)));
+  });
 
   return (
     <Modal saveFunc={save} setModalVisible={props.setModalVisible}>

@@ -9,14 +9,7 @@ import Plus from "lucide-solid/icons/plus";
 import { Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
-import {
-  Button,
-  DataSelect,
-  DataTime,
-  IconButton,
-  MeasurementValueSelect,
-  NumberInput,
-} from "../../components";
+import { Button, DataTime, IconButton, MeasurementValueSelect, NumberInput } from "../../components";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import { getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
@@ -198,6 +191,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       cell: (ctx) => {
         const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType;
         const key = mType?.numeric ? "measurementNumeric" : "measurementValue";
+        const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
           <MeasurementValueSelect
@@ -212,8 +206,8 @@ export const RoutineExerciseList: Component<Props> = (props) => {
                 "expand",
                 "routineExercises_via_routine",
                 ctx.row.index,
-                "expand",
-                key as any,
+                //@ts-ignore
+                ...path,
                 v ?? undefined
               )
             }
@@ -233,6 +227,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       cell: (ctx) => {
         const mType = ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2;
         const key = mType?.numeric ? "measurement2Numeric" : "measurement2Value";
+        const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
           <MeasurementValueSelect
@@ -247,13 +242,12 @@ export const RoutineExerciseList: Component<Props> = (props) => {
                 "expand",
                 "routineExercises_via_routine",
                 ctx.row.index,
-                "expand",
-                key as any,
+                //@ts-ignore
+                ...path,
                 v ?? undefined
               )
             }
             saveFunc={(v) => {
-              console.log(`saving ${key} as ${v} for ${ctx.row.original.id}`);
               return saveRow(ctx.row.original.id, key, v);
             }}
           />
