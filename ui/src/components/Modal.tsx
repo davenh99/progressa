@@ -8,20 +8,22 @@ import { ModalContext } from "./modalContext";
 interface Props {
   setModalVisible: (v: boolean) => void;
   saveFunc?: () => Promise<void>;
+  zIndexClass?: string;
 }
 
 export const Modal: ParentComponent<Props> = (props) => {
   const [loading, setLoading] = createSignal(false);
+
+  const containerStyle = `${
+    props.zIndexClass !== undefined ? props.zIndexClass : "z-50"
+  } fixed inset-0 flex items-center justify-center bg-black/50`;
 
   return (
     <Portal>
       <Show when={loading()}>
         <LoadFullScreen />
       </Show>
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        onClick={() => props.setModalVisible(false)}
-      >
+      <div class={containerStyle} onClick={() => props.setModalVisible(false)}>
         <div
           class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
               w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col`}
@@ -62,7 +64,7 @@ export function useModalLoading() {
   const context = useContext(ModalContext);
 
   if (!context) {
-    throw new Error("useModal must be used within a Modal");
+    throw new Error("useModalLoading must be used within a Modal");
   }
 
   return context;

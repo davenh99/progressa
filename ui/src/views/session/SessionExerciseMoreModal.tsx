@@ -1,12 +1,14 @@
-import { Component, createEffect } from "solid-js";
+import { Component, createEffect, createSignal, Show } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import Plus from "lucide-solid/icons/plus";
 import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
+import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
-import { Session, SessionExercise } from "../../../Types";
+import { Exercise, ExerciseVariation, Session, SessionExercise } from "../../../Types";
 import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
+import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
@@ -21,7 +23,9 @@ interface Props {
 }
 
 export const SessionExerciseMoreModal: Component<Props> = (props) => {
-  const [exercise, setExercise] = createStore(JSON.parse(JSON.stringify(props.initialExercise)));
+  const [exercise, setExercise] = createStore<SessionExercise>(
+    JSON.parse(JSON.stringify(props.initialExercise))
+  );
   const { pb, getSessionByID } = useAuthPB();
 
   const save = async () => {
@@ -53,11 +57,49 @@ interface ModalProps {
 }
 
 const ModalContent: Component<ModalProps> = (props) => {
+  const [showExerciseSelectModal, setShowExerciseSelectModal] = createSignal(false);
+  const [warning, setWarning] = createSignal("");
   const { setLoading } = useModalLoading();
+
+  const selectNewExercise = async (exercise: Exercise, variation?: ExerciseVariation) => {
+    props.setExercise("exercise", exercise.id);
+    props.setExercise("variation", variation?.id ?? "");
+    props.setExercise("expand", (currentExpand: any) => ({
+      ...currentExpand,
+      exercise: { ...currentExpand?.exercise, name: exercise.name },
+      variation: { ...currentExpand?.variation, name: variation?.name ?? "" },
+    }));
+    props.setExercise("measurementNumeric", 0);
+    props.setExercise("measurement2Numeric", 0);
+    props.setExercise("measurement3Numeric", 0);
+    props.setExercise("measurementValue", undefined);
+    props.setExercise("measurement2Value", undefined);
+    props.setExercise("measurement3Value", undefined);
+
+    setWarning("Warning: changing the exercise will reset measurements");
+    setShowExerciseSelectModal(false);
+  };
 
   return (
     <div class="overflow-y-auto">
+      <Show when={showExerciseSelectModal()}>
+        <ExerciseSelectModal
+          setModalVisible={setShowExerciseSelectModal}
+          selectExercise={selectNewExercise}
+        />
+      </Show>
       <h2 class="pb-2">Exercise Options</h2>
+      <div class="mb-3">
+        <Button class="w-full flex items-center" onClick={() => setShowExerciseSelectModal(true)}>
+          <p class="flex-1">
+            {props.exercise.expand?.variation?.name
+              ? `${props.exercise.expand?.exercise?.name} (${props.exercise.expand?.variation?.name})`
+              : props.exercise.expand?.exercise?.name}
+          </p>
+          <ArrowUp size={18} />
+        </Button>
+        <p class="pt-1 text-red-400 text-xs">{warning()}</p>
+      </div>
       <Checkbox
         checked={props.exercise.isWarmup}
         onChange={(v) => props.setExercise("isWarmup", v)}

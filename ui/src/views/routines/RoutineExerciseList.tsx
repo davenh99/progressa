@@ -6,7 +6,13 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
-import { Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Types";
+import {
+  Exercise,
+  ExerciseVariation,
+  Routine,
+  RoutineExercise,
+  RoutineExerciseCreateData,
+} from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { Button, DataTime, IconButton, MeasurementValueSelect, NumberInput } from "../../components";
@@ -111,11 +117,11 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addRoutineExercise = async (exerciseID: string, variationID?: string) => {
+  const addRoutineExercise = async (exercise: Exercise, variation?: ExerciseVariation) => {
     const data: RoutineExerciseCreateData = {
       routine: props.routineId,
-      variation: variationID || undefined,
-      exercise: exerciseID,
+      variation: variation?.id || undefined,
+      exercise: exercise.id,
     };
     const record = await pb.collection<RoutineExercise>("routineExercises").create(data, {
       expand: SESSION_EXERCISE_EXPAND,
@@ -399,7 +405,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       <Show when={showCreateRoutineExercise()}>
         <ExerciseSelectModal
           setModalVisible={setShowCreateRoutineExercise}
-          addExercise={addRoutineExercise}
+          selectExercise={addRoutineExercise}
         />
       </Show>
       <Show when={showAddRoutine()}>

@@ -7,7 +7,14 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { Routine, Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
+import {
+  Exercise,
+  ExerciseVariation,
+  Routine,
+  Session,
+  SessionExercise,
+  SessionExerciseCreateData,
+} from "../../../Types";
 import {
   Button,
   DataSelect,
@@ -118,12 +125,12 @@ export const SessionExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addSessionExercise = async (exerciseID: string, variationID?: string) => {
+  const addSessionExercise = async (exercise: Exercise, variation?: ExerciseVariation) => {
     const data: SessionExerciseCreateData = {
       user: user.id,
       session: props.sessionID,
-      variation: variationID || undefined,
-      exercise: exerciseID,
+      variation: variation?.id || undefined,
+      exercise: exercise.id,
       perceivedEffort: 0,
     };
 
@@ -426,7 +433,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       <Show when={showCreateSessionExercise()}>
         <ExerciseSelectModal
           setModalVisible={setShowCreateSessionExercise}
-          addExercise={addSessionExercise}
+          selectExercise={addSessionExercise}
         />
       </Show>
       <Show when={showAddRoutine()}>
