@@ -17,7 +17,6 @@ import {
 } from "../../../Types";
 import {
   Button,
-  DataSelect,
   IconButton,
   DataTime,
   NumberInput,
@@ -25,7 +24,7 @@ import {
   MeasurementValueSelect,
 } from "../../components";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
-import { getDropsetAddData, getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
+import { getDropsetAddData, getGroupInds, getGroups, getSupersetInds } from "../../methods/sessionExercise";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import SessionExerciseMoreModal from "./SessionExerciseMoreModal";
@@ -45,6 +44,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
   const { pb, user, updateRecord, sessionToSortedExercisesAndMeals } = useAuthPB();
+  const groups = createMemo(() => getGroups(props.sessionExercises));
 
   const setNumbers = createMemo(() => {
     const setNumbers = [];
@@ -362,7 +362,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
 
         let inds = [];
         if (sourceData.isGroup as boolean) {
-          inds = getGroupInds(sourceData.ind as number, props.sessionExercises);
+          inds = getGroupInds(sourceData.ind as number, groups());
         } else {
           inds = getSupersetInds(sourceData.ind as number, props.sessionExercises);
         }
@@ -380,22 +380,18 @@ export const SessionExerciseList: Component<Props> = (props) => {
             <DraggableRow
               row={row}
               saveRow={saveRow}
-              firstOfGroup={
-                row.index === 0 ||
-                row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
-                row.original.variation !== props.sessionExercises[row.index - 1].variation
-              }
+              groupTitle={groups()[row.index]}
+              firstOfGroup={row.index === 0 || groups()[row.index] !== groups()[row.index - 1]}
               lastOfGroup={
                 row.index === props.sessionExercises.length - 1 ||
-                row.original.exercise !== props.sessionExercises[row.index + 1].exercise ||
-                row.original.variation !== props.sessionExercises[row.index + 1].variation
+                groups()[row.index] !== groups()[row.index + 1]
               }
               firstOfSuperset={!row.original.supersetParent}
               lastOfSuperset={
                 row.index === props.sessionExercises.length - 1 ||
                 !props.sessionExercises[row.index + 1].supersetParent
               }
-              getGroupInds={() => getGroupInds(row.index, props.sessionExercises)}
+              getGroupInds={() => getGroupInds(row.index, groups())}
               timeInput={
                 <DataTime
                   value={row.original.restAfter}

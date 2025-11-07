@@ -23,6 +23,7 @@ interface DraggableRowProps {
   getGroupInds: () => number[];
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   timeInput: JSX.Element;
+  groupTitle: string;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -201,11 +202,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
       >
         <Show when={props.firstOfGroup}>
           {/* exercise name */}
-          <p class="font-bold">
-            {props.row.original.expand?.variation?.name
-              ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
-              : props.row.original.expand?.exercise?.name}
-          </p>
+          <p class="font-bold">{props.groupTitle}</p>
 
           {/* column headers */}
           <div class="w-full flex flex-row justify-between mt-1 text-center">

@@ -17,10 +17,10 @@ import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { Button, DataTime, IconButton, MeasurementValueSelect, NumberInput } from "../../components";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
-import { getGroupInds, getSupersetInds } from "../../methods/sessionExercise";
+import { getGroupInds, getGroups, getSupersetInds } from "../../methods/sessionExercise";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
 import RoutineSelectModal from "./RoutineSelectModal";
-import { getDropsetAddData } from "../../methods/routineExercises";
+import { getDropsetAddData } from "../../methods/routineExercise";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 
 interface Props {
@@ -37,6 +37,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
   const [showMoreExercise, setShowMoreExercise] = createSignal(false);
   const [selectedExerciseInd, setSelectedExerciseInd] = createSignal(-1);
   const { pb, updateRecord, routineToSortedExercises } = useAuthPB();
+  const groups = createMemo(() => getGroups(props.routineExercises));
 
   const setNumbers = createMemo(() => {
     const setNumbers = [];
@@ -334,7 +335,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
 
         let inds = [];
         if (sourceData.isGroup as boolean) {
-          inds = getGroupInds(sourceData.ind as number, props.routineExercises);
+          inds = getGroupInds(sourceData.ind as number, groups());
         } else {
           inds = getSupersetInds(sourceData.ind as number, props.routineExercises);
         }
@@ -352,22 +353,18 @@ export const RoutineExerciseList: Component<Props> = (props) => {
             <DraggableRow
               row={row}
               saveRow={saveRow}
-              firstOfGroup={
-                row.index === 0 ||
-                row.original.exercise !== props.routineExercises[row.index - 1].exercise ||
-                row.original.variation !== props.routineExercises[row.index - 1].variation
-              }
+              groupTitle={groups()[row.index]}
+              firstOfGroup={row.index === 0 || groups()[row.index] !== groups()[row.index - 1]}
               lastOfGroup={
                 row.index === props.routineExercises.length - 1 ||
-                row.original.exercise !== props.routineExercises[row.index + 1].exercise ||
-                row.original.variation !== props.routineExercises[row.index + 1].variation
+                groups()[row.index] !== groups()[row.index + 1]
               }
               firstOfSuperset={!row.original.supersetParent}
               lastOfSuperset={
                 row.index === props.routineExercises.length - 1 ||
                 !props.routineExercises[row.index + 1].supersetParent
               }
-              getGroupInds={() => getGroupInds(row.index, props.routineExercises)}
+              getGroupInds={() => getGroupInds(row.index, groups())}
               timeInput={
                 <DataTime
                   value={row.original.restAfter}

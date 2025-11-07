@@ -13,12 +13,38 @@ export const getSupersetInds = (index: number, data: (SessionExercise | RoutineE
   return inds;
 };
 
-export const getGroupInds = (index: number, data: (SessionExercise | RoutineExercise)[]) => {
-  const inds = [];
-  const exerciseId = data[index].exercise;
+export const getGroups = (exercises: (SessionExercise | RoutineExercise)[]) => {
+  type Res = { [id: string]: { exerciseNames: string[] } };
+  const resMap: Res = {};
 
-  for (const [i, d] of data.slice(index).entries()) {
-    if (d.exercise === exerciseId) {
+  // loop and populate resMap
+  for (const routineOrSessionExercise of exercises) {
+    const id = routineOrSessionExercise.supersetParent || routineOrSessionExercise.id;
+    const name = routineOrSessionExercise.expand?.variation?.name
+      ? `${routineOrSessionExercise.expand?.exercise?.name} (${routineOrSessionExercise.expand?.variation?.name})`
+      : routineOrSessionExercise.expand?.exercise?.name || "";
+
+    if (!resMap[id]) {
+      resMap[id] = { exerciseNames: [name] };
+    } else if (!resMap[id].exerciseNames.includes(name)) {
+      resMap[id].exerciseNames.push(name);
+    }
+  }
+
+  // map inds to group titles
+  const groups = exercises.map((routineOrSessionExercise) =>
+    resMap[routineOrSessionExercise.supersetParent || routineOrSessionExercise.id].exerciseNames.join(" ✕ ")
+  );
+
+  return groups;
+};
+
+export const getGroupInds = (index: number, groups: string[]) => {
+  const inds = [];
+  const group = groups[index];
+
+  for (const [i, d] of groups.slice(index).entries()) {
+    if (d === group) {
       inds.push(i + index);
     } else {
       break;
