@@ -1,13 +1,15 @@
-import { Component, createEffect, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import * as Plot from "@observablehq/plot";
-import { SegmentedControl } from "@kobalte/core/segmented-control";
 
 import { Analysis, Session } from "../../../Types";
 import { TextArea, Input, Button } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import PlotChart from "./Plot";
 import LoadFullScreen from "../app/LoadFullScreen";
+import { ClientResponseError } from "pocketbase";
+import { SegmentedControl } from "../../components";
+import { filterByRange } from "../../methods/analysis";
 
 interface Props {
   analysis: Analysis;
@@ -56,7 +58,7 @@ const AnalysisGraph: Component<Props> = (props) => {
         <Show
           when={editing()}
           fallback={
-            <Button class="text-lg" variant="text" variantColor="good" onClick={() => setEditing(true)}>
+            <Button class="text-lg" variant="text" onClick={() => setEditing(true)}>
               edit
             </Button>
           }
@@ -83,53 +85,59 @@ const AnalysisGraph: Component<Props> = (props) => {
   );
 };
 
-type Range = "5y" | "1y" | "6m" | "1m" | "custom";
-const ranges: Range[] = ["5y", "1y", "6m", "1m", "custom"];
+const ranges = ["5y", "1y", "6m", "1m", "custom"];
 
 const Graph: Component<Props> = (props) => {
   const [data, setData] = createSignal<Session[]>([]);
-  const [range, setRange] = createSignal<Range>("5y");
+  const [range, setRange] = createSignal("1y");
   const { pb } = useAuthPB();
 
   const getData = async () => {
     try {
       const sessions = await pb.collection<Session>("sessions").getFullList({ sort: "-userDay" });
-      console.log(sessions);
+
       setData(sessions);
     } catch (e) {
-      console.error("get sessions error: ", e);
+      if (e instanceof ClientResponseError && e.status == 0) {
+      } else {
+        console.error("get sessions error: ", e);
+      }
     }
   };
 
   createEffect(() => getData());
 
+  const computedData = createMemo(() =>
+    filterByRange(data(), range())
+      .filter((s) => s.userWeight !== undefined && s.userWeight !== null)
+      .map((s) => ({
+        date: new Date(s.userDay),
+        weight: s.userWeight,
+        series: "Weight (kg)",
+      }))
+  );
+
   return (
-    <div>
-      <SegmentedControl class="flex flex-col gap-0.5 my-2">
-        <div role="presentation" class="bg-charcoal-600 rounded-sm m-0 p-0 relative w-fit">
-          <SegmentedControl.Indicator
-            class={`bg-charcoal-700 rounded-sm opacity-40 absolute transition-segmented-control-indicator
-              `}
-          />
-          <div role="presentation" class="inline-flex list-none">
-            <For each={ranges}>
-              {(range) => (
-                <SegmentedControl.Item value={range} class="relative flex justify-center px-2 py-1">
-                  <SegmentedControl.ItemInput class="" />
-                  <SegmentedControl.ItemLabel class="">{range}</SegmentedControl.ItemLabel>
-                </SegmentedControl.Item>
-              )}
-            </For>
-          </div>
-        </div>
-      </SegmentedControl>
+    <div class="w-full flex flex-col items-center">
+      <SegmentedControl value={range} onChange={setRange} options={ranges} />
       <PlotChart
         options={{
-          caption: "my chart",
-          y: { grid: true },
-          x: { grid: true },
-          color: { scheme: "burd" },
-          marks: [Plot.ruleY([0]), Plot.dot(data(), { x: "x", y: "y", stroke: "Anomaly" })],
+          y: { grid: true, label: null },
+          x: { grid: true, label: null },
+          width: 350,
+          height: 250,
+          style: {
+            fontSize: "0.9rem",
+          },
+          color: { legend: true, scheme: "Greens" },
+          marks: [
+            Plot.ruleY([0]),
+            Plot.line(computedData(), {
+              x: "date",
+              y: "weight",
+              stroke: "series",
+            }),
+          ],
         }}
       />
     </div>

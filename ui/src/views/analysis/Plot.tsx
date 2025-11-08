@@ -29,7 +29,7 @@ const PlotChart: Component<PlotProps> = (props) => {
     });
   });
 
-  return <div ref={ref} />;
+  return <div class="my-3" ref={ref} />;
 };
 
 export default PlotChart;
