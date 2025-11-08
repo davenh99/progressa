@@ -209,3 +209,15 @@ export interface RoutineExerciseCreateData {
 }
 
 export type RoutineExercise = RoutineExerciseCreateData & RoutineOrSessionExercise;
+
+export interface AnalysisCreateData {
+  user: string;
+  title: string;
+  description: string;
+  series: string[];
+  filters: string[];
+}
+
+export interface Analysis extends AnalysisCreateData {
+  id: string;
+}

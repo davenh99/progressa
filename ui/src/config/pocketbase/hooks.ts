@@ -1,6 +1,6 @@
 import { useContext } from "solid-js";
 import { PBContext } from "./context";
-import { Routine, Session } from "../../../Types";
+import { Analysis, Routine, Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
 import { ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
 import { sortSessionOrRoutineExercises } from "../../methods/sessionExercise";
@@ -171,6 +171,18 @@ export function useAuthPB() {
     }
   };
 
+  const getAnalysisByID = async (id: string): Promise<Analysis | null> => {
+    try {
+      return await pb.collection<Analysis>("analyses").getOne(id);
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+        return null;
+      } else {
+        throw e;
+      }
+    }
+  };
+
   return {
     pb,
     user,
@@ -180,6 +192,7 @@ export function useAuthPB() {
     getSessionByDate,
     getSessionByID,
     getRoutineByID,
+    getAnalysisByID,
     sessionToSortedExercisesAndMeals,
     routineToSortedExercises,
   };

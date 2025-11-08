@@ -20,6 +20,7 @@
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
     "@kobalte/core": "^0.13.10",
+    "@observablehq/plot": "^0.6.17",
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/solid-table": "^8.21.3",

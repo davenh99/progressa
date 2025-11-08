@@ -18,6 +18,7 @@ const Auth = lazy(() => import("./routes/Auth"));
 const LogSession = lazy(() => import("./routes/LogSession"));
 const Sessions = lazy(() => import("./routes/Sessions"));
 const Routines = lazy(() => import("./routes/Routines"));
+const Analysis = lazy(() => import("./routes/Analyses"));
 const Profile = lazy(() => import("./routes/Profile"));
 import { Toaster } from "./config/toaster";
 import { Toast } from "./config/toaster";
@@ -87,6 +88,7 @@ function App() {
       <Route path="/routines" component={Routines} />
       <Route path="/profile" component={Profile} />
       <Route path="/log" component={LogSession} />
+      <Route path="/analysis" component={Analysis} />
     </Route>
   );
 }

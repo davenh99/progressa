@@ -4,11 +4,10 @@ import Log from "lucide-solid/icons/pencil-line";
 import Routine from "lucide-solid/icons/notebook-text";
 import History from "lucide-solid/icons/history";
 import User from "lucide-solid/icons/user";
+import Chart from "lucide-solid/icons/chart-spline";
 
 export const AppLayout: ParentComponent = (props) => {
   const location = useLocation();
-
-  const isLogActive = () => location.pathname.startsWith("/log");
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -27,25 +26,27 @@ export const AppLayout: ParentComponent = (props) => {
     <div class="flex h-screen bg-charcoal-500 text-dark-slate-gray-900">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-charcoal-100/80 py-4 space-y-6">
+        <A href="/analysis" class={linkClasses("/analysis")}>
+          <Chart size={24} class={iconClasses("/analysis")} />
+          <p>Analysis</p>
+        </A>
         <A href="/" class={linkClasses("/")}>
           <History size={24} class={iconClasses("/")} />
           <p>History</p>
-        </A>
-        <A href="/routines" class={linkClasses("/routines")}>
-          <Routine size={24} class={iconClasses("/routines")} />
-          <p>Routines</p>
         </A>
         <A
           href="/log"
           class={linkClasses("/log")}
           onClick={(e) => {
-            if (isLogActive()) {
-              e.preventDefault();
-            }
+            isActive("/log") && e.preventDefault();
           }}
         >
           <Log size={24} class={iconClasses("/log")} />
           <p>Log</p>
+        </A>
+        <A href="/routines" class={linkClasses("/routines")}>
+          <Routine size={24} class={iconClasses("/routines")} />
+          <p>Routines</p>
         </A>
         <A href="/profile" class={linkClasses("/profile")}>
           <User size={24} class={iconClasses("/profile")} />
@@ -60,27 +61,29 @@ export const AppLayout: ParentComponent = (props) => {
       <nav
         class="sm:hidden fixed bottom-3 left-1/2 -translate-x-1/2
          bg-charcoal-100/50 flex justify-between
-         py-2.5 px-5 space-x-[7vw]  rounded-full backdrop-blur-xs"
+         py-2.5 px-5 space-x-[3vw]  rounded-full backdrop-blur-xs"
       >
+        <A href="/analysis" class="flex flex-col items-center">
+          <Chart size={30} class={iconClasses("/analysis")} />
+          <p class="text-xs">Analysis</p>
+        </A>
         <A href="/" class="flex flex-col items-center">
           <History size={30} class={iconClasses("/")} />
           <p class="text-xs">History</p>
-        </A>
-        <A href="/routines" class="flex flex-col items-center">
-          <Routine size={30} class={iconClasses("/routines")} />
-          <p class="text-xs">Routines</p>
         </A>
         <A
           href="/log"
           class="flex flex-col items-center"
           onClick={(e) => {
-            if (isLogActive()) {
-              e.preventDefault();
-            }
+            isActive("/log") && e.preventDefault();
           }}
         >
           <Log size={30} class={iconClasses("/log")} />
           <p class="text-xs">Log</p>
+        </A>
+        <A href="/routines" class="flex flex-col items-center">
+          <Routine size={30} class={iconClasses("/routines")} />
+          <p class="text-xs">Routines</p>
         </A>
         <A href="/profile" class="flex flex-col items-center">
           <User size={30} class={iconClasses("/profile")} />
