@@ -33,7 +33,6 @@ export const DataTime: Component<Props> = (props) => {
         minValue={0}
         inputProps={{
           ref: (el) => (minRef = el),
-          onFocus: (e) => e.currentTarget.select(),
           value: minutes(),
           onInput: (e) => {
             if (e.currentTarget.value.includes(".")) {
@@ -66,7 +65,6 @@ export const DataTime: Component<Props> = (props) => {
         minValue={0}
         inputProps={{
           ref: (el) => (secRef = el),
-          onFocus: (e) => e.currentTarget.select(),
           value: seconds().toString().padStart(2, "0"),
           onInput: (e) => {
             const raw = parseInt(e.currentTarget.value) || 0;
