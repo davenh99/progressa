@@ -7,7 +7,7 @@ interface PlotProps {
 
 const PlotChart: Component<PlotProps> = (props) => {
   let ref: HTMLDivElement | undefined;
-  let chart: HTMLElement | null = null;
+  let chart: ((SVGSVGElement | HTMLElement) & Plot.Plot) | null = null;
 
   createEffect(() => {
     if (!ref) return;
@@ -29,7 +29,7 @@ const PlotChart: Component<PlotProps> = (props) => {
     });
   });
 
-  return <div ref={ref!} />;
+  return <div ref={ref} />;
 };
 
 export default PlotChart;

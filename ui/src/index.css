@@ -1,7 +1,23 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Rubik";
+  src: url("/fonts/Rubik-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rubik";
+  src: url("/fonts/Rubik-Italic-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  font-family: "Ubuntu", "Helvetica Neue", sans-serif;
+  font-family: "Rubik", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
@@ -174,4 +190,9 @@ input[type="number"] {
 
 .animate-fade-in-up {
   animation: fade-in-up 120ms ease-out;
+}
+
+.transition-segmented-control-indicator {
+  transition: opacity 500ms ease-in-out, box-shadow 100ms ease-in-out, width 200ms ease, height 200ms ease,
+    transform 200ms ease;
 }
