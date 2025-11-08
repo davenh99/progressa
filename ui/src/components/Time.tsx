@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal } from "solid-js";
+import { Component, createEffect, createSignal, untrack } from "solid-js";
 import NumberInput from "./NumberInput";
 
 interface Props {
@@ -13,10 +13,16 @@ export const DataTime: Component<Props> = (props) => {
   const [seconds, setSeconds] = createSignal(Math.round(props.value % 60));
   const [timesEnteredMinutes, setTimesEnteredMinutes] = createSignal(0);
   const [timesEnteredSeconds, setTimesEnteredSeconds] = createSignal(0);
+  const [mounted, setMounted] = createSignal(false);
   let minRef: HTMLInputElement;
   let secRef: HTMLInputElement;
 
   createEffect(() => {
+    if (!untrack(mounted)) {
+      setMounted(true);
+      return;
+    }
+
     const min = minutes() || 0;
     const sec = seconds() || 0;
 
