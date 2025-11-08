@@ -18,16 +18,15 @@ export const DataTime: Component<Props> = (props) => {
   let secRef: HTMLInputElement;
 
   createEffect(() => {
+    const min = minutes() || 0;
+    const sec = seconds() || 0;
+
     if (!untrack(mounted)) {
       setMounted(true);
       return;
     }
 
-    const min = minutes() || 0;
-    const sec = seconds() || 0;
-
     const newVal = min * 60 + sec;
-
     props.saveFunc(newVal).then(() => props.onValueChange(newVal));
   });
 
@@ -57,10 +56,12 @@ export const DataTime: Component<Props> = (props) => {
 
             setTimesEnteredMinutes(timesEnteredMinutes() + 1);
             if (timesEnteredMinutes() >= (props.maxMinutes ?? 999).toString().length) {
-              setTimesEnteredMinutes(0);
               secRef.focus();
             }
             setMinutes(clamped);
+          },
+          onBlur: (e) => {
+            setTimesEnteredMinutes(0);
           },
         }}
       />
@@ -82,10 +83,12 @@ export const DataTime: Component<Props> = (props) => {
 
             setTimesEnteredSeconds(timesEnteredSeconds() + 1);
             if (timesEnteredSeconds() >= 2) {
-              setTimesEnteredSeconds(0);
               secRef.blur();
             }
             setSeconds(clamped);
+          },
+          onBlur: (e) => {
+            setTimesEnteredSeconds(0);
           },
         }}
       />
