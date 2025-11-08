@@ -197,6 +197,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   const columns = createMemo<ColumnDef<SessionExercise>[]>(() => [
     {
       header: "Set Type",
+      id: "set",
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
     },
     {
