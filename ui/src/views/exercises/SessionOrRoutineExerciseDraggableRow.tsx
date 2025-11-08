@@ -216,7 +216,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
         <Show when={props.firstOfExercises}>
           {/* column headers */}
           <div class="w-full flex flex-row justify-between text-center">
-            <p class="flex-2">set</p>
+            <p class="flex-1">set</p>
             <p class={measurementHeaderClass()}>{measurementHeader()}</p>
             {measurement2 && <p class={measurement2HeaderClass()}>{measurement2Header()}</p>}
             <p class="flex-2">+kg</p>
@@ -256,7 +256,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
                 }
 
                 const classes = `py-1 flex flex-col items-center ${
-                  cell.column.id === "more" ? "flex-1" : "flex-2"
+                  cell.column.id === "more" || cell.column.id === "set" ? "flex-1" : "flex-2"
                 }`;
 
                 return <div class={classes}>{rendered}</div>;
