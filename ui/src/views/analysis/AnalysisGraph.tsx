@@ -86,9 +86,10 @@ const AnalysisGraph: Component<Props> = (props) => {
 };
 
 const ranges = ["5y", "1y", "6m", "1m", "custom"];
+import sampleData from "../../../../test_data/sampleData.json";
 
 const Graph: Component<Props> = (props) => {
-  const [data, setData] = createSignal<Session[]>([]);
+  const [data, setData] = createSignal<Session[]>(sampleData as any);
   const [range, setRange] = createSignal("1y");
   const { pb } = useAuthPB();
 
@@ -105,14 +106,15 @@ const Graph: Component<Props> = (props) => {
     }
   };
 
-  createEffect(() => getData());
+  // createEffect(() => getData());
 
   const computedData = createMemo(() =>
     filterByRange(data(), range())
-      .filter((s) => s.userWeight !== undefined && s.userWeight !== null)
+      .filter((s) => s.sleepQuality !== undefined && s.sleepQuality !== null)
+      .sort((sA, sB) => new Date(sA.userDay).getTime() - new Date(sB.userDay).getTime())
       .map((s) => ({
         date: new Date(s.userDay),
-        weight: s.userWeight,
+        weight: s.sleepQuality,
         series: "Weight (kg)",
       }))
   );
@@ -132,10 +134,11 @@ const Graph: Component<Props> = (props) => {
           color: { legend: true, scheme: "Greens" },
           marks: [
             Plot.ruleY([0]),
-            Plot.line(computedData(), {
+            Plot.lineY(computedData(), {
               x: "date",
               y: "weight",
               stroke: "series",
+              curve: "bump-x",
             }),
           ],
         }}
