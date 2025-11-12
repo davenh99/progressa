@@ -203,6 +203,10 @@ export const RoutineExerciseList: Component<Props> = (props) => {
         return mType ? (
           <MeasurementValueSelect
             value={ctx.row.original.expand?.measurementValue ?? null}
+            values={
+              ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
+                ?.measurementValues_via_measurementType ?? []
+            }
             valueNumeric={ctx.row.original.measurementNumeric || 0}
             key={key}
             numeric={mType.numeric ?? false}
@@ -239,6 +243,10 @@ export const RoutineExerciseList: Component<Props> = (props) => {
         return mType ? (
           <MeasurementValueSelect
             value={ctx.row.original.expand?.measurement2Value ?? null}
+            values={
+              ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2?.expand
+                ?.measurementValues_via_measurementType ?? []
+            }
             valueNumeric={ctx.row.original.measurement2Numeric || 0}
             key={key}
             numeric={mType.numeric ?? false}
