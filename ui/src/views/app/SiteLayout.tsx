@@ -5,6 +5,7 @@ import Header from "./Header";
 import User from "lucide-solid/icons/user";
 import { A } from "@solidjs/router";
 import Footer from "./Footer";
+import pkg from "../../../package.json";
 
 export const SiteLayout: ParentComponent = (props) => {
   return (
@@ -28,7 +29,7 @@ export const SiteLayout: ParentComponent = (props) => {
       </main>
 
       <Footer class="text-xs">
-        <p>version 0.1</p>
+        <p>version {pkg.version}</p>
         <A class="underline" href="/privacy">
           Privacy Policy
         </A>
