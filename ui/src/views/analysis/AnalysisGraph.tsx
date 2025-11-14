@@ -3,13 +3,14 @@ import { SetStoreFunction } from "solid-js/store";
 import * as Plot from "@observablehq/plot";
 
 import { Analysis, Session, SleepQuality } from "../../../Types";
-import { TextArea, Input, Button } from "../../components";
+import { TextArea, Input, Button, sleepValueLabels } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import PlotChart from "./Plot";
 import LoadFullScreen from "../app/LoadFullScreen";
 import { ClientResponseError } from "pocketbase";
 import { SegmentedControl } from "../../components";
 import { filterByRange } from "../../methods/analysis";
+import { SESSION_EXPAND } from "../../../constants";
 
 interface Props {
   analysis: Analysis;
@@ -111,9 +112,9 @@ const Graph: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const sessions = await pb.collection<Session>("sessions").getFullList({ sort: "-userDay" });
+      const sessions = await pb.collection<Session>("sessions").getFullList({ sort: " -userDay" });
 
-      setData(sessions);
+      // setData(sessions);
     } catch (e) {
       if (e instanceof ClientResponseError && e.status == 0) {
       } else {
@@ -122,7 +123,7 @@ const Graph: Component<Props> = (props) => {
     }
   };
 
-  // createEffect(() => getData());
+  createEffect(() => getData());
 
   const computedData = createMemo(() => {
     let mappedData = filterByRange(data(), range())
@@ -138,11 +139,15 @@ const Graph: Component<Props> = (props) => {
 
         return {
           date: new Date(s.userDay),
-          scaledValue: sleepValueValues[s.sleepQuality],
-          originalValue: s.sleepQuality,
+          sleep: sleepValueValues[s.sleepQuality],
+          originalSleep: sleepValueLabels[s.sleepQuality],
+          weight: 0,
+          originalWeight: s.userWeight,
           series: "Sleep Quality",
-          kj,
-          gramsProtein,
+          originalKj: kj,
+          originalGramsProtein: gramsProtein,
+          kj: NaN,
+          gramsProtein: NaN,
         };
       });
 
@@ -158,18 +163,50 @@ const Graph: Component<Props> = (props) => {
     mappedData = mappedData.map((d) => ({
       ...d,
       kj: normalizeData(
-        d.kj || NaN,
-        Math.min(...mappedData.map((d) => d.kj)),
-        Math.max(...mappedData.map((d) => d.kj))
+        d.originalKj || NaN,
+        Math.min(...mappedData.map((d) => d.originalKj)),
+        Math.max(...mappedData.map((d) => d.originalKj))
       ),
       gramsProtein: normalizeData(
-        d.gramsProtein || NaN,
-        Math.min(...mappedData.map((d) => d.gramsProtein)),
-        Math.max(...mappedData.map((d) => d.gramsProtein))
+        d.originalGramsProtein || NaN,
+        Math.min(...mappedData.map((d) => d.originalGramsProtein)),
+        Math.max(...mappedData.map((d) => d.originalGramsProtein))
+      ),
+      weight: normalizeData(
+        d.originalWeight || NaN,
+        Math.min(...mappedData.map((d) => d.originalWeight)),
+        Math.max(...mappedData.map((d) => d.originalWeight))
       ),
     }));
 
-    return mappedData;
+    const long = mappedData.flatMap((d) => [
+      {
+        date: d.date,
+        series: "Sleep",
+        value: d.sleep,
+        raw: d.originalSleep,
+      },
+      {
+        date: d.date,
+        series: "Weight",
+        value: d.weight,
+        raw: d.originalWeight,
+      },
+      {
+        date: d.date,
+        series: "KJ",
+        value: d.kj,
+        raw: d.originalKj,
+      },
+      {
+        date: d.date,
+        series: "Protein",
+        value: d.gramsProtein,
+        raw: d.originalGramsProtein,
+      },
+    ]);
+
+    return long;
   });
 
   return (
@@ -194,29 +231,21 @@ const Graph: Component<Props> = (props) => {
             Plot.ruleX([computedData()[0].date]),
             Plot.lineY(computedData(), {
               x: "date",
-              y: "scaledValue",
+              y: "value",
               stroke: "series",
-              curve: "monotone-x",
-              strokeWidth: 2.5,
-              dx: -4, // TODO offset sleep so it is between days, need to calculate distance properly
-            }),
-            Plot.lineY(computedData(), {
-              x: "date",
-              y: "kj",
-              stroke: "red",
-              curve: "monotone-x",
-              strokeWidth: 2.5,
-            }),
-            Plot.lineY(computedData(), {
-              x: "date",
-              y: "gramsProtein",
-              stroke: "blue",
               curve: "monotone-x",
               strokeWidth: 2.5,
             }),
             Plot.tip(
               computedData(),
-              Plot.pointerX({ x: "date", y: "kj", style: { background: "red", opacity: 1 } })
+              Plot.pointerX({
+                x: "date",
+                y: "value",
+                title: (d) => `${d.date.toLocaleDateString()}\n${d.series}: ${d.raw}`,
+                strokeWidth: 0.8,
+                opacity: 0.95,
+                fill: "#1c252a",
+              })
             ),
           ],
         }}
