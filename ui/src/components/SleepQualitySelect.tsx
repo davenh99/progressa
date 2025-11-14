@@ -8,12 +8,13 @@ interface EmojiOption {
   value: SleepQuality;
 }
 
-const sleepValueLabels: { [key in SleepQuality]: string } = {
+export const sleepValueLabels: { [key in SleepQuality | ""]: string } = {
   terrible: "Very Poor",
   poor: "Poor",
   fair: "Fair",
   good: "Good",
   great: "Excellent",
+  "": "None",
 };
 
 const sleepOptions: EmojiOption[] = [
