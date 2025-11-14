@@ -2,7 +2,7 @@ import { Component, createEffect, createMemo, createSignal, For, Show } from "so
 import { SetStoreFunction } from "solid-js/store";
 import * as Plot from "@observablehq/plot";
 
-import { Analysis, Session } from "../../../Types";
+import { Analysis, Session, SleepQuality } from "../../../Types";
 import { TextArea, Input, Button } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import PlotChart from "./Plot";
@@ -73,7 +73,15 @@ const AnalysisGraph: Component<Props> = (props) => {
           </Button>
         </Show>
       </div>
-      <Show when={editing()} fallback={<Graph analysis={props.analysis} setAnalysis={props.setAnalysis} />}>
+      <Show
+        when={editing()}
+        fallback={
+          <>
+            <Graph analysis={props.analysis} setAnalysis={props.setAnalysis} />
+            <p>we will put stuff here to add series and stuff</p>
+          </>
+        }
+      >
         <Input label="Name" class="mb-3" labelPosition="above" value={title()} onChange={setTitle} />
         <TextArea
           label="Description"
@@ -86,6 +94,14 @@ const AnalysisGraph: Component<Props> = (props) => {
 };
 
 const ranges = ["5y", "1y", "6m", "1m", "custom"];
+const sleepValueValues: { [key in SleepQuality | ""]: number } = {
+  terrible: 0.1,
+  poor: 0.3,
+  fair: 0.5,
+  good: 0.7,
+  great: 0.9,
+  "": NaN,
+};
 import sampleData from "../../../../test_data/sampleData.json";
 
 const Graph: Component<Props> = (props) => {
@@ -108,38 +124,100 @@ const Graph: Component<Props> = (props) => {
 
   // createEffect(() => getData());
 
-  const computedData = createMemo(() =>
-    filterByRange(data(), range())
+  const computedData = createMemo(() => {
+    let mappedData = filterByRange(data(), range())
       .filter((s) => s.sleepQuality !== undefined && s.sleepQuality !== null)
       .sort((sA, sB) => new Date(sA.userDay).getTime() - new Date(sB.userDay).getTime())
-      .map((s) => ({
-        date: new Date(s.userDay),
-        weight: s.sleepQuality,
-        series: "Weight (kg)",
-      }))
-  );
+      .map((s) => {
+        let kj = 0;
+        let gramsProtein = 0;
+        for (const m of s.expand?.sessionMeals_via_session ?? []) {
+          kj += m.kj;
+          gramsProtein += m.gramsProtein;
+        }
+
+        return {
+          date: new Date(s.userDay),
+          scaledValue: sleepValueValues[s.sleepQuality],
+          originalValue: s.sleepQuality,
+          series: "Sleep Quality",
+          kj,
+          gramsProtein,
+        };
+      });
+
+    const normalizeData = (value: number, min: number, max: number, buffer = 0.1) => {
+      if (Number.isNaN(value)) return NaN;
+      const range = max - min;
+      const bufferedMin = min - range * buffer;
+      const bufferedMax = max + range * buffer;
+      if (bufferedMax === bufferedMin) return 0.5;
+      return (value - bufferedMin) / (bufferedMax - bufferedMin);
+    };
+
+    mappedData = mappedData.map((d) => ({
+      ...d,
+      kj: normalizeData(
+        d.kj || NaN,
+        Math.min(...mappedData.map((d) => d.kj)),
+        Math.max(...mappedData.map((d) => d.kj))
+      ),
+      gramsProtein: normalizeData(
+        d.gramsProtein || NaN,
+        Math.min(...mappedData.map((d) => d.gramsProtein)),
+        Math.max(...mappedData.map((d) => d.gramsProtein))
+      ),
+    }));
+
+    return mappedData;
+  });
 
   return (
     <div class="w-full flex flex-col items-center">
       <SegmentedControl value={range} onChange={setRange} options={ranges} />
       <PlotChart
         options={{
-          y: { grid: true, label: null },
-          x: { grid: true, label: null },
-          width: 350,
-          height: 250,
+          y: { grid: 5, label: "Value", tickFormat: () => "", ticks: [0.2, 0.4, 0.6, 0.8] },
+          x: { label: null },
+          marginBottom: 40,
+          width: 370,
+          height: 300,
           style: {
             fontSize: "0.9rem",
+            fontWeight: "bold",
+            strokeWidth: "2",
+            fontFamily: "Rubik",
           },
-          color: { legend: true, scheme: "Greens" },
+          color: { scheme: "Greens" },
           marks: [
             Plot.ruleY([0]),
+            Plot.ruleX([computedData()[0].date]),
             Plot.lineY(computedData(), {
               x: "date",
-              y: "weight",
+              y: "scaledValue",
               stroke: "series",
-              curve: "bump-x",
+              curve: "monotone-x",
+              strokeWidth: 2.5,
+              dx: -4, // TODO offset sleep so it is between days, need to calculate distance properly
             }),
+            Plot.lineY(computedData(), {
+              x: "date",
+              y: "kj",
+              stroke: "red",
+              curve: "monotone-x",
+              strokeWidth: 2.5,
+            }),
+            Plot.lineY(computedData(), {
+              x: "date",
+              y: "gramsProtein",
+              stroke: "blue",
+              curve: "monotone-x",
+              strokeWidth: 2.5,
+            }),
+            Plot.tip(
+              computedData(),
+              Plot.pointerX({ x: "date", y: "kj", style: { background: "red", opacity: 1 } })
+            ),
           ],
         }}
       />
