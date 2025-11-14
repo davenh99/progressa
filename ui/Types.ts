@@ -70,7 +70,7 @@ export interface SessionCreateData {
   userWeight: number;
   exercisesOrder: string[] | null;
   mealsOrder: string[] | null;
-  sleepQuality?: SleepQuality;
+  sleepQuality: SleepQuality | "";
 }
 
 export interface Session extends SessionCreateData {
