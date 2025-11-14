@@ -1,13 +1,16 @@
 import { ParentComponent } from "solid-js";
+import { A } from "@solidjs/router";
+import User from "lucide-solid/icons/user";
 
 import Container from "./Container";
 import Header from "./Header";
-import User from "lucide-solid/icons/user";
-import { A } from "@solidjs/router";
 import Footer from "./Footer";
 import pkg from "../../../package.json";
+import { usePB } from "../../config/pocketbase";
 
 export const SiteLayout: ParentComponent = (props) => {
+  const { store } = usePB();
+
   return (
     <div class="flex flex-col h-screen bg-charcoal-500 text-dark-slate-gray-900">
       <Header>
@@ -18,7 +21,7 @@ export const SiteLayout: ParentComponent = (props) => {
             </p>
           </A>
 
-          <A href="/auth" class="flex flex-col items-center">
+          <A href={!store.user ? "/auth" : "/profile"} class="flex flex-col items-center">
             <User size={28} />
           </A>
         </nav>
