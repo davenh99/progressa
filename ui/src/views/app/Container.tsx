@@ -3,6 +3,7 @@ import { tv } from "tailwind-variants";
 
 interface Props {
   class?: string;
+  ref?: HTMLDivElement | undefined;
 }
 
 const container = tv({
@@ -16,7 +17,11 @@ const Container: ParentComponent<Props> = (props) => {
     })
   );
 
-  return <div class={classes()}>{props.children}</div>;
+  return (
+    <div ref={props.ref} class={classes()}>
+      {props.children}
+    </div>
+  );
 };
 
 export default Container;

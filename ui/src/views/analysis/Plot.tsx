@@ -3,6 +3,7 @@ import * as Plot from "@observablehq/plot";
 
 interface PlotProps {
   options: Plot.PlotOptions;
+  class?: string;
 }
 
 const PlotChart: Component<PlotProps> = (props) => {
@@ -29,7 +30,7 @@ const PlotChart: Component<PlotProps> = (props) => {
     });
   });
 
-  return <div class="my-3" ref={ref} />;
+  return <div class={props.class} ref={ref} />;
 };
 
 export default PlotChart;

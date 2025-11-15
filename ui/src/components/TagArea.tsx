@@ -2,14 +2,14 @@ import { Component, createSignal, For, JSX } from "solid-js";
 import { Button as KobalteButton } from "@kobalte/core/button";
 import CloseIcon from "lucide-solid/icons/x";
 
-import type { Tag as TagType } from "../../Types";
+import type { Tag as TTag } from "../../Types";
 import Input from "./Input";
 import { useAuthPB } from "../config/pocketbase";
 import { ClientResponseError } from "pocketbase";
 
 interface Props {
   onClick: () => void;
-  tag: TagType;
+  tag: TTag;
 }
 
 const Tag: Component<Props> = (props) => {
@@ -27,8 +27,8 @@ const Tag: Component<Props> = (props) => {
 };
 
 interface TagAreaProps {
-  tags: TagType[];
-  setTags: (tags: TagType[]) => void;
+  tags: TTag[];
+  setTags: (tags: TTag[]) => void;
   modelName: string;
   recordID: string;
   updateRecord?: (modelName: string, recordID: string, field: string, newVal: any) => Promise<any>;
@@ -47,7 +47,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       if (!props.tags.map((t) => t.name).includes(newTag)) {
         try {
           const foundTag = await pb
-            .collection<TagType>("tags")
+            .collection<TTag>("tags")
             .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
 
           await updateFn(props.modelName, props.recordID, "+tags", foundTag.id);
@@ -55,7 +55,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
         } catch (e) {
           if (e instanceof ClientResponseError && e.status == 404) {
             const createdTag = await pb
-              .collection<TagType>("tags")
+              .collection<TTag>("tags")
               .create({ name: newTag, public: false, createdBy: user.id, colorHex: "#ccccff" });
 
             await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
@@ -69,7 +69,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
     }
   };
 
-  const deleteTag = async (t: TagType) => {
+  const deleteTag = async (t: TTag) => {
     try {
       await updateFn(props.modelName, props.recordID, "tags-", t.id);
       props.setTags((props.tags || []).filter((tag) => tag.id !== t.id));
