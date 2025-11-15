@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "@solidjs/router";
-import { Component, createEffect, Show } from "solid-js";
+import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { ClientResponseError } from "pocketbase";
 import ArrowLeft from "lucide-solid/icons/arrow-left";
@@ -8,17 +8,19 @@ import Container from "../views/app/Container";
 import { Button } from "../components";
 import Header from "../views/app/Header";
 import AnalysisList from "../views/analysis/AnalysisList";
-import { Analysis, AnalysisCreateData } from "../../Types";
+import { Analysis as TAnalysis, AnalysisCreateData } from "../../Types";
 import { useAuthPB } from "../config/pocketbase";
-import AnalysisGraph from "../views/analysis/AnalysisGraph";
+import Analysis from "../views/analysis/Analysis";
 
 type SearchParams = {
   analysisId: string;
 };
 
 const Sessions: Component = () => {
+  let ref: HTMLDivElement | undefined;
+  const [dimensions, setDimensions] = createSignal({ width: 0, height: 0 });
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
-  const [analysis, setAnalysis] = createStore<{ analysis: Analysis | null }>({ analysis: null });
+  const [analysis, setAnalysis] = createStore<{ analysis: TAnalysis | null }>({ analysis: null });
   const { pb, user, updateRecord, getAnalysisByID } = useAuthPB();
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ const Sessions: Component = () => {
       filters: [],
     };
     try {
-      const newAnalysis = await pb.collection<Analysis>("analyses").create(createData);
+      const newAnalysis = await pb.collection<TAnalysis>("analyses").create(createData);
 
       setAnalysis({ analysis: newAnalysis });
       setSearchParams({ analysisId: newAnalysis.id });
@@ -42,7 +44,7 @@ const Sessions: Component = () => {
 
   const analysisUpdate = async (field: string, newVal: any) => {
     if (analysis.analysis?.id) {
-      return await updateRecord<Analysis>("analyses", analysis.analysis?.id, field, newVal);
+      return await updateRecord<TAnalysis>("analyses", analysis.analysis?.id, field, newVal);
     } else {
       throw new Error("Tried to update an analysis when missing id");
     }
@@ -70,6 +72,15 @@ const Sessions: Component = () => {
     _getAnalysisByID();
   });
 
+  onMount(() => {
+    if (ref) {
+      setDimensions({
+        width: ref.clientWidth,
+        height: ref.clientHeight,
+      });
+    }
+  });
+
   return (
     <>
       <Header>
@@ -85,7 +96,7 @@ const Sessions: Component = () => {
           </Show>
         </div>
       </Header>
-      <Container class="pb-25 overflow-y-auto py-0 bg-charcoal-500">
+      <Container ref={ref} class="pb-25 overflow-y-auto py-0 bg-charcoal-500 h-full">
         <Show
           when={analysis.analysis != null && !!searchParams.analysisId}
           fallback={
@@ -95,7 +106,7 @@ const Sessions: Component = () => {
             />
           }
         >
-          <AnalysisGraph analysis={analysis.analysis!} setAnalysis={setAnalysis} />
+          <Analysis pageDimensions={dimensions} analysis={analysis.analysis!} setAnalysis={setAnalysis} />
         </Show>
       </Container>
     </>
