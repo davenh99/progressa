@@ -6,7 +6,7 @@ import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
 import { Exercise, ExerciseVariation, Session, SessionExercise } from "../../../Types";
-import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
+import { Button, Checkbox, Modal, Slider, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
@@ -105,6 +105,24 @@ const ModalContent: Component<ModalProps> = (props) => {
         onChange={(v) => props.setExercise("isWarmup", v)}
         label="Mark as warmup"
       />
+      <div class="my-4 space-y-4">
+        <Slider
+          label="Endurance Rating"
+          value={props.exercise.enduranceRating ?? 0}
+          min={0}
+          max={100}
+          step={5}
+          onValueChange={(v) => props.setExercise("enduranceRating", v)}
+        />
+        <Slider
+          label="Strength Rating"
+          value={props.exercise.strengthRating ?? 0}
+          min={0}
+          max={100}
+          step={5}
+          onValueChange={(v) => props.setExercise("strengthRating", v)}
+        />
+      </div>
       <TextArea
         class="my-2"
         label="Notes"

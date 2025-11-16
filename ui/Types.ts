@@ -1,5 +1,44 @@
-export type SleepQuality = "terrible" | "poor" | "fair" | "good" | "great";
+export type SleepQuality = "terrible" | "poor" | "fair" | "good" | "great" | "";
 export type DraggingState = "idle" | "dragging" | "dragging-over";
+export type Rating = 0 | 1 | 2 | 3 | 4 | 5;
+
+export interface RatingOption<T extends string | number> {
+  emoji: string;
+  label: string;
+  value: T;
+}
+
+export const moodOptions: RatingOption<Rating>[] = [
+  { emoji: "😢", label: "Very Bad", value: 1 },
+  { emoji: "☹️", label: "Bad", value: 2 },
+  { emoji: "😐", label: "Neutral", value: 3 },
+  { emoji: "🙂", label: "Good", value: 4 },
+  { emoji: "😄", label: "Great", value: 5 },
+];
+
+export const stressOptions: RatingOption<Rating>[] = [
+  { emoji: "😌", label: "Very Low", value: 1 },
+  { emoji: "🙂", label: "Low", value: 2 },
+  { emoji: "😐", label: "Medium", value: 3 },
+  { emoji: "😣", label: "High", value: 4 },
+  { emoji: "😫", label: "Very High", value: 5 },
+];
+
+export const anxietyOptions: RatingOption<Rating>[] = [
+  { emoji: "😌", label: "Very Low", value: 1 },
+  { emoji: "🙂", label: "Low", value: 2 },
+  { emoji: "😕", label: "Medium", value: 3 },
+  { emoji: "😟", label: "High", value: 4 },
+  { emoji: "😰", label: "Very High", value: 5 },
+];
+
+export const sleepOptions: RatingOption<string>[] = [
+  { emoji: "😞", label: "Very Poor", value: "terrible" },
+  { emoji: "😕", label: "Poor", value: "poor" },
+  { emoji: "😐", label: "Fair", value: "fair" },
+  { emoji: "😊", label: "Good", value: "good" },
+  { emoji: "😴", label: "Excellent", value: "great" },
+];
 
 export interface User {
   id: string;
@@ -70,11 +109,14 @@ export interface SessionCreateData {
   userWeight: number;
   exercisesOrder: string[] | null;
   mealsOrder: string[] | null;
-  sleepQuality?: SleepQuality;
 }
 
 export interface Session extends SessionCreateData {
   id: string;
+  sleepQuality: SleepQuality;
+  stressRating: Rating;
+  anxietyRating: Rating;
+  moodRating: Rating;
   expand?: {
     tags?: Tag[];
     sessionExercises_via_session?: SessionExercise[];
@@ -104,6 +146,8 @@ interface RoutineOrSessionExercise {
   measurement2Value?: string;
   measurement3Value?: string;
   supersetParent?: string;
+  strengthRating: number; // 0-100
+  enduranceRating: number; // 0-100
   expand?: {
     exercise?: Exercise;
     variation?: ExerciseVariation;

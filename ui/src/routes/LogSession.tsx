@@ -2,14 +2,22 @@ import { Component, createEffect, createSignal, Show } from "solid-js";
 import { Tabs } from "@kobalte/core/tabs";
 import { createStore } from "solid-js/store";
 import { useSearchParams } from "@solidjs/router";
+import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
-import { Input, DataTextArea, TagArea, DataSleepQualitySelector, Button, DateInput } from "../components";
+import { Input, DataTextArea, TagArea, Button, DateInput, RatingSelector } from "../components";
 import Container from "../views/app/Container";
-import type { SleepQuality, Session, SessionCreateData } from "../../Types";
+import {
+  type SleepQuality,
+  type Session,
+  type SessionCreateData,
+  moodOptions,
+  stressOptions,
+  anxietyOptions,
+  sleepOptions,
+} from "../../Types";
 import Loading from "../views/app/Loading";
 import LogSessionNav from "../views/session/LogSessionNav";
-import { ClientResponseError } from "pocketbase";
 import Header from "../views/app/Header";
 import { NumberInput } from "../components/NumberInput";
 import Card from "../views/app/Card";
@@ -153,10 +161,39 @@ const LogSession: Component = () => {
 
                 <Card class="space-y-3">
                   <h2>Sleep Quality</h2>
-                  <DataSleepQualitySelector
+                  <RatingSelector
+                    label="Sleep Quality"
                     value={session.session?.sleepQuality}
                     onValueChange={(v) => setSession("session", "sleepQuality", v as SleepQuality)}
-                    saveFunc={(v: string) => sessionUpdate("sleepQuality", v)}
+                    saveFunc={(v) => sessionUpdate("sleepQuality", v)}
+                    options={sleepOptions}
+                  />
+                </Card>
+
+                <Card class="space-y-3">
+                  <h2>Mental Health</h2>
+                  <RatingSelector
+                    label="Mood"
+                    value={session.session?.moodRating}
+                    onValueChange={(v) => setSession("session", "moodRating", v)}
+                    saveFunc={(v) => sessionUpdate("moodRating", v)}
+                    options={moodOptions}
+                  />
+
+                  <RatingSelector
+                    label="Stress"
+                    value={session.session?.stressRating}
+                    onValueChange={(v) => setSession("session", "stressRating", v)}
+                    saveFunc={(v) => sessionUpdate("stressRating", v)}
+                    options={stressOptions}
+                  />
+
+                  <RatingSelector
+                    label="Anxiety"
+                    value={session.session?.anxietyRating}
+                    onValueChange={(v) => setSession("session", "anxietyRating", v)}
+                    saveFunc={(v) => sessionUpdate("anxietyRating", v)}
+                    options={anxietyOptions}
                   />
                 </Card>
               </Container>
