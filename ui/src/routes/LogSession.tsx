@@ -148,7 +148,7 @@ const LogSession: Component = () => {
               </Container>
             </Tabs.Content>
 
-            <Tabs.Content value="meals">
+            <Tabs.Content value="meals" class="flex flex-1 overflow-hidden">
               <Container class="space-y-4 pb-30 overflow-y-auto">
                 <Card>
                   <h2>Meals</h2>
@@ -199,7 +199,7 @@ const LogSession: Component = () => {
               </Container>
             </Tabs.Content>
 
-            <Tabs.Content value="settings">
+            <Tabs.Content value="settings" class="flex flex-1 overflow-hidden">
               <Container class="space-y-2 pb-30 overflow-y-auto">
                 <h2 class="mb-4">Session Settings</h2>
 
