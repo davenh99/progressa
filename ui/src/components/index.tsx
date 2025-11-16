@@ -13,3 +13,4 @@ export * from "./Switch";
 export * from "./RPESelect";
 export * from "./DateInput";
 export * from "./RatingSelector";
+export * from "./Popover";

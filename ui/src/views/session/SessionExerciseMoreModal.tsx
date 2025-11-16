@@ -6,7 +6,16 @@ import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
 import { Exercise, ExerciseVariation, Session, SessionExercise } from "../../../Types";
-import { Button, Checkbox, Modal, Slider, TagArea, TextArea, useModalLoading } from "../../components";
+import {
+  Button,
+  Checkbox,
+  Modal,
+  Slider,
+  TagArea,
+  TextArea,
+  Popover,
+  useModalLoading,
+} from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
@@ -107,7 +116,12 @@ const ModalContent: Component<ModalProps> = (props) => {
       />
       <div class="my-4 space-y-4">
         <Slider
-          label="Endurance Rating"
+          label={
+            <span class="inline-flex items-center space-x-1">
+              <p>Endurance Rating</p>
+              <Popover msg="How much you think this exercise was focused on endurance" />
+            </span>
+          }
           value={props.exercise.enduranceRating ?? 0}
           min={0}
           max={100}
@@ -115,7 +129,12 @@ const ModalContent: Component<ModalProps> = (props) => {
           onValueChange={(v) => props.setExercise("enduranceRating", v)}
         />
         <Slider
-          label="Strength Rating"
+          label={
+            <span class="inline-flex items-center space-x-1">
+              <p>Strength Rating</p>
+              <Popover msg="How much you think this exercise was strength focused" />
+            </span>
+          }
           value={props.exercise.strengthRating ?? 0}
           min={0}
           max={100}

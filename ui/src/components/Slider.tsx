@@ -1,9 +1,9 @@
-import { Component, createMemo } from "solid-js";
+import { Component, createMemo, JSX } from "solid-js";
 import { Slider as KSlider } from "@kobalte/core/slider";
 import { debounce } from "../methods/debounce";
 
 interface Props {
-  label?: string;
+  label?: JSX.Element;
   value: number;
   min?: number;
   max?: number;
@@ -31,7 +31,7 @@ export const Slider: Component<Props> = (props) => {
       step={props.step ?? 1}
       getValueLabel={(params) => `${params.values[0]}%`}
     >
-      <div>{props.label && <KSlider.Label>{props.label}</KSlider.Label>}</div>
+      <>{props.label && <KSlider.Label>{props.label}</KSlider.Label>}</>
 
       <div class="flex items-center mx-2 justify-between">
         <KSlider.Track class="h-2 w-[85%] rounded-4xl relative bg-dark-slate-gray-200">
