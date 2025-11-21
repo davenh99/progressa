@@ -27,3 +27,12 @@ serve-dev:
 	(make ui-dev)
 
 dev: serve-dev
+
+release-patch:
+	./release.sh patch
+
+release-minor:
+	./release.sh minor
+
+release-major:
+	./release.sh major
