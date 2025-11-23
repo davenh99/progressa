@@ -4,7 +4,10 @@ import (
 	"embed"
 	"io/fs"
 	"log"
+	c "progressa/core"
 	"progressa/core/routes"
+	"progressa/plugins/computedfields"
+	"progressa/plugins/gentypes"
 	"progressa/utils"
 
 	"github.com/pocketbase/pocketbase"
@@ -24,9 +27,16 @@ func main() {
 	app := pocketbase.New()
 	env := utils.Env.Env
 
+	computedfields.Register(app, c.ComputedFieldsCfg)
+
 	migrationsFilePattern := `^\d.*\.(js|ts)`
 	if env == "development" {
 		migrationsFilePattern = `^.*\.(js|ts)$`
+
+		gentypes.Register(app, gentypes.Config{
+			FilePath:                   "ui/base.d.ts",
+			CollectionAdditionalFields: c.ComputedFieldsCfg.ExtractFields(),
+		})
 	}
 
 	jsvm.MustRegister(app, jsvm.Config{

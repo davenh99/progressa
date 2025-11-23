@@ -36,3 +36,6 @@ release-minor:
 
 release-major:
 	./release.sh major
+
+types: build
+	@cd dist; ./progressa gen-types
