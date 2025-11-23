@@ -139,7 +139,6 @@ export interface SessionExercises {
   measurement2Value?: string; // relation
   measurement3Value?: string; // relation
   supersetParent?: string; // relation
-  variation?: string; // relation
   isWarmup?: boolean; // bool
   perceivedEffort?: number; // number
   session: string; // relation
@@ -151,15 +150,6 @@ export interface SessionExercises {
 }
 
 export type SessionExercisesRecord = SessionExercises & BaseRecord;
-
-/* Collection type: base */
-export interface ExerciseVariations {
-  name?: string; // text
-  description?: string; // text
-  exercise: string; // relation
-}
-
-export type ExerciseVariationsRecord = ExerciseVariations & BaseRecord;
 
 /* Collection type: base */
 export interface SessionMeals {
@@ -200,7 +190,6 @@ export interface RoutineExercises {
   measurementValue?: string; // relation
   measurement2Value?: string; // relation
   measurement3Value?: string; // relation
-  variation?: string; // relation
   isWarmup?: boolean; // bool
   supersetParent?: string; // relation
   enduranceRating?: number; // number
