@@ -261,18 +261,28 @@ func sortNewIds(app core.App, fromCollection string, oldToNewIdsMap map[string]s
 }
 
 func duplicateExercise(dst *core.Record, src *core.Record, parentId *string) {
-	dst.Set("exercise", src.Get("exercise"))
-	dst.Set("notes", src.Get("notes"))
-	dst.Set("tags", src.Get("tags"))
-	dst.Set("addedWeight", src.Get("addedWeight"))
-	dst.Set("restAfter", src.Get("restAfter"))
-	dst.Set("isWarmup", src.Get("isWarmup"))
-	dst.Set("measurementNumeric", src.Get("measurementNumeric"))
-	dst.Set("measurement2Numeric", src.Get("measurement2Numeric"))
-	dst.Set("measurement3Numeric", src.Get("measurement3Numeric"))
-	dst.Set("measurementValue", src.Get("measurementValue"))
-	dst.Set("measurement2Value", src.Get("measurement2Value"))
-	dst.Set("measurement3Value", src.Get("measurement3Value"))
+	copyFields := []string{
+		"exercise",
+		"notes",
+		"tags",
+		"addedWeight",
+		"restAfter",
+		"isWarmup",
+		"measurementNumeric",
+		"measurement2Numeric",
+		"measurement3Numeric",
+		"measurementValue",
+		"measurement2Value",
+		"measurement3Value",
+		"enduranceRating",
+		"strengthRating",
+		"perceivedEffort",
+		"exerciseDuration",
+	}
+
+	for _, f := range copyFields {
+		dst.Set(f, src.Get(f))
+	}
 
 	if src.Get("routine") != nil {
 		dst.Set("routine", src.Get("routine"))
