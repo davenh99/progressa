@@ -43,11 +43,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   const measurement2HeaderClass = createMemo(() =>
     measurement2Header().length > 5 ? "text-sm flex-2" : "flex-2"
   );
-  const exercisesTitle = createMemo(() =>
-    props.row.original.expand?.variation?.name
-      ? `${props.row.original.expand?.exercise?.name} (${props.row.original.expand?.variation?.name})`
-      : props.row.original.expand?.exercise?.name || ""
-  );
+  const exercisesTitle = createMemo(() => props.row.original.expand?.exercise?.name);
 
   createEffect(() => {
     if (!props.firstOfSuperset && !props.lastOfSuperset) return;

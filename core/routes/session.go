@@ -18,7 +18,6 @@ var SESSION_EXPANDS = []string{
 	"sessionExercises_via_session.measurementValue",
 	"sessionExercises_via_session.measurement2Value",
 	"sessionExercises_via_session.measurement3Value",
-	"sessionExercises_via_session.variation",
 	"sessionExercises_via_session.tags",
 	"sessionMeals_via_session.tags",
 }

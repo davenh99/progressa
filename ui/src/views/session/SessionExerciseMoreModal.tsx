@@ -5,7 +5,7 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
-import { Exercise, ExerciseVariation, Session, SessionExercise } from "../../../Types";
+import { Exercise, Session, SessionExercise } from "../../../Types";
 import {
   Button,
   Checkbox,
@@ -70,13 +70,11 @@ const ModalContent: Component<ModalProps> = (props) => {
   const [warning, setWarning] = createSignal("");
   const { setLoading } = useModalLoading();
 
-  const selectNewExercise = async (exercise: Exercise, variation?: ExerciseVariation) => {
+  const selectNewExercise = async (exercise: Exercise) => {
     props.setExercise("exercise", exercise.id);
-    props.setExercise("variation", variation?.id ?? "");
     props.setExercise("expand", (currentExpand: any) => ({
       ...currentExpand,
       exercise: { ...currentExpand?.exercise, name: exercise.name },
-      variation: { ...currentExpand?.variation, name: variation?.name ?? "" },
     }));
     props.setExercise("measurementNumeric", 0);
     props.setExercise("measurement2Numeric", 0);
@@ -100,11 +98,7 @@ const ModalContent: Component<ModalProps> = (props) => {
       <h2 class="pb-2">Exercise Options</h2>
       <div class="mb-3">
         <Button class="w-full flex items-center" onClick={() => setShowExerciseSelectModal(true)}>
-          <p class="flex-1">
-            {props.exercise.expand?.variation?.name
-              ? `${props.exercise.expand?.exercise?.name} (${props.exercise.expand?.variation?.name})`
-              : props.exercise.expand?.exercise?.name}
-          </p>
+          <p class="flex-1">{props.exercise.expand?.exercise?.name}</p>
           <ArrowUp size={18} />
         </Button>
         <p class="pt-1 text-red-400 text-xs">{warning()}</p>

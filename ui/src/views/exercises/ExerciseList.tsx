@@ -52,7 +52,7 @@ export const ExerciseList: Component<Props> = (props) => {
     try {
       const exercises = await pb
         .collection<Exercise>("exercises")
-        .getFullList({ expand: "defaultMeasurementType, exerciseVariations_via_exercise", sort: "name" });
+        .getFullList({ expand: "defaultMeasurementType", sort: "name" });
 
       setExercises(exercises);
     } catch (e) {

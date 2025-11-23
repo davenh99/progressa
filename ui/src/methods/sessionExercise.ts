@@ -20,9 +20,7 @@ export const getGroups = (exercises: (SessionExercise | RoutineExercise)[]) => {
   // loop and populate resMap
   for (const routineOrSessionExercise of exercises) {
     const id = routineOrSessionExercise.supersetParent || routineOrSessionExercise.id;
-    const name = routineOrSessionExercise.expand?.variation?.name
-      ? `${routineOrSessionExercise.expand?.exercise?.name} (${routineOrSessionExercise.expand?.variation?.name})`
-      : routineOrSessionExercise.expand?.exercise?.name || "";
+    const name = routineOrSessionExercise.expand?.exercise?.name || "";
 
     if (!resMap[id]) {
       resMap[id] = { exerciseNames: [name] };
@@ -60,7 +58,6 @@ export const getDropsetAddData = (sessionExercise: SessionExercise) => {
     user,
     exercise,
     session,
-    variation,
     perceivedEffort,
     addedWeight,
     restAfter,
@@ -73,7 +70,6 @@ export const getDropsetAddData = (sessionExercise: SessionExercise) => {
     user,
     exercise,
     session,
-    variation,
     perceivedEffort,
     addedWeight,
     restAfter,

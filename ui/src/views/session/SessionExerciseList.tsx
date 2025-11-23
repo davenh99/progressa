@@ -7,14 +7,7 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
 import { useAuthPB } from "../../config/pocketbase";
-import {
-  Exercise,
-  ExerciseVariation,
-  Routine,
-  Session,
-  SessionExercise,
-  SessionExerciseCreateData,
-} from "../../../Types";
+import { Exercise, Routine, Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
 import {
   Button,
   IconButton,
@@ -125,11 +118,10 @@ export const SessionExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addSessionExercise = async (exercise: Exercise, variation?: ExerciseVariation) => {
+  const addSessionExercise = async (exercise: Exercise) => {
     const data: SessionExerciseCreateData = {
       user: user.id,
       session: props.sessionID,
-      variation: variation?.id || undefined,
       exercise: exercise.id,
       perceivedEffort: 0,
     };
@@ -395,8 +387,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
                 firstOfExercises={
                   firstOfGroup ||
                   row.index === 0 ||
-                  row.original.exercise !== props.sessionExercises[row.index - 1].exercise ||
-                  row.original.variation !== props.sessionExercises[row.index - 1].variation
+                  row.original.exercise !== props.sessionExercises[row.index - 1].exercise
                 }
                 firstOfGroup={firstOfGroup}
                 lastOfGroup={

@@ -6,7 +6,6 @@ export const SESSION_EXPAND =
   "sessionExercises_via_session.measurementValue, " +
   "sessionExercises_via_session.measurement2Value, " +
   "sessionExercises_via_session.measurement3Value, " +
-  "sessionExercises_via_session.variation, " +
   "sessionExercises_via_session.tags, " +
   "sessionMeals_via_session.tags";
 
@@ -17,11 +16,10 @@ export const ROUTINE_EXPAND =
   "routineExercises_via_routine.measurementValue, " +
   "routineExercises_via_routine.measurement2Value, " +
   "routineExercises_via_routine.measurement3Value, " +
-  "routineExercises_via_routine.variation, " +
   "routineExercises_via_routine.tags";
 
 export const SESSION_EXERCISE_EXPAND =
-  "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, variation, tags";
+  "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, tags";
 
 export const SESSION_MEAL_EXPAND = "tags";
 

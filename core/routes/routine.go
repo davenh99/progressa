@@ -17,13 +17,11 @@ var ROUTINE_EXPANDS = []string{
 	"routineExercises_via_routine.measurementValue",
 	"routineExercises_via_routine.measurement2Value",
 	"routineExercises_via_routine.measurement3Value",
-	"routineExercises_via_routine.variation",
 	"routineExercises_via_routine.tags",
 }
 
 var importRoutineCopyFields = []string{
 	"exercise",
-	"variation",
 	"notes",
 	"tags",
 	"addedWeight",

@@ -262,7 +262,6 @@ func sortNewIds(app core.App, fromCollection string, oldToNewIdsMap map[string]s
 
 func duplicateExercise(dst *core.Record, src *core.Record, parentId *string) {
 	dst.Set("exercise", src.Get("exercise"))
-	dst.Set("variation", src.Get("variation"))
 	dst.Set("notes", src.Get("notes"))
 	dst.Set("tags", src.Get("tags"))
 	dst.Set("addedWeight", src.Get("addedWeight"))

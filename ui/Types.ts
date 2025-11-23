@@ -88,15 +88,7 @@ export interface Exercise {
     defaultMeasurementType?: MeasurementType;
     defaultMeasurementType2?: MeasurementType;
     defaultMeasurementType3?: MeasurementType;
-    exerciseVariations_via_exercise?: ExerciseVariation[];
   };
-}
-
-export interface ExerciseVariation {
-  id: string;
-  exercise: string;
-  name: string;
-  description: string;
 }
 
 export interface SessionCreateData {
@@ -128,7 +120,6 @@ export interface SessionExerciseCreateData {
   user: string;
   exercise: string;
   session: string;
-  variation?: string;
   perceivedEffort: number; // 0 - 100
 }
 
@@ -150,7 +141,6 @@ interface RoutineOrSessionExercise {
   enduranceRating: number; // 0-100
   expand?: {
     exercise?: Exercise;
-    variation?: ExerciseVariation;
     measurementValue?: MeasurementValue;
     measurement2Value?: MeasurementValue;
     measurement3Value?: MeasurementValue;
@@ -205,7 +195,6 @@ export interface Routine extends RoutineCreateData {
 export interface RoutineExerciseCreateData {
   exercise: string;
   routine: string;
-  variation?: string;
 }
 
 export type RoutineExercise = RoutineExerciseCreateData & RoutineOrSessionExercise;
