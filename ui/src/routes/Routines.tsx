@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 import ArrowLeft from "lucide-solid/icons/arrow-left";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
+import Delete from "lucide-solid/icons/x";
 
 import Container from "../views/app/Container";
 import Header from "../views/app/Header";
@@ -47,6 +48,16 @@ const Routines: Component = () => {
       return await updateRecord<Routine>("routines", routine.routine?.id, field, newVal);
     } else {
       throw new Error("Tried to update a routine when missing id");
+    }
+  };
+
+  const deleteRoutine = async () => {
+    if (routine.routine?.id) throw new Error("Tried to delete a routine when missing id");
+
+    try {
+      await pb.collection("routines").delete(routine.routine!.id);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -111,7 +122,7 @@ const Routines: Component = () => {
             saveFunc={(v) => routineUpdate("description", v)}
             onValueChange={(v) => setRoutine("routine", "description", v)}
           />
-          <div>
+          <div class="mb-3">
             <p class="mt-3">Exercises</p>
             <RoutineExerciseList
               routineExercises={routine.routine!.expand?.routineExercises_via_routine ?? []}
@@ -119,6 +130,15 @@ const Routines: Component = () => {
               setRoutine={setRoutine}
             />
           </div>
+          <Button
+            class="flex items-center space-x-1 my-2 w-full justify-center"
+            variantColor="bad"
+            variant="text"
+            onClick={deleteRoutine}
+          >
+            <Delete size={20} />
+            <span>Delete Routine</span>
+          </Button>
         </Show>
       </Container>
     </>

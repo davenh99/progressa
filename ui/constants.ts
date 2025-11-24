@@ -19,7 +19,10 @@ export const ROUTINE_EXPAND =
   "routineExercises_via_routine.tags";
 
 export const SESSION_EXERCISE_EXPAND =
-  "exercise.defaultMeasurementType.measurementValues_via_measurementType, measurementValue, tags";
+  "exercise.defaultMeasurementType.measurementValues_via_measurementType, " +
+  "exercise.defaultMeasurementType2.measurementValues_via_measurementType, " +
+  "exercise.defaultMeasurementType3.measurementValues_via_measurementType, " +
+  "measurementValue, tags";
 
 export const SESSION_MEAL_EXPAND = "tags";
 
