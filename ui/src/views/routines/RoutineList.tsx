@@ -9,28 +9,34 @@ import {
   getFilteredRowModel,
 } from "@tanstack/solid-table";
 
-import { Routine } from "../../../Types";
 import { Button, Input } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
   createRoutine: () => Promise<void>;
-  onClick: (routine: Routine) => void;
+  onClick: (routine: RoutinesRecord) => void;
 }
 
 export const RoutineList: Component<Props> = (props) => {
-  const [exercises, setExercises] = createSignal<Routine[]>([]);
+  const [routines, setRoutines] = createSignal<RoutinesRecord[]>([]);
   const [nameFilter, setNameFilter] = createSignal<string>("");
   const { pb } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<Routine>[]>(() => [
+  const columns = createMemo<ColumnDef<RoutinesRecord>[]>(() => [
     {
       accessorKey: "name",
       header: "Routine",
       cell: (ctx) => (
         <div>
-          <p>{ctx.getValue() as string}</p>
-          <p class="text-sm">{ctx.row.original.description}</p>
+          <p class="font-bold">{ctx.getValue() as string}</p>
+          <p class="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
+            {ctx.row.original.description}
+          </p>
+          <p class="text-xs space-y-0">
+            <For each={ctx.row.original.preview.split(", ")}>
+              {(val) => <span class="block text-ellipsis whitespace-nowrap overflow-hidden">{val}</span>}
+            </For>
+          </p>
         </div>
       ),
     },
@@ -43,7 +49,7 @@ export const RoutineList: Component<Props> = (props) => {
 
   const table = createSolidTable({
     get data() {
-      return exercises();
+      return routines();
     },
     columns: columns(),
     getCoreRowModel: getCoreRowModel(),
@@ -57,9 +63,9 @@ export const RoutineList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const exercises = await pb.collection<Routine>("routines").getFullList({ sort: "name" });
+      const routines = await pb.collection<RoutinesRecord>("routines").getFullList({ sort: "name" });
 
-      setExercises(exercises);
+      setRoutines(routines);
     } catch (e) {
       console.error("get exercises error: ", e);
     }
@@ -98,7 +104,10 @@ export const RoutineList: Component<Props> = (props) => {
               >
                 <For each={row.getVisibleCells()}>
                   {(cell) => {
-                    const classes = `p-1 flex items-center ${cell.column.getIndex() === 0 ? "flex-1" : ""}`;
+                    const classes =
+                      cell.column.getIndex() === 0
+                        ? "p-1 flex flex-col flex-1 min-w-0"
+                        : "p-1 flex items-center w-8 justify-center";
 
                     return (
                       <div class={classes}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>

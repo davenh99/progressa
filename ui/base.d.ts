@@ -1,6 +1,6 @@
 /* This file was automatically generated, changes will be overwritten. */
 
-export interface BaseRecord {
+interface BaseRecord {
   id: string;
   collectionName: string;
   collectionId: string;
@@ -9,7 +9,7 @@ export interface BaseRecord {
 }
 
 /* Collection type: auth */
-export interface Users {
+interface Users {
   email: string; // email
   emailVisibility?: boolean; // bool
   verified?: boolean; // bool
@@ -20,10 +20,10 @@ export interface Users {
   dob?: string; // date
 }
 
-export type UsersRecord = Users & BaseRecord;
+type UsersRecord = Users & BaseRecord;
 
 /* Collection type: base */
-export interface MeasurementTypes {
+interface MeasurementTypes {
   system?: boolean; // bool
   createdBy?: string; // relation
   name?: string; // text
@@ -32,20 +32,20 @@ export interface MeasurementTypes {
   displayName?: string; // text
 }
 
-export type MeasurementTypesRecord = MeasurementTypes & BaseRecord;
+type MeasurementTypesRecord = MeasurementTypes & BaseRecord;
 
 /* Collection type: base */
-export interface MeasurementValues {
+interface MeasurementValues {
   measurementType?: string; // relation
   value?: string; // text
   createdBy?: string; // relation
   public?: boolean; // bool
 }
 
-export type MeasurementValuesRecord = MeasurementValues & BaseRecord;
+type MeasurementValuesRecord = MeasurementValues & BaseRecord;
 
 /* Collection type: base */
-export interface Exercises {
+interface Exercises {
   createdBy?: string; // relation
   name?: string; // text
   description?: string; // text
@@ -91,10 +91,10 @@ export interface Exercises {
   isTimeBased?: boolean; // bool
 }
 
-export type ExercisesRecord = Exercises & BaseRecord;
+type ExercisesRecord = Exercises & BaseRecord;
 
 /* Collection type: base */
-export interface Sessions {
+interface Sessions {
   name?: string; // text
   user?: string; // relation
   userDay?: string; // text
@@ -113,20 +113,20 @@ export interface Sessions {
   sessionDuration?: number; // number
 }
 
-export type SessionsRecord = Sessions & BaseRecord;
+type SessionsRecord = Sessions & BaseRecord;
 
 /* Collection type: base */
-export interface Tags {
+interface Tags {
   name?: string; // text
   createdBy?: string; // relation
   public?: boolean; // bool
   colorHex?: string; // text
 }
 
-export type TagsRecord = Tags & BaseRecord;
+type TagsRecord = Tags & BaseRecord;
 
 /* Collection type: base */
-export interface SessionExercises {
+interface SessionExercises {
   exercise: string; // relation
   notes?: string; // text
   tags?: string[]; // relation
@@ -149,10 +149,10 @@ export interface SessionExercises {
   exerciseDuration?: number; // number
 }
 
-export type SessionExercisesRecord = SessionExercises & BaseRecord;
+type SessionExercisesRecord = SessionExercises & BaseRecord;
 
 /* Collection type: base */
-export interface SessionMeals {
+interface SessionMeals {
   name?: string; // text
   kj?: number; // number
   gramsProtein?: number; // number
@@ -164,20 +164,21 @@ export interface SessionMeals {
   saved?: boolean; // bool
 }
 
-export type SessionMealsRecord = SessionMeals & BaseRecord;
+type SessionMealsRecord = SessionMeals & BaseRecord;
 
 /* Collection type: base */
-export interface Routines {
+interface Routines {
   name: string; // text
   user?: string; // relation
   description?: string; // text
   exercisesOrder?: any; // json
+  readonly preview: string; // text
 }
 
-export type RoutinesRecord = Routines & BaseRecord;
+type RoutinesRecord = Routines & BaseRecord;
 
 /* Collection type: base */
-export interface RoutineExercises {
+interface RoutineExercises {
   routine: string; // relation
   exercise: string; // relation
   notes?: string; // text
@@ -191,17 +192,18 @@ export interface RoutineExercises {
   measurement2Value?: string; // relation
   measurement3Value?: string; // relation
   isWarmup?: boolean; // bool
+  targetDuration?: number; // number
   supersetParent?: string; // relation
   enduranceRating?: number; // number
   strengthRating?: number; // number
 }
 
-export type RoutineExercisesRecord = RoutineExercises & BaseRecord;
+type RoutineExercisesRecord = RoutineExercises & BaseRecord;
 
 /* Collection type: base */
-export interface Equipments {
+interface Equipments {
   name: string; // text
 }
 
-export type EquipmentsRecord = Equipments & BaseRecord;
+type EquipmentsRecord = Equipments & BaseRecord;
 

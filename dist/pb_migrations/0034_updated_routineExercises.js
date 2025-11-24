@@ -6,6 +6,21 @@ migrate(
     // remove field
     collection.fields.removeById("relation1654338538");
 
+    // add field
+    collection.fields.addAt(
+      14,
+      new Field({
+        hidden: false,
+        id: "duration1654338838",
+        min: 0,
+        name: "targetDuration",
+        presentable: false,
+        required: false,
+        system: false,
+        type: "number",
+      })
+    );
+
     return app.save(collection);
   },
   (app) => {
@@ -28,6 +43,9 @@ migrate(
         type: "relation",
       })
     );
+
+    // remove field
+    collection.fields.removeById("duration1654338838");
 
     return app.save(collection);
   }

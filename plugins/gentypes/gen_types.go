@@ -26,6 +26,7 @@ func (f Field) IsReadOnly() bool { return f.ReadOnly }
 
 type Config struct {
 	FilePath                   string
+	Export                     bool
 	CollectionAdditionalFields map[string][]common.Field
 }
 
@@ -71,7 +72,7 @@ func (c *Config) generateTypes(app *pocketbase.PocketBase) error {
 
 	f.WriteString("/* This file was automatically generated, changes will be overwritten. */\n\n")
 
-	printBaseType(f)
+	c.printBaseType(f)
 
 	for _, collection := range collections {
 		if !collection.System {
@@ -82,8 +83,11 @@ func (c *Config) generateTypes(app *pocketbase.PocketBase) error {
 	return nil
 }
 
-func printBaseType(f *os.File) {
-	fmt.Fprint(f, "export interface BaseRecord {\n")
+func (c *Config) printBaseType(f *os.File) {
+	if c.Export {
+		fmt.Fprint(f, "export ")
+	}
+	fmt.Fprint(f, "interface BaseRecord {\n")
 
 	baseFields := []string{"id", "collectionName", "collectionId", "created", "updated"}
 
@@ -98,7 +102,10 @@ func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
 	typeName := capitalise(collection.Name)
 
 	fmt.Fprintf(f, "/* Collection type: %s */\n", collection.Type)
-	fmt.Fprintf(f, "export interface %s {\n", typeName)
+	if c.Export {
+		fmt.Fprint(f, "export ")
+	}
+	fmt.Fprintf(f, "interface %s {\n", typeName)
 
 	for _, field := range collection.Fields {
 		if field.Type() == "autodate" || field.GetName() == "id" || field.GetHidden() {
@@ -123,7 +130,10 @@ func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
 
 	fmt.Fprint(f, "}\n\n")
 
-	fmt.Fprintf(f, "export type %sRecord = %s & BaseRecord;\n\n", typeName, typeName)
+	if c.Export {
+		fmt.Fprint(f, "export ")
+	}
+	fmt.Fprintf(f, "type %sRecord = %s & BaseRecord;\n\n", typeName, typeName)
 }
 
 func capitalise(s string) string {
