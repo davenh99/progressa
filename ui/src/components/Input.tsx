@@ -86,13 +86,13 @@ export const Input: Component<InputRootProps> = (props) => {
         <TextField.Label>{local.label}</TextField.Label>
       </Show>
       <TextField.Input
+        {...local.inputProps}
         class={inputField({
           variant: local.variant,
           padding: local.noPadding ? "no" : "yes",
           background: local.noBackground ? "no" : "yes",
           class: local.inputProps?.class,
         })}
-        {...local.inputProps}
       />
     </TextField>
   );
