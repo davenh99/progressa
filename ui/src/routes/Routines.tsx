@@ -1,4 +1,4 @@
-import { Component, createEffect, Show } from "solid-js";
+import { Component, createEffect, createSignal, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import ArrowLeft from "lucide-solid/icons/arrow-left";
 import { useNavigate, useSearchParams } from "@solidjs/router";
@@ -7,7 +7,7 @@ import Delete from "lucide-solid/icons/x";
 
 import Container from "../views/app/Container";
 import Header from "../views/app/Header";
-import { Button, DataTextArea, Input } from "../components";
+import { AlertDialog, Button, DataTextArea, Input } from "../components";
 import RoutineList from "../views/routines/RoutineList";
 import RoutineExerciseList from "../views/routines/RoutineExerciseList";
 import { Routine, RoutineCreateData } from "../../Types";
@@ -22,6 +22,7 @@ const Routines: Component = () => {
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
   const [routine, setRoutine] = createStore<{ routine: Routine | null }>({ routine: null });
   const { pb, user, updateRecord, getRoutineByID } = useAuthPB();
+  const [dialogOpen, setDialogOpen] = createSignal(false);
   const navigate = useNavigate();
 
   const createRoutine = async () => {
@@ -52,10 +53,11 @@ const Routines: Component = () => {
   };
 
   const deleteRoutine = async () => {
-    if (routine.routine?.id) throw new Error("Tried to delete a routine when missing id");
+    if (!routine.routine?.id) throw new Error("Tried to delete a routine when missing id");
 
     try {
       await pb.collection("routines").delete(routine.routine!.id);
+      navigate("/routines");
     } catch (e) {
       console.error(e);
     }
@@ -130,15 +132,37 @@ const Routines: Component = () => {
               setRoutine={setRoutine}
             />
           </div>
-          <Button
-            class="flex items-center space-x-1 my-2 w-full justify-center"
-            variantColor="bad"
-            variant="text"
-            onClick={deleteRoutine}
+          <AlertDialog
+            title="Delete Routine"
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            decsription="Are you sure you want to delete this routine?"
+            buttons={
+              <>
+                <Button
+                  variantColor="bad"
+                  onClick={() => {
+                    deleteRoutine();
+                    setDialogOpen(false);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button variantColor="neutral" onClick={() => setDialogOpen(false)}>
+                  Cancel
+                </Button>
+              </>
+            }
           >
-            <Delete size={20} />
-            <span>Delete Routine</span>
-          </Button>
+            <Button
+              class="flex items-center space-x-1 w-full justify-center"
+              variantColor="bad"
+              variant="text"
+            >
+              <Delete size={20} />
+              <span>Delete Routine</span>
+            </Button>
+          </AlertDialog>
         </Show>
       </Container>
     </>
