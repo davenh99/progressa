@@ -1,13 +1,18 @@
 import { Component, createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { A } from "@solidjs/router";
 import { createSolidTable, flexRender, getCoreRowModel, ColumnDef } from "@tanstack/solid-table";
+import Loader from "lucide-solid/icons/loader";
 
 import { Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
-import Loading from "../app/Loading";
+import LoadFullScreen from "../app/LoadFullScreen";
+import { Button } from "../../components";
 
-export const SessionList: Component = (props) => {
+export const SessionList: Component = () => {
   const [sessions, setSessions] = createSignal<Session[]>([]);
+  const [totalSessions, setTotalSessions] = createSignal(0);
+  const [loading, setLoading] = createSignal(false);
+  const [page, setPage] = createSignal(1);
   const { pb } = useAuthPB();
 
   const columns = createMemo<ColumnDef<Session>[]>(() => [
@@ -32,12 +37,21 @@ export const SessionList: Component = (props) => {
   });
 
   const getData = async () => {
+    setLoading(true);
     try {
-      const sessions = await pb.collection<Session>("sessions").getFullList({ sort: "-userDay" });
+      if (sessions().length === 0 || sessions().length < totalSessions()) {
+        const listResult = await pb
+          .collection<Session>("sessions")
+          .getList(page(), 50, { sort: "-userDay", fields: "name, notes, userDay" });
 
-      setSessions(sessions);
+        setTotalSessions(listResult.totalItems);
+        setPage(listResult.page + 1);
+        setSessions([...sessions(), ...listResult.items]);
+      }
     } catch (e) {
       console.error("get sessions error: ", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,7 +60,7 @@ export const SessionList: Component = (props) => {
   });
 
   return (
-    <Show when={!!sessions()} fallback={<Loading />}>
+    <Show when={!!sessions()} fallback={<LoadFullScreen />}>
       <div class="w-full">
         <For each={table.getHeaderGroups()}>
           {(headerGroup) => (
@@ -74,6 +88,14 @@ export const SessionList: Component = (props) => {
             </A>
           )}
         </For>
+        <Show when={sessions().length < totalSessions()}>
+          <div class="w-full flex justify-center mt-5">
+            <Button disabled={loading()} onClick={getData} class="flex items-center space-x-1">
+              <span>Load More</span>
+              {loading() && <Loader size={16} class="animate-spin" />}
+            </Button>
+          </div>
+        </Show>
         {sessions().length === 0 && <div class="text-center py-4">No sessions found</div>}
       </div>
     </Show>
