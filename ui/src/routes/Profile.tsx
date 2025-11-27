@@ -8,6 +8,7 @@ import { Button, DataDateInput, NumberInput } from "../components";
 import Container from "../views/app/Container";
 import Header from "../views/app/Header";
 import Card from "../views/app/Card";
+import { SessionList } from "../views/session/SessionList";
 
 const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
@@ -21,7 +22,7 @@ const Profile: Component = () => {
       <Header>
         <h1 class="text-xl font-bold">Profile</h1>
       </Header>
-      <Container class="space-y-4">
+      <Container class="space-y-4 mb-25">
         <Card class="flex flex-col">
           <div class="flex flex-row items-center space-x-2">
             <h2 class="text-xl font-semibold">{user.name}</h2>
@@ -91,6 +92,12 @@ const Profile: Component = () => {
           <Switch label="Use Device Dark Mode" />
           <Switch label="Dark mode on" />
         </Card> */}
+        <Card class="flex flex-col max-h-[50vh] overflow-clip">
+          <h2 class="mb-3">Your exercise history</h2>
+          <div class="flex-1 overflow-y-auto">
+            <SessionList />
+          </div>
+        </Card>
       </Container>
     </>
   );

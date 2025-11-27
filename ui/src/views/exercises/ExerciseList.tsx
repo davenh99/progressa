@@ -14,6 +14,7 @@ import { Exercise } from "../../../Types";
 import { Input } from "../../components";
 import LoadFullScreen from "../app/LoadFullScreen";
 import { debounce } from "../../methods/debounce";
+import { ClientResponseError } from "pocketbase";
 
 interface Props {
   onClick: (exercise: Exercise) => void;
@@ -58,7 +59,7 @@ export const ExerciseList: Component<Props> = (props) => {
           expand: "defaultMeasurementType",
           filter: nameFilter() === "" ? "" : `name ~ '${nameFilter()}'`,
           sort: "name",
-          fields: "name, description",
+          fields: "id, name, description",
         });
 
         if (fetched === 0) {
@@ -71,7 +72,10 @@ export const ExerciseList: Component<Props> = (props) => {
         page = listResult.page + 1;
       }
     } catch (e) {
-      console.error("get exercises error: ", e);
+      if (e instanceof ClientResponseError && e.isAbort) {
+      } else {
+        console.error("get exercises error: ", e);
+      }
     }
 
     setLoading(false);
@@ -95,7 +99,7 @@ export const ExerciseList: Component<Props> = (props) => {
             }}
             inputProps={{ placeholder: "Search Exercises", class: "p-1" }}
           />
-          {loading() && <Loader size={16} class="ml-1 animate-spin" />}
+          {loading() && <Loader size={16} class="mx-1 animate-spin" />}
         </div>
         <Show when={table.getRowModel().rows.length === 0}>
           <div class="text-center py-4 italic">No Exercises found</div>

@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
 } from "@tanstack/solid-table";
+import { ClientResponseError } from "pocketbase";
 
 import { Button, Input } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
@@ -67,7 +68,10 @@ export const RoutineList: Component<Props> = (props) => {
 
       setRoutines(routines);
     } catch (e) {
-      console.error("get exercises error: ", e);
+      if (e instanceof ClientResponseError && e.isAbort) {
+      } else {
+        console.error("get exercises error: ", e);
+      }
     }
   };
 
