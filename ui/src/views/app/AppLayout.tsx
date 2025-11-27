@@ -2,8 +2,8 @@ import { ParentComponent } from "solid-js";
 import { A, useLocation } from "@solidjs/router";
 import Log from "lucide-solid/icons/pencil-line";
 import Routine from "lucide-solid/icons/notebook-text";
-import History from "lucide-solid/icons/history";
 import User from "lucide-solid/icons/user";
+import Bicep from "lucide-solid/icons/biceps-flexed";
 
 export const AppLayout: ParentComponent = (props) => {
   const location = useLocation();
@@ -27,9 +27,9 @@ export const AppLayout: ParentComponent = (props) => {
     <div class="flex h-screen bg-charcoal-500 text-dark-slate-gray-900">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-charcoal-100/80 py-4 space-y-6">
-        <A href="/" class={linkClasses("/")}>
-          <History size={24} class={iconClasses("/")} />
-          <p>History</p>
+        <A href="/exercises" class={linkClasses("/")}>
+          <Bicep size={24} class={iconClasses("/")} />
+          <p>Exercises</p>
         </A>
         <A href="/routines" class={linkClasses("/routines")}>
           <Routine size={24} class={iconClasses("/routines")} />
@@ -62,9 +62,9 @@ export const AppLayout: ParentComponent = (props) => {
          bg-charcoal-100/50 flex justify-between
          py-2.5 px-5 space-x-[7vw]  rounded-full backdrop-blur-xs"
       >
-        <A href="/" class="flex flex-col items-center">
-          <History size={30} class={iconClasses("/")} />
-          <p class="text-xs">History</p>
+        <A href="/exercises" class="flex flex-col items-center">
+          <Bicep size={30} class={iconClasses("/")} />
+          <p class="text-xs">Exercises</p>
         </A>
         <A href="/routines" class="flex flex-col items-center">
           <Routine size={30} class={iconClasses("/routines")} />

@@ -16,7 +16,7 @@ const Privacy = lazy(() => import("./routes/Privacy"));
 const NotFound = lazy(() => import("./routes/NotFound"));
 const Auth = lazy(() => import("./routes/Auth"));
 const LogSession = lazy(() => import("./routes/LogSession"));
-const Sessions = lazy(() => import("./routes/Sessions"));
+const Exercises = lazy(() => import("./routes/Exercises"));
 const Routines = lazy(() => import("./routes/Routines"));
 const Profile = lazy(() => import("./routes/Profile"));
 import { Toaster } from "./config/toaster";
@@ -83,10 +83,11 @@ function Content() {
 function App() {
   return (
     <Route path="/" component={AppLayout}>
-      <Route path="/" component={Sessions} />
+      <Route path="/" component={LogSession} />
+      <Route path="/log" component={LogSession} />
+      <Route path="/exercises" component={Exercises} />
       <Route path="/routines" component={Routines} />
       <Route path="/profile" component={Profile} />
-      <Route path="/log" component={LogSession} />
     </Route>
   );
 }
