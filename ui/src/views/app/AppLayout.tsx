@@ -11,24 +11,25 @@ export const AppLayout: ParentComponent = (props) => {
   const isLogActive = () => location.pathname.startsWith("/log");
 
   const isActive = (path: string) => {
+    if (path === "") return false;
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
 
-  const linkClasses = (path: string) =>
+  const linkClasses = (path: string, path2 = "") =>
     `flex flex-row space-x-2 mx-4 hover:text-gray-300 active:opacity-80 ${
-      isActive(path) ? "text-cambridge-blue-700" : "text-dark-slate-gray-900"
+      isActive(path) || isActive(path2) ? "text-cambridge-blue-700" : "text-dark-slate-gray-900"
     }`;
 
-  const iconClasses = (path: string) =>
-    `active:opacity-80 ${isActive(path) ? "text-cambridge-blue-700" : "text-white"}`;
+  const iconClasses = (path: string, path2 = "") =>
+    `active:opacity-80 ${isActive(path) || isActive(path2) ? "text-cambridge-blue-700" : "text-white"}`;
 
   return (
     <div class="flex h-screen bg-charcoal-500 text-dark-slate-gray-900">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-charcoal-100/80 py-4 space-y-6">
-        <A href="/exercises" class={linkClasses("/")}>
-          <Bicep size={24} class={iconClasses("/")} />
+        <A href="/exercises" class={linkClasses("/", "/exercises")}>
+          <Bicep size={24} class={iconClasses("/", "/exercises")} />
           <p>Exercises</p>
         </A>
         <A href="/routines" class={linkClasses("/routines")}>
@@ -63,7 +64,7 @@ export const AppLayout: ParentComponent = (props) => {
          py-2.5 px-5 space-x-[7vw]  rounded-full backdrop-blur-xs"
       >
         <A href="/exercises" class="flex flex-col items-center">
-          <Bicep size={30} class={iconClasses("/")} />
+          <Bicep size={30} class={iconClasses("/", "/exercises")} />
           <p class="text-xs">Exercises</p>
         </A>
         <A href="/routines" class="flex flex-col items-center">

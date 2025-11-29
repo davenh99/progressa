@@ -95,7 +95,7 @@ export const RoutineList: Component<Props> = (props) => {
           value={nameFilter()}
           onChange={setNameFilter}
           class="flex-1"
-          inputProps={{ placeholder: "Search Routines", class: "p-1 border-b-1 w-full" }}
+          inputProps={{ placeholder: "Search Routines", class: "p-1 w-full" }}
         />
       </div>
       <div class="mt-2">

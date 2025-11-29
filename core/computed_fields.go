@@ -113,11 +113,11 @@ var ComputedFieldsCfg = computedfields.Config{
 
 						// No measurement, single
 						case k.Amount == "" && count == 1:
-							parts = append(parts, name)
+							parts = append(parts, fmt.Sprintf("1× %s", name))
 
 						// No measurement, grouped
 						default:
-							parts = append(parts, fmt.Sprintf("%d×%s", count, name))
+							parts = append(parts, fmt.Sprintf("%d× %s", count, name))
 						}
 					}
 

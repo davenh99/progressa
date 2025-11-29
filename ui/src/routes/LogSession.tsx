@@ -16,7 +16,6 @@ import {
   anxietyOptions,
   sleepOptions,
 } from "../../Types";
-import Loading from "../views/app/Loading";
 import LogSessionNav from "../views/session/LogSessionNav";
 import Header from "../views/app/Header";
 import { NumberInput } from "../components/NumberInput";
@@ -24,6 +23,7 @@ import Card from "../views/app/Card";
 import { SESSION_EXPAND } from "../../constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
 import { SessionMealList } from "../views/session/SessionMealList";
+import LoadFullScreen from "../views/app/LoadFullScreen";
 
 export type LogSessionTab = "exercises" | "meals" | "settings";
 
@@ -118,7 +118,7 @@ const LogSession: Component = () => {
         </div>
       </Header>
 
-      <Show when={!loading()} fallback={<Loading />}>
+      <Show when={!loading()} fallback={<LoadFullScreen />}>
         <Show
           when={!!session.session}
           fallback={

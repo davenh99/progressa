@@ -10,8 +10,8 @@ import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import { useAuthPB } from "../../config/pocketbase";
 import { SessionMeal } from "../../../Types";
-import Loading from "../app/Loading";
 import { Input } from "../../components";
+import LoadFullScreen from "../app/LoadFullScreen";
 
 interface Props {
   onClick: (meal: SessionMeal) => void;
@@ -66,7 +66,7 @@ export const MealList: Component<Props> = (props) => {
   });
 
   return (
-    <Show when={!!meals()} fallback={<Loading />}>
+    <Show when={!!meals()} fallback={<LoadFullScreen />}>
       <div class="p-1 flex flex-col flex-1 overflow-hidden">
         <Input
           noPadding
