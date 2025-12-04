@@ -1,30 +1,10 @@
 import { Component, createSignal, For, JSX } from "solid-js";
-import { Button as KobalteButton } from "@kobalte/core/button";
-import CloseIcon from "lucide-solid/icons/x";
 
 import type { Tag as TagType } from "../../Types";
 import Input from "./Input";
 import { useAuthPB } from "../config/pocketbase";
 import { ClientResponseError } from "pocketbase";
-
-interface Props {
-  onClick: () => void;
-  tag: TagType;
-}
-
-const Tag: Component<Props> = (props) => {
-  return (
-    <div
-      style={{ "background-color": `${props.tag.colorHex}30`, color: "#ccf" }}
-      class="flex items-center pl-2 pr-1 py-1 rounded-full select-none border-1"
-    >
-      <span class="text-sm font-bold">{props.tag.name}</span>
-      <KobalteButton onClick={props.onClick} class="p-1 rounded-full flex items-center justify-center">
-        <CloseIcon size={14} />
-      </KobalteButton>
-    </div>
-  );
-};
+import Tag from "./Tag";
 
 interface TagAreaProps {
   tags: TagType[];
@@ -92,7 +72,9 @@ export const TagArea: Component<TagAreaProps> = (props) => {
         class="flex-1 min-w-[120px] mb-2"
       />
       <div class="flex flex-wrap gap-2">
-        <For each={props.tags || []}>{(t) => <Tag tag={t} onClick={() => deleteTag(t)} />}</For>
+        <For each={props.tags || []}>
+          {(t) => <Tag title={t.name} colorHex={t.colorHex} onClick={() => deleteTag(t)} />}
+        </For>
       </div>
     </div>
   );

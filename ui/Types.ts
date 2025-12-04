@@ -8,6 +8,25 @@ export interface RatingOption<T extends string | number> {
   value: T;
 }
 
+export const MuscleGroups = [
+  "Trapezius",
+  "Abductors",
+  "Glutes",
+  "Adductors",
+  "Chest",
+  "Forearms",
+  "Shins",
+  "Hip Flexors",
+  "Triceps",
+  "Calves",
+  "Biceps",
+  "Quadriceps",
+  "Hamstrings",
+  "Shoulders",
+  "Abdominals",
+  "Back",
+];
+
 export const moodOptions: RatingOption<Rating>[] = [
   { emoji: "😢", label: "Very Bad", value: 1 },
   { emoji: "☹️", label: "Bad", value: 2 },

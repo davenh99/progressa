@@ -1,5 +1,6 @@
 export * from "./Button";
 export * from "./IconButton";
+export * from "./Tag";
 export * from "./TagArea";
 export * from "./Checkbox";
 export * from "./Slider";

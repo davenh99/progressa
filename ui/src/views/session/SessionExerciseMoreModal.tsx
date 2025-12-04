@@ -51,7 +51,7 @@ export const SessionExerciseMoreModal: Component<Props> = (props) => {
   createEffect(() => setExercise(JSON.parse(JSON.stringify(props.initialExercise))));
 
   return (
-    <Modal saveFunc={save} setModalVisible={props.setModalVisible}>
+    <Modal saveFunc={save} setModalVisible={props.setModalVisible} title="Exercise Options">
       <ModalContent exercise={exercise} setExercise={setExercise} parentProps={props} />
     </Modal>
   );
@@ -70,7 +70,7 @@ const ModalContent: Component<ModalProps> = (props) => {
   const [warning, setWarning] = createSignal("");
   const { setLoading } = useModalLoading();
 
-  const selectNewExercise = async (exercise: Exercise) => {
+  const selectNewExercise = async (exercise: ExercisesRecord) => {
     props.setExercise("exercise", exercise.id);
     props.setExercise("expand", (currentExpand: any) => ({
       ...currentExpand,
@@ -95,7 +95,6 @@ const ModalContent: Component<ModalProps> = (props) => {
           selectExercise={selectNewExercise}
         />
       </Show>
-      <h2 class="pb-2">Exercise Options</h2>
       <div class="mb-3">
         <Button class="w-full flex items-center" onClick={() => setShowExerciseSelectModal(true)}>
           <p class="flex-1">{props.exercise.expand?.exercise?.name}</p>

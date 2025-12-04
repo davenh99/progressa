@@ -1,6 +1,6 @@
-import { Component, createMemo, createSignal, onMount } from "solid-js";
-import { ColumnDef } from "@tanstack/solid-table";
-import { ArrowRight } from "lucide-solid";
+import { Component, createMemo, createSignal, For, onMount } from "solid-js";
+import { ColumnDef, flexRender, Row } from "@tanstack/solid-table";
+import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import List from "../app/List";
 import { useAuthPB } from "../../config/pocketbase";
@@ -17,12 +17,13 @@ export const EquipmentList: Component<Props> = (props) => {
   const columns = createMemo<ColumnDef<EquipmentsRecord>[]>(() => [
     {
       accessorKey: "name",
-      header: "Meal",
-    },
-    {
-      header: "",
-      id: "continue",
-      cell: () => <ArrowRight class="self-end" />,
+      header: "Equipment",
+      cell: (ctx) => (
+        <div class="flex justify-between">
+          <div class="flex-1 truncate">{ctx.getValue() as Element}</div>
+          <ArrowRight class="self-end" />
+        </div>
+      ),
     },
   ]);
 
@@ -45,6 +46,6 @@ export const EquipmentList: Component<Props> = (props) => {
   });
 
   return (
-    <List<EquipmentsRecord> columns={columns} onRowClick={props.onClick} data={data} loading={loading} />
+    <List<EquipmentsRecord> columns={columns} onRowClick={props.onClick} data={data} loading={loading()} />
   );
 };

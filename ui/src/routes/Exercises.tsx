@@ -12,8 +12,8 @@ const Exercises: Component = () => {
           <h1 class="text-xl font-bold">Exercises</h1>
         </div>
       </Header>
-      <Container class="pt-0 pb-25 overflow-y-auto">
-        <ExerciseList onClick={() => {}} />
+      <Container class="py-0 overflow-y-auto">
+        <ExerciseList onClick={() => {}} containerClass="pb-25" />
       </Container>
     </>
   );

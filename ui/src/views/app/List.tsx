@@ -8,6 +8,8 @@ import {
   Row,
 } from "@tanstack/solid-table";
 import { Accessor, For, JSXElement, Show, createMemo, createSignal } from "solid-js";
+import { createVirtualizer } from "@tanstack/solid-virtual";
+import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
 import Plus from "lucide-solid/icons/plus";
 
@@ -21,39 +23,43 @@ interface ListProps<T> {
   headerActions?: JSXElement;
   columns: Accessor<ColumnDef<T>[]>;
   onRowClick: (item: T) => void;
-  loading: Accessor<boolean>;
+  loading?: boolean;
   emptyState?: JSXElement;
   loadingFallback?: JSXElement;
   searchPlaceholder?: string;
-  renderBody?: (rows: Row<T>[], onRowClick: (item: T) => void) => JSXElement;
+  renderRow?: (row: Row<T>, onRowClick: (item: T) => void) => JSXElement;
   showItemCount?: boolean;
+  containerClass?: string;
 }
 
-interface TableBodyProps<T> {
-  rows: Row<T>[];
-  onRowClick: (item: T) => void;
-}
+const containerClass = tv({
+  base: "overflow-y-auto relative flex-1",
+});
 
-const DefaultTableBody = <T,>(props: TableBodyProps<T>): JSXElement => {
+export const DefaultRowRenderer = <T,>(props: {
+  row: Row<T>;
+  columns: Accessor<ColumnDef<T>[]>;
+  onClick: (item: T) => void;
+}): JSXElement => {
   return (
-    <table class="table w-full">
-      <tbody>
-        <For each={props.rows}>
-          {(row) => (
-            <tr class="hover text-sm" onClick={() => props.onRowClick(row.original)}>
-              <For each={row.getVisibleCells()}>
-                {(cell) => <td class="p-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
-              </For>
-            </tr>
-          )}
-        </For>
-      </tbody>
-    </table>
+    <div
+      class="flex items-center hover:bg-gray-700/50 cursor-pointer text-sm border-b border-gray-700 py-2"
+      onClick={() => props.onClick(props.row.original)}
+    >
+      <For each={props.row.getVisibleCells()}>
+        {(cell) => (
+          <div class="flex-1 overflow-hidden truncate">
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </div>
+        )}
+      </For>
+    </div>
   );
 };
 
 export const List = <T,>(props: ListProps<T>): JSXElement => {
   const [globalFilter, setGlobalFilter] = createSignal<string>();
+  let parentRef!: HTMLDivElement;
 
   const table = createSolidTable({
     get data() {
@@ -73,59 +79,105 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
   });
 
   const rowCount = createMemo(() => table.getRowModel().rows.length);
-  const dataExists = createMemo(() => (props.data && props.data.length > 0) || props.loading);
+  const dataExists = createMemo(() => props.data?.() || props.loading);
   const rows = createMemo(() => table.getRowModel().rows);
 
-  return (
-    <Show when={dataExists()} fallback={props.loadingFallback || <LoadFullScreen />}>
-      <div class="pb-1 sticky top-0 bg-charcoal-500/95 backdrop-blur-xs pt-3">
-        <div class="flex items-center space-x-2">
-          <Show when={props.createFunc}>
-            <Button
-              class="flex text-sm items-center pl-1 pr-2"
-              variant="solid"
-              variantColor="good"
-              onClick={() => {}}
-            >
-              <Plus size={20} />
-              New
-            </Button>
-          </Show>
+  const virtualizer = createVirtualizer({
+    get count() {
+      return rows().length;
+    },
+    getScrollElement: () => {
+      return parentRef;
+    },
+    estimateSize: () => 41,
+    get getItemKey() {
+      return (index: number) => rows()[index].id;
+    },
+  });
 
-          <div class="w-full relative">
-            <Input
-              noPadding
-              class="w-full"
-              value={globalFilter()}
-              onChange={setGlobalFilter}
-              inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}
-            />
-            {props.loading() && (
-              <Loader size={16} class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2" />
-            )}
+  const virtualRows = createMemo(() => virtualizer.getVirtualItems());
+  const totalSize = createMemo(() => virtualizer.getTotalSize());
+
+  const containerStyle = createMemo(() => containerClass({ class: props.containerClass }));
+
+  return (
+    <div class="flex flex-col h-full max-h-[inherit]">
+      <Show when={dataExists()} fallback={props.loadingFallback || <LoadFullScreen />}>
+        <div class="pb-1 sticky top-0 bg-charcoal-500/95 backdrop-blur-xs pt-3">
+          <div class="flex items-center space-x-2">
+            <Show when={props.createFunc}>
+              <Button
+                class="flex text-sm items-center pl-1 pr-2"
+                variant="solid"
+                variantColor="good"
+                onClick={() => {}}
+              >
+                <Plus size={20} />
+                New
+              </Button>
+            </Show>
+
+            <div class="w-full relative">
+              <Input
+                noPadding
+                class="w-full"
+                value={globalFilter()}
+                onChange={setGlobalFilter}
+                inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}
+              />
+              {props.loading && (
+                <Loader size={16} class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2" />
+              )}
+            </div>
           </div>
+
+          <Show when={props.headerActions}>{props.headerActions}</Show>
+
+          <Show when={props.showItemCount}>
+            <p class="text-xs italic">{rowCount()} items</p>
+          </Show>
         </div>
 
-        <div class="flex items-center space-x-2 mt-2 mb-1">{props.headerActions}</div>
+        <div ref={parentRef} class={containerStyle()}>
+          <Show
+            when={rowCount() > 0}
+            fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
+          >
+            <div
+              class="w-full"
+              style={{
+                height: `${totalSize()}px`,
+                position: "relative",
+              }}
+            >
+              <For each={virtualRows()}>
+                {(virtualRow) => {
+                  const row = rows()[virtualRow.index];
 
-        <Show when={props.showItemCount}>
-          <p class="text-xs italic">{rowCount()} items found.</p>
-        </Show>
-      </div>
-
-      <div class="overflow-y-auto">
-        <Show
-          when={rowCount() > 0}
-          fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
-        >
-          {props.renderBody ? (
-            props.renderBody(rows(), props.onRowClick)
-          ) : (
-            <DefaultTableBody<T> rows={rows()} onRowClick={props.onRowClick} />
-          )}
-        </Show>
-      </div>
-    </Show>
+                  return (
+                    <div
+                      data-index={virtualRow.index}
+                      ref={(el) => queueMicrotask(() => virtualizer.measureElement(el))}
+                      class="absolute w-full"
+                      style={{ transform: `translateY(${virtualRow.start}px)` }}
+                    >
+                      <Show
+                        when={props.renderRow}
+                        fallback={
+                          <DefaultRowRenderer row={row} columns={props.columns} onClick={props.onRowClick} />
+                        }
+                      >
+                        {props.renderRow!(row, props.onRowClick)}
+                      </Show>
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
+        </div>
+      </Show>
+    </div>
   );
 };
 

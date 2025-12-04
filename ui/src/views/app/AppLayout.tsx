@@ -28,8 +28,8 @@ export const AppLayout: ParentComponent = (props) => {
     <div class="flex h-screen bg-charcoal-500 text-dark-slate-gray-900">
       {/* Sidebar (desktop global nav) */}
       <nav class="hidden sm:flex  flex-col items-start bg-charcoal-100/80 py-4 space-y-6">
-        <A href="/exercises" class={linkClasses("/", "/exercises")}>
-          <Bicep size={24} class={iconClasses("/", "/exercises")} />
+        <A href="/exercises" class={linkClasses("/exercises")}>
+          <Bicep size={24} class={iconClasses("/exercises")} />
           <p>Exercises</p>
         </A>
         <A href="/routines" class={linkClasses("/routines")}>
@@ -45,7 +45,7 @@ export const AppLayout: ParentComponent = (props) => {
             }
           }}
         >
-          <Log size={24} class={iconClasses("/log")} />
+          <Log size={24} class={iconClasses("/log", "/")} />
           <p>Log</p>
         </A>
         <A href="/profile" class={linkClasses("/profile")}>
@@ -64,7 +64,7 @@ export const AppLayout: ParentComponent = (props) => {
          py-2.5 px-5 space-x-[7vw]  rounded-full backdrop-blur-xs"
       >
         <A href="/exercises" class="flex flex-col items-center">
-          <Bicep size={30} class={iconClasses("/", "/exercises")} />
+          <Bicep size={30} class={iconClasses("/exercises")} />
           <p class="text-xs">Exercises</p>
         </A>
         <A href="/routines" class="flex flex-col items-center">
@@ -80,7 +80,7 @@ export const AppLayout: ParentComponent = (props) => {
             }
           }}
         >
-          <Log size={30} class={iconClasses("/log")} />
+          <Log size={30} class={iconClasses("/log", "/")} />
           <p class="text-xs">Log</p>
         </A>
         <A href="/profile" class="flex flex-col items-center">

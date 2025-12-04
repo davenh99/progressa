@@ -9,6 +9,7 @@ interface Props {
   setModalVisible: (v: boolean) => void;
   saveFunc?: () => Promise<void>;
   zIndexClass?: string;
+  title?: string;
 }
 
 export const Modal: ParentComponent<Props> = (props) => {
@@ -26,10 +27,13 @@ export const Modal: ParentComponent<Props> = (props) => {
       <div class={containerStyle} onClick={() => props.setModalVisible(false)}>
         <div
           class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
-              w-full mx-3 sm:w-[50vw] lg:w-[35vw] max-h-[60vh] flex flex-col`}
+              w-full mx-3 sm:w-[50vw] lg:w-[35vw] flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div class="flex flex-col flex-1 overflow-y-hidden">
+          <Show when={props.title}>
+            <h2 class="pb-2">{props.title}</h2>
+          </Show>
+          <div class="max-h-[55vh] overflow-y-hidden flex flex-col h-full">
             <ModalContext.Provider value={{ loading, setLoading }}>{props.children}</ModalContext.Provider>
           </div>
           <div class="w-full flex justify-end space-x-2">

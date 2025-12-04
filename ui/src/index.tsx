@@ -10,6 +10,10 @@ import { ThemeProvider } from "./config/theme";
 import AppLayout from "./views/app/AppLayout";
 import LoadFullScreen from "./views/app/LoadFullScreen";
 import SiteLayout from "./views/app/SiteLayout";
+import { Toaster } from "./config/toaster";
+import { Toast } from "./config/toaster";
+import { Store } from "./config/store/Store";
+import { IGNORE_ERRORS } from "../constants";
 
 const Landing = lazy(() => import("./routes/Landing"));
 const Privacy = lazy(() => import("./routes/Privacy"));
@@ -19,8 +23,6 @@ const LogSession = lazy(() => import("./routes/LogSession"));
 const Exercises = lazy(() => import("./routes/Exercises"));
 const Routines = lazy(() => import("./routes/Routines"));
 const Profile = lazy(() => import("./routes/Profile"));
-import { Toaster } from "./config/toaster";
-import { Toast } from "./config/toaster";
 
 const root = document.getElementById("root");
 
@@ -31,7 +33,9 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 window.onerror = (msg) => {
-  toaster.show((props) => <Toast {...props} variant="error" title="JS Error" msg={String(msg)} />);
+  if (!IGNORE_ERRORS.includes(String(msg))) {
+    toaster.show((props) => <Toast {...props} variant="error" title="JS Error" msg={String(msg)} />);
+  }
 };
 
 window.onunhandledrejection = (event) => {
@@ -52,8 +56,10 @@ render(
   () => (
     <PBProvider>
       <ThemeProvider>
-        <Content />
-        <Toaster />
+        <Store>
+          <Content />
+          <Toaster />
+        </Store>
       </ThemeProvider>
     </PBProvider>
   ),
