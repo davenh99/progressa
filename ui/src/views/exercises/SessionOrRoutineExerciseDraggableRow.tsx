@@ -10,12 +10,12 @@ import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/el
 import invariant from "tiny-invariant";
 import { flexRender, type Row as RowType } from "@tanstack/solid-table";
 
-import { DraggingState, RoutineExercise, SessionExercise } from "../../../Types";
+import { DraggingState, SessionExercise } from "../../../Types";
 import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../../constants";
 import { JSX } from "solid-js";
 
 interface DraggableRowProps {
-  row: RowType<SessionExercise | RoutineExercise>;
+  row: RowType<SessionExercise | RoutineExercisesRecordExpand>;
   firstOfGroup: boolean;
   lastOfGroup: boolean;
   firstOfSuperset: boolean;

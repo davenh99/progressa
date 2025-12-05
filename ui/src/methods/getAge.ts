@@ -1,4 +1,7 @@
 export const getAge = (birthDate: Date | string): number => {
+  if (!birthDate) {
+    return 0;
+  }
   const birthDateObj = new Date(birthDate);
   const today = new Date();
 

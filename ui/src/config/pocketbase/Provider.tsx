@@ -3,7 +3,6 @@ import PocketBase, { ClientResponseError } from "pocketbase";
 import { createStore } from "solid-js/store";
 
 import { PBContext } from "./context";
-import { User } from "../../../Types";
 
 const apiUrl =
   import.meta.env.VITE_PUBLIC_API_URL ||
@@ -14,13 +13,13 @@ const apiUrl =
 export const PBProvider: ParentComponent = (props) => {
   const pb = new PocketBase(apiUrl);
   const [pbStore, setPBStore] = createStore({
-    user: pb.authStore.record as unknown as User | null,
+    user: pb.authStore.record as UsersRecord | null,
     loading: true,
     networkError: false,
   });
 
   pb.authStore.onChange(() => {
-    setPBStore("user", pb.authStore.record as unknown as User | null);
+    setPBStore("user", pb.authStore.record as UsersRecord | null);
   });
 
   const checkAuth = async () => {

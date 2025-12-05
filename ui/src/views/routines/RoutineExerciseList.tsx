@@ -18,10 +18,10 @@ import { getDropsetAddData } from "../../methods/routineExercise";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 
 interface Props {
-  routineExercises: RoutineExercise[];
+  routineExercises: RoutineExercisesRecordExpand[];
   routineId: string;
   setRoutine: SetStoreFunction<{
-    routine: Routine | null;
+    routine: RoutinesRecordExpand | null;
   }>;
 }
 
@@ -98,7 +98,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     ).catch(console.error);
   };
 
-  const insertRowsAndSync = async (index: number, records: RoutineExercise[]) => {
+  const insertRowsAndSync = async (index: number, records: RoutineExercisesRecordExpand[]) => {
     const newRows = [...props.routineExercises];
     newRows.splice(index, 0, ...records);
 
@@ -112,12 +112,12 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addRoutineExercise = async (exercise: Exercise) => {
+  const addRoutineExercise = async (exercise: ExercisesRecordExpand) => {
     const data: RoutineExerciseCreateData = {
       routine: props.routineId,
       exercise: exercise.id,
     };
-    const record = await pb.collection<RoutineExercise>("routineExercises").create(data, {
+    const record = await pb.collection<RoutineExercisesRecordExpand>("routineExercises").create(data, {
       expand: SESSION_EXERCISE_EXPAND,
     });
 
@@ -128,7 +128,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
   const addDropset = async (index: number) => {
     const data = getDropsetAddData(props.routineExercises[index]);
 
-    const record = await pb.collection<RoutineExercise>("routineExercises").create(data, {
+    const record = await pb.collection<RoutineExercisesRecordExpand>("routineExercises").create(data, {
       expand: SESSION_EXERCISE_EXPAND,
     });
 
@@ -138,7 +138,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
 
   const duplicateRow = async (index: number) => {
     try {
-      const newRoutine = await pb.send<Routine>(`/routine/duplicateRow`, {
+      const newRoutine = await pb.send<RoutinesRecordExpand>(`/routine/duplicateRow`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -156,9 +156,9 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     setShowMoreExercise(false);
   };
 
-  const importFromRoutine = async (routine: Routine, index: number) => {
+  const importFromRoutine = async (routine: RoutinesRecordExpand, index: number) => {
     try {
-      const newRoutine = await pb.send<Routine>(`/routine/importRoutine`, {
+      const newRoutine = await pb.send<RoutinesRecordExpand>(`/routine/importRoutine`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -177,7 +177,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
     setShowAddRoutine(false);
   };
 
-  const columns = createMemo<ColumnDef<RoutineExercise>[]>(() => [
+  const columns = createMemo<ColumnDef<RoutineExercisesRecordExpand>[]>(() => [
     {
       header: "Set Type",
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
@@ -376,7 +376,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
                 getGroupInds={() => getGroupInds(row.index, groups())}
                 timeInput={
                   <DataTime
-                    value={row.original.restAfter}
+                    value={row.original.restAfter || 0}
                     onValueChange={(v) =>
                       props.setRoutine(
                         "routine",

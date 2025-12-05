@@ -9,7 +9,7 @@ import { ROUTINE_EXPAND } from "../../../constants";
 
 interface Props {
   setModalVisible: (v: boolean) => void;
-  addRoutine: (routine: Routine) => Promise<void>;
+  addRoutine: (routine: RoutinesRecordExpand) => Promise<void>;
 }
 
 export const RoutineSelectModal: Component<Props> = (props) => {

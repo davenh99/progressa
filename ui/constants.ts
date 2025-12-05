@@ -24,6 +24,8 @@ export const SESSION_EXERCISE_EXPAND =
   "exercise.defaultMeasurementType3.measurementValues_via_measurementType, " +
   "measurementValue, tags";
 
+export const EXERCISE_EXPAND = "";
+
 export const SESSION_MEAL_EXPAND = "tags";
 
 export const DROP_ABOVE_CLASS = `

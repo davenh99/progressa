@@ -1,14 +1,13 @@
 import { Component, createSignal, For, JSX } from "solid-js";
 
-import type { Tag as TagType } from "../../Types";
 import Input from "./Input";
 import { useAuthPB } from "../config/pocketbase";
 import { ClientResponseError } from "pocketbase";
 import Tag from "./Tag";
 
 interface TagAreaProps {
-  tags: TagType[];
-  setTags: (tags: TagType[]) => void;
+  tags: TagsRecord[];
+  setTags: (tags: TagsRecord[]) => void;
   modelName: string;
   recordID: string;
   updateRecord?: (modelName: string, recordID: string, field: string, newVal: any) => Promise<any>;
@@ -27,7 +26,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       if (!props.tags.map((t) => t.name).includes(newTag)) {
         try {
           const foundTag = await pb
-            .collection<TagType>("tags")
+            .collection<TagsRecord>("tags")
             .getFirstListItem(`createdBy = '${user.id}' && name = '${newTag}'`);
 
           await updateFn(props.modelName, props.recordID, "+tags", foundTag.id);
@@ -35,7 +34,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
         } catch (e) {
           if (e instanceof ClientResponseError && e.status == 404) {
             const createdTag = await pb
-              .collection<TagType>("tags")
+              .collection<TagsRecord>("tags")
               .create({ name: newTag, public: false, createdBy: user.id, colorHex: "#ccccff" });
 
             await updateFn(props.modelName, props.recordID, "+tags", createdTag.id);
@@ -49,7 +48,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
     }
   };
 
-  const deleteTag = async (t: TagType) => {
+  const deleteTag = async (t: TagsRecord) => {
     try {
       await updateFn(props.modelName, props.recordID, "tags-", t.id);
       props.setTags((props.tags || []).filter((tag) => tag.id !== t.id));
@@ -73,7 +72,7 @@ export const TagArea: Component<TagAreaProps> = (props) => {
       />
       <div class="flex flex-wrap gap-2">
         <For each={props.tags || []}>
-          {(t) => <Tag title={t.name} colorHex={t.colorHex} onClick={() => deleteTag(t)} />}
+          {(t) => <Tag title={t.name || ""} colorHex={t.colorHex || ""} onClick={() => deleteTag(t)} />}
         </For>
       </div>
     </div>

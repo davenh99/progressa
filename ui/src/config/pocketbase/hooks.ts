@@ -2,7 +2,7 @@ import { useContext } from "solid-js";
 import { PBContext } from "./context";
 import { Routine, Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
-import { ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
+import { EXERCISE_EXPAND, ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
 import { sortSessionOrRoutineExercises } from "../../methods/sessionExercise";
 import { sortMeals } from "../../methods/sessionMeal";
 
@@ -97,13 +97,14 @@ export function useAuthPB() {
     }
   };
 
-  const routineToSortedExercises = (routine: Routine) => {
+  const routineToSortedExercises = (routine: RoutinesRecordExpand) => {
     const newRoutine = { ...routine };
     if (newRoutine.expand?.routineExercises_via_routine) {
-      newRoutine.expand.routineExercises_via_routine = sortSessionOrRoutineExercises(
-        newRoutine.expand.routineExercises_via_routine ?? [],
-        newRoutine.exercisesOrder ?? []
-      );
+      newRoutine.expand.routineExercises_via_routine =
+        sortSessionOrRoutineExercises<RoutineExercisesRecordExpand>(
+          newRoutine.expand.routineExercises_via_routine ?? [],
+          newRoutine.exercisesOrder ?? []
+        );
     }
     return newRoutine;
   };
@@ -157,11 +158,23 @@ export function useAuthPB() {
     }
   };
 
-  const getRoutineByID = async (id: string): Promise<Routine | null> => {
+  const getRoutineByID = async (id: string): Promise<RoutinesRecordExpand | null> => {
     try {
       return routineToSortedExercises(
-        await pb.collection<Routine>("routines").getOne(id, { expand: ROUTINE_EXPAND })
+        await pb.collection<RoutinesRecordExpand>("routines").getOne(id, { expand: ROUTINE_EXPAND })
       );
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+        return null;
+      } else {
+        throw e;
+      }
+    }
+  };
+
+  const getExerciseByID = async (id: string): Promise<ExercisesRecord | null> => {
+    try {
+      return await pb.collection<ExercisesRecordExpand>("exercises").getOne(id, { expand: EXERCISE_EXPAND });
     } catch (e) {
       if (e instanceof ClientResponseError && e.status === 404) {
         return null;
@@ -180,6 +193,7 @@ export function useAuthPB() {
     getSessionByDate,
     getSessionByID,
     getRoutineByID,
+    getExerciseByID,
     sessionToSortedExercisesAndMeals,
     routineToSortedExercises,
   };

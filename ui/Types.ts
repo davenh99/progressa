@@ -59,15 +59,6 @@ export const sleepOptions: RatingOption<string>[] = [
   { emoji: "😴", label: "Excellent", value: "great" },
 ];
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  dob: string;
-  height: number;
-  weight: number;
-}
-
 export interface MeasurementType {
   id: string;
   system: boolean;

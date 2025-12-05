@@ -5,17 +5,17 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
-import { Exercise, Routine, RoutineExercise } from "../../../Types";
+import { Exercise } from "../../../Types";
 import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
-  initialExercise: RoutineExercise;
+  initialExercise: RoutineExercisesRecordExpand;
   routineId: string;
   setRoutine: SetStoreFunction<{
-    routine: Routine | null;
+    routine: RoutinesRecordExpand | null;
   }>;
   deleteRow: () => Promise<void>;
   duplicateRow: () => Promise<void>;
@@ -51,8 +51,8 @@ export const RoutineExerciseMoreModal: Component<Props> = (props) => {
 export default RoutineExerciseMoreModal;
 
 interface ModalProps {
-  exercise: RoutineExercise;
-  setExercise: SetStoreFunction<RoutineExercise>;
+  exercise: RoutineExercisesRecordExpand;
+  setExercise: SetStoreFunction<RoutineExercisesRecordExpand>;
   parentProps: Props;
 }
 
@@ -61,7 +61,7 @@ const ModalContent: Component<ModalProps> = (props) => {
   const [warning, setWarning] = createSignal("");
   const { setLoading } = useModalLoading();
 
-  const selectNewExercise = async (exercise: Exercise) => {
+  const selectNewExercise = async (exercise: ExercisesRecordExpand) => {
     props.setExercise("exercise", exercise.id);
     props.setExercise("expand", (currentExpand: any) => ({
       ...currentExpand,
@@ -95,7 +95,7 @@ const ModalContent: Component<ModalProps> = (props) => {
         <p class="pt-1 text-red-400 text-xs">{warning()}</p>
       </div>
       <Checkbox
-        checked={props.exercise.isWarmup}
+        checked={props.exercise.isWarmup || false}
         onChange={(v) => props.setExercise("isWarmup", v)}
         label="Mark as warmup"
       />

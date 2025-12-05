@@ -207,3 +207,15 @@ interface Equipments {
 
 type EquipmentsRecord = Equipments & BaseRecord;
 
+/* Collection type: base */
+interface ExercisePreferences {
+  user: string; // relation
+  exercise: string; // relation
+  notes?: string; // text
+  saved?: boolean; // bool
+  tags?: string[]; // relation
+  preferredMeasurementType?: string; // relation
+}
+
+type ExercisePreferencesRecord = ExercisePreferences & BaseRecord;
+

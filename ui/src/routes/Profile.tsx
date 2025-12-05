@@ -14,7 +14,7 @@ const Profile: Component = () => {
   const { user, logout, updateRecord } = useAuthPB();
   const [height, setHeight] = createSignal(user.height);
   const [weight, setWeight] = createSignal(user.weight);
-  const [dob, setDob] = createSignal(new Date(user.dob).toLocaleDateString("en-ca"));
+  const [dob, setDob] = createSignal(new Date(user.dob || "").toLocaleDateString("en-ca"));
   const navigate = useNavigate();
 
   return (
@@ -27,7 +27,7 @@ const Profile: Component = () => {
           <div class="flex flex-row items-center space-x-2">
             <h2 class="text-xl font-semibold">{user.name}</h2>
             <Show when={!!user.dob}>
-              <p>({getAge(user.dob)} years old)</p>
+              <p>({getAge(user.dob || "")} years old)</p>
             </Show>
           </div>
           <div class="flex flex-col space-y-2 mt-3">

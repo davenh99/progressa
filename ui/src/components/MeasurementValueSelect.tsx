@@ -3,14 +3,13 @@ import { Select as KobalteSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
 import UpDown from "lucide-solid/icons/chevrons-up-down";
 
-import { MeasurementValue } from "../../Types";
 import NumberInput from "./NumberInput";
 import DataTime from "./Time";
 
 interface Props {
-  values: MeasurementValue[];
-  value: MeasurementValue | null;
-  onChange: (v: MeasurementValue | null) => void;
+  values: MeasurementValuesRecord[];
+  value: MeasurementValuesRecord | null;
+  onChange: (v: MeasurementValuesRecord | null) => void;
   placeholder?: string;
 }
 
@@ -34,7 +33,9 @@ export const Select: Component<Props> = (props) => {
       )}
     >
       <KobalteSelect.Trigger class="rounded-sm border-1 bg-dark-slate-gray-900/20 flex flex-row px-1 items-center space-x-1">
-        <KobalteSelect.Value<MeasurementValue>>{(state) => state.selectedOption().value}</KobalteSelect.Value>
+        <KobalteSelect.Value<MeasurementValuesRecord>>
+          {(state) => state.selectedOption().value}
+        </KobalteSelect.Value>
         <KobalteSelect.Icon>
           <UpDown size={16} />
         </KobalteSelect.Icon>
@@ -49,9 +50,9 @@ export const Select: Component<Props> = (props) => {
 };
 
 interface DataProps {
-  values: MeasurementValue[];
-  value: MeasurementValue | null;
-  onValueChange: (v: MeasurementValue | null) => void;
+  values: MeasurementValuesRecord[];
+  value: MeasurementValuesRecord | null;
+  onValueChange: (v: MeasurementValuesRecord | null) => void;
   saveFunc: (id: string) => Promise<void>;
 }
 
@@ -77,8 +78,8 @@ interface MeasurementValueSelectProps {
     | "measurement2Value"
     | "measurement3Value";
   measurementType?: string;
-  values?: MeasurementValue[];
-  value?: MeasurementValue | null;
+  values?: MeasurementValuesRecord[];
+  value?: MeasurementValuesRecord | null;
   valueNumeric?: number;
   onValueChange: (v: any) => void;
   saveFunc: (v: any) => Promise<void>;

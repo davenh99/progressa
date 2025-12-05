@@ -1,6 +1,6 @@
-import { RoutineExercise, SessionExercise } from "../../Types";
+import { SessionExercise } from "../../Types";
 
-export const getSupersetInds = (index: number, data: (SessionExercise | RoutineExercise)[]) => {
+export const getSupersetInds = (index: number, data: (SessionExercise | RoutineExercisesRecordExpand)[]) => {
   const inds = [index];
   const sessionExerciseId = data[index].id;
 
@@ -13,7 +13,7 @@ export const getSupersetInds = (index: number, data: (SessionExercise | RoutineE
   return inds;
 };
 
-export const getGroups = (exercises: (SessionExercise | RoutineExercise)[]) => {
+export const getGroups = (exercises: (SessionExercise | RoutineExercisesRecordExpand)[]) => {
   type Res = { [id: string]: { exerciseNames: string[] } };
   const resMap: Res = {};
 
@@ -80,7 +80,7 @@ export const getDropsetAddData = (sessionExercise: SessionExercise) => {
   };
 };
 
-export const sortSessionOrRoutineExercises = <T extends SessionExercise | RoutineExercise>(
+export const sortSessionOrRoutineExercises = <T extends SessionExercise | RoutineExercisesRecordExpand>(
   sessionExercises: T[],
   order: string[]
 ): T[] => {
