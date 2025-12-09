@@ -1,6 +1,5 @@
 import { useContext } from "solid-js";
 import { PBContext } from "./context";
-import { Routine, Session } from "../../../Types";
 import { ClientResponseError } from "pocketbase";
 import { EXERCISE_EXPAND, ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
 import { sortSessionOrRoutineExercises } from "../../methods/sessionExercise";
@@ -69,7 +68,7 @@ export function useAuthPB() {
 
   const getSessions = async () => {
     try {
-      const sessions = await pb.collection<Session>("sessions").getFullList({
+      const sessions = await pb.collection<SessionsRecordExpand>("sessions").getFullList({
         filter: `user = '${user.id}'`,
         sort: "-userDay",
       });
@@ -109,7 +108,7 @@ export function useAuthPB() {
     return newRoutine;
   };
 
-  const sessionToSortedExercisesAndMeals = (session: Session) => {
+  const sessionToSortedExercisesAndMeals = (session: SessionsRecordExpand) => {
     const newSession = { ...session };
     if (newSession.expand?.sessionExercises_via_session) {
       newSession.expand.sessionExercises_via_session = sortSessionOrRoutineExercises(
@@ -126,10 +125,10 @@ export function useAuthPB() {
     return newSession;
   };
 
-  const getSessionByDate = async (date: string): Promise<Session | null> => {
+  const getSessionByDate = async (date: string): Promise<SessionsRecordExpand | null> => {
     try {
       return sessionToSortedExercisesAndMeals(
-        await pb.collection<Session>("sessions").getFirstListItem(`userDay = '${date}'`, {
+        await pb.collection<SessionsRecordExpand>("sessions").getFirstListItem(`userDay = '${date}'`, {
           expand: SESSION_EXPAND,
         })
       );
@@ -142,10 +141,10 @@ export function useAuthPB() {
     }
   };
 
-  const getSessionByID = async (id: string): Promise<Session | null> => {
+  const getSessionByID = async (id: string): Promise<SessionsRecordExpand | null> => {
     try {
       return sessionToSortedExercisesAndMeals(
-        await pb.collection<Session>("sessions").getOne(id, {
+        await pb.collection<SessionsRecordExpand>("sessions").getOne(id, {
           expand: SESSION_EXPAND,
         })
       );

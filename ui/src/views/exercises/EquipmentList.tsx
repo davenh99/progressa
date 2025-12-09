@@ -1,5 +1,5 @@
-import { Component, createMemo, createSignal, For, onMount } from "solid-js";
-import { ColumnDef, flexRender, Row } from "@tanstack/solid-table";
+import { Component, createMemo, createSignal, onMount } from "solid-js";
+import { ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import List from "../app/List";

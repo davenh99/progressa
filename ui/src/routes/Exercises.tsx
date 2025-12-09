@@ -46,17 +46,19 @@ const Exercises: Component = () => {
   return (
     <>
       <Header>
-        <div class="flex justify-between items-start">
-          <Show
-            when={exercise.exercise != null && !!searchParams.exerciseId}
-            fallback={<h1 class="text-xl font-bold">Exercises</h1>}
+        <Show
+          when={exercise.exercise != null && !!searchParams.exerciseId}
+          fallback={<h1 class="text-xl font-bold">Exercises</h1>}
+        >
+          <Button
+            variant="text"
+            class="flex justify-start items-center space-x-1"
+            onClick={() => navigate(-1)}
           >
-            <Button variant="text" onClick={() => navigate(-1)}>
-              <ArrowLeft />
-            </Button>
-            <h1 class="text-xl font-bold">{exercise.exercise?.name}</h1>
-          </Show>
-        </div>
+            <ArrowLeft />
+            <h1 class="text-xl font-bold">Back to Exercises</h1>
+          </Button>
+        </Show>
       </Header>
       <Container class="py-0 overflow-y-auto">
         <Show

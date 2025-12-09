@@ -3,7 +3,7 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
-import { SessionMeal, Session } from "../../../Types";
+import { Session } from "../../../Types";
 import {
   Button,
   Input,
@@ -18,7 +18,7 @@ import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
-  initialMeal: SessionMeal;
+  initialMeal: SessionMealsRecordExpand;
   sessionID: string;
   setSession: SetStoreFunction<{
     session: Session | null;
@@ -54,8 +54,8 @@ export const MealMoreModal: Component<Props> = (props) => {
 export default MealMoreModal;
 
 interface ModalProps {
-  meal: SessionMeal;
-  setMeal: SetStoreFunction<SessionMeal>;
+  meal: SessionMealsRecordExpand;
+  setMeal: SetStoreFunction<SessionMealsRecordExpand>;
   parentProps: Props;
 }
 
@@ -64,7 +64,11 @@ const ModalContent: Component<ModalProps> = (props) => {
   return (
     <div class="overflow-y-auto space-y-1">
       <h2 class="pb-2">Meal Options</h2>
-      <Checkbox checked={props.meal.saved} onChange={(v) => props.setMeal("saved", v)} label="Save meal" />
+      <Checkbox
+        checked={props.meal.saved ?? false}
+        onChange={(v) => props.setMeal("saved", v)}
+        label="Save meal"
+      />
       <Input label="Name" value={props.meal.name} onChange={(v) => props.setMeal("name", v)} />
       <TextArea
         label="Description"
@@ -125,7 +129,7 @@ const ModalContent: Component<ModalProps> = (props) => {
         <p class="w-4">g</p>
       </div>
       <TagArea
-        tags={props.meal.expand.tags ?? []}
+        tags={props.meal.expand?.tags ?? []}
         setTags={(tags) => {
           props.setMeal("expand", "tags", tags);
           props.setMeal(

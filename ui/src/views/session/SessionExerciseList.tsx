@@ -7,7 +7,7 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { Exercise, Routine, Session, SessionExercise, SessionExerciseCreateData } from "../../../Types";
+import { SessionExerciseCreateData } from "../../../Types";
 import {
   Button,
   IconButton,
@@ -24,10 +24,10 @@ import SessionExerciseMoreModal from "./SessionExerciseMoreModal";
 import RoutineSelectModal from "../routines/RoutineSelectModal";
 
 interface Props {
-  sessionExercises: SessionExercise[];
+  sessionExercises: SessionExercisesRecordExpand[];
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: Session | null;
+    session: SessionsRecordExpand | null;
   }>;
 }
 
@@ -104,7 +104,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
     ).catch(console.error);
   };
 
-  const insertRowsAndSync = async (index: number, records: SessionExercise[]) => {
+  const insertRowsAndSync = async (index: number, records: SessionExercisesRecordExpand[]) => {
     const newRows = [...props.sessionExercises];
     newRows.splice(index, 0, ...records);
 
@@ -118,7 +118,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
     );
   };
 
-  const addSessionExercise = async (exercise: Exercise) => {
+  const addSessionExercise = async (exercise: ExercisesRecord) => {
     const data: SessionExerciseCreateData = {
       user: user.id,
       session: props.sessionID,
@@ -126,7 +126,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       perceivedEffort: 0,
     };
 
-    const record = await pb.collection<SessionExercise>("sessionExercises").create(data, {
+    const record = await pb.collection<SessionExercisesRecordExpand>("sessionExercises").create(data, {
       expand: SESSION_EXERCISE_EXPAND,
     });
 
@@ -137,7 +137,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   const addDropset = async (index: number) => {
     const data = getDropsetAddData(props.sessionExercises[index]);
 
-    const record = await pb.collection<SessionExercise>("sessionExercises").create(data, {
+    const record = await pb.collection<SessionExercisesRecordExpand>("sessionExercises").create(data, {
       expand: SESSION_EXERCISE_EXPAND,
     });
 
@@ -147,7 +147,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
 
   const duplicateRow = async (index: number) => {
     try {
-      const newSession = await pb.send<Session>(`/session/duplicateRow`, {
+      const newSession = await pb.send<SessionsRecordExpand>(`/session/duplicateRow`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -165,9 +165,9 @@ export const SessionExerciseList: Component<Props> = (props) => {
     setShowMoreExercise(false);
   };
 
-  const importFromRoutine = async (routine: Routine, index: number) => {
+  const importFromRoutine = async (routine: RoutinesRecordExpand, index: number) => {
     try {
-      const newSession = await pb.send<Session>(`/session/importRoutine`, {
+      const newSession = await pb.send<SessionsRecordExpand>(`/session/importRoutine`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -186,7 +186,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
     setShowAddRoutine(false);
   };
 
-  const columns = createMemo<ColumnDef<SessionExercise>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionExercisesRecordExpand>[]>(() => [
     {
       header: "Set Type",
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
@@ -294,7 +294,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
       accessorKey: "perceivedEffort",
       cell: (ctx) => (
         <RPESelect
-          value={ctx.row.original.perceivedEffort}
+          value={ctx.row.original.perceivedEffort || 0}
           onChange={(v) => {
             props.setSession(
               "session",
@@ -402,7 +402,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
                 getGroupInds={() => getGroupInds(row.index, groups())}
                 timeInput={
                   <DataTime
-                    value={row.original.restAfter}
+                    value={row.original.restAfter || 0}
                     onValueChange={(v) =>
                       props.setSession(
                         "session",

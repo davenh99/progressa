@@ -1,20 +1,20 @@
-import { SessionMeal, SessionMealCreateData } from "../../Types";
+import { SessionMealCreateData } from "../../Types";
 
-export const extractMealData = (meal: SessionMeal): SessionMealCreateData => {
+export const extractMealData = (meal: SessionMealsRecordExpand): SessionMealCreateData => {
   const { session, name, description, tags, kj, gramsProtein, gramsCarbohydrate, gramsFat } = meal;
   return {
     session,
-    name,
-    description,
-    tags,
-    kj,
-    gramsProtein,
-    gramsCarbohydrate,
-    gramsFat,
+    name: name || "",
+    description: description || "",
+    tags: tags || [],
+    kj: kj || 0,
+    gramsProtein: gramsProtein || 0,
+    gramsCarbohydrate: gramsCarbohydrate || 0,
+    gramsFat: gramsFat || 0,
   };
 };
 
-export const sortMeals = (sessionExercises: SessionMeal[], order: string[]) => {
+export const sortMeals = (sessionExercises: SessionMealsRecordExpand[], order: string[]) => {
   const itemsMap = new Map(sessionExercises.map((item) => [item.id, item]));
 
   const orderedItems = order.map((id) => itemsMap.get(id)).filter((item) => item !== undefined);

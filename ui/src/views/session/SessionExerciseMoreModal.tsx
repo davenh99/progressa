@@ -5,7 +5,6 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
-import { Exercise, Session, SessionExercise } from "../../../Types";
 import {
   Button,
   Checkbox,
@@ -21,10 +20,10 @@ import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
-  initialExercise: SessionExercise;
+  initialExercise: SessionExercisesRecordExpand;
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: Session | null;
+    session: SessionsRecord | null;
   }>;
   deleteRow: () => Promise<void>;
   duplicateRow: () => Promise<void>;
@@ -32,7 +31,7 @@ interface Props {
 }
 
 export const SessionExerciseMoreModal: Component<Props> = (props) => {
-  const [exercise, setExercise] = createStore<SessionExercise>(
+  const [exercise, setExercise] = createStore<SessionExercisesRecordExpand>(
     JSON.parse(JSON.stringify(props.initialExercise))
   );
   const { pb, getSessionByID } = useAuthPB();
@@ -60,8 +59,8 @@ export const SessionExerciseMoreModal: Component<Props> = (props) => {
 export default SessionExerciseMoreModal;
 
 interface ModalProps {
-  exercise: SessionExercise;
-  setExercise: SetStoreFunction<SessionExercise>;
+  exercise: SessionExercisesRecordExpand;
+  setExercise: SetStoreFunction<SessionExercisesRecordExpand>;
   parentProps: Props;
 }
 
@@ -103,7 +102,7 @@ const ModalContent: Component<ModalProps> = (props) => {
         <p class="pt-1 text-red-400 text-xs">{warning()}</p>
       </div>
       <Checkbox
-        checked={props.exercise.isWarmup}
+        checked={props.exercise.isWarmup || false}
         onChange={(v) => props.setExercise("isWarmup", v)}
         label="Mark as warmup"
       />
