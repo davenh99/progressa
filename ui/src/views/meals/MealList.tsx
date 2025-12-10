@@ -9,20 +9,19 @@ import {
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { SessionMeal } from "../../../Types";
 import { Input } from "../../components";
 import LoadFullScreen from "../app/LoadFullScreen";
 
 interface Props {
-  onClick: (meal: SessionMeal) => void;
+  onClick: (meal: SessionMealsRecordExpand) => void;
 }
 
 export const MealList: Component<Props> = (props) => {
-  const [meals, setMeals] = createSignal<SessionMeal[]>([]);
+  const [meals, setMeals] = createSignal<SessionMealsRecordExpand[]>([]);
   const [nameFilter, setNameFilter] = createSignal<string>("");
   const { pb, user } = useAuthPB();
 
-  const columns = createMemo<ColumnDef<SessionMeal>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionMealsRecordExpand>[]>(() => [
     {
       accessorKey: "name",
       header: "Meal",
@@ -50,7 +49,7 @@ export const MealList: Component<Props> = (props) => {
 
   const getData = async () => {
     try {
-      const meals = await pb.collection<SessionMeal>("sessionMeals").getFullList({
+      const meals = await pb.collection<SessionMealsRecordExpand>("sessionMeals").getFullList({
         filter: `session.user = '${user.id}' && name != '' && saved = true`,
         sort: "name",
       });

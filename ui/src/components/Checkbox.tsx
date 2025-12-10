@@ -30,15 +30,17 @@ export const Checkbox: Component<Props> = (props) => {
 
 interface DataProps {
   value: boolean;
-  onValueChange: (v: boolean) => void;
+  onValueChange?: (v: boolean) => void;
   saveFunc: (v: boolean) => Promise<void>;
+  label?: string;
 }
 
 export const DataCheckbox: Component<DataProps> = (props) => {
   return (
     <Checkbox
       checked={props.value}
-      onChange={(v: boolean) => props.saveFunc(v).then(() => props.onValueChange(v))}
+      label={props.label}
+      onChange={(v: boolean) => props.saveFunc(v).then(() => props.onValueChange?.(v))}
     />
   );
 };

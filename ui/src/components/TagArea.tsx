@@ -1,4 +1,4 @@
-import { Component, createSignal, For, JSX } from "solid-js";
+import { Component, createSignal, For, JSX, Show } from "solid-js";
 
 import Input from "./Input";
 import { useAuthPB } from "../config/pocketbase";
@@ -59,21 +59,21 @@ export const TagArea: Component<TagAreaProps> = (props) => {
 
   return (
     <div class="rounded-md p-2 flex flex-col bg-charcoal-600">
-      <Input
-        label=""
-        noPadding
-        value={tagInput()}
-        onChange={(v) => setTagInput(v)}
-        inputProps={{
-          onKeyDown: handleTagInput,
-          placeholder: "Add tags (press Enter)",
-        }}
-        class="flex-1 min-w-[120px] mb-2"
-      />
       <div class="flex flex-wrap gap-2">
         <For each={props.tags || []}>
           {(t) => <Tag title={t.name || ""} colorHex={t.colorHex || ""} onClick={() => deleteTag(t)} />}
         </For>
+        <Input
+          label=""
+          noPadding
+          value={tagInput()}
+          onChange={(v) => setTagInput(v)}
+          inputProps={{
+            onKeyDown: handleTagInput,
+            placeholder: "Add tags (press Enter)",
+          }}
+          class="flex-1 min-w-[120px]"
+        />
       </div>
     </div>
   );

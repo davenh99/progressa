@@ -5,7 +5,7 @@ import { useSearchParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
 
 import { useAuthPB } from "../config/pocketbase";
-import { Input, DataTextArea, TagArea, Button, DateInput, RatingSelector } from "../components";
+import { Input, TextArea, TagArea, Button, DateInput, RatingSelector } from "../components";
 import Container from "../views/app/Container";
 import {
   type SleepQuality,
@@ -34,7 +34,7 @@ export type LogSessionSearchParams = {
 
 const LogSession: Component = () => {
   const [loading, setLoading] = createSignal(false);
-  const [session, setSession] = createStore<{ session: Session | null }>({ session: null });
+  const [session, setSession] = createStore<{ session: SessionsRecordExpand | null }>({ session: null });
   const { pb, user, updateRecord, getSessionByDate } = useAuthPB();
   const [searchParams, setSearchParams] = useSearchParams<LogSessionSearchParams>();
 
@@ -48,14 +48,14 @@ const LogSession: Component = () => {
       tags: [],
       user: user.id,
       userDay: searchParams.date,
-      userHeight: user.height,
-      userWeight: user.weight,
+      userHeight: user.height || 0,
+      userWeight: user.weight || 0,
       exercisesOrder: [],
       mealsOrder: [],
     };
     try {
       const newSession = await pb
-        .collection<Session>("sessions")
+        .collection<SessionsRecordExpand>("sessions")
         .create(createData, { expand: SESSION_EXPAND });
       setSession({ session: newSession });
     } catch (e) {
@@ -226,10 +226,10 @@ const LogSession: Component = () => {
 
                 <div>
                   <h3>Notes</h3>
-                  <DataTextArea
-                    placeholder="Feeling rested today..."
+                  <TextArea
+                    inputProps={{ placeholder: "Feeling rested today..." }}
                     value={session.session?.notes ?? ""}
-                    onValueChange={(v) => setSession("session", "notes", v)}
+                    onChange={(v) => setSession("session", "notes", v)}
                     saveFunc={(v: string) => sessionUpdate("notes", v)}
                   />
                 </div>

@@ -3,7 +3,6 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 
-import { Session } from "../../../Types";
 import {
   Button,
   Input,
@@ -21,7 +20,7 @@ interface Props {
   initialMeal: SessionMealsRecordExpand;
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: Session | null;
+    session: SessionsRecordExpand | null;
   }>;
   deleteRow: () => Promise<void>;
   duplicateRow: () => Promise<void>;

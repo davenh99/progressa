@@ -50,3 +50,9 @@ interface SessionMealsRecordExpand extends SessionMealsRecord {
     tags?: TagsRecord[];
   };
 }
+
+interface ExercisePreferencesExpand extends ExercisePreferences {
+  expand?: {
+    tags?: TagsRecord[];
+  };
+}

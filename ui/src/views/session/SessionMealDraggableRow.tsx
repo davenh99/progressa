@@ -10,15 +10,15 @@ import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/el
 import invariant from "tiny-invariant";
 import { flexRender, type Row } from "@tanstack/solid-table";
 
-import { DraggingState, SessionMeal, Session } from "../../../Types";
+import { DraggingState } from "../../../Types";
 import { SetStoreFunction } from "solid-js/store";
 import { DROP_ABOVE_CLASS, DROP_BELOW_CLASS } from "../../../constants";
 
 interface DraggableRowProps {
-  row: Row<SessionMeal>;
+  row: Row<SessionMealsRecordExpand>;
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   setSession: SetStoreFunction<{
-    session: Session | null;
+    session: SessionsRecordExpand | null;
   }>;
 }
 
@@ -98,7 +98,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           }),
           render({ container }) {
             const preview = document.createElement("div");
-            preview.textContent = props.row.original.name;
+            preview.textContent = props.row.original.name || "";
             preview.className = "px-2.5 py-1.5 rounded-sm bg-charcoal-800";
             container.appendChild(preview);
           },

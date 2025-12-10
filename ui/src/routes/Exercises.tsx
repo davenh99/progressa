@@ -60,19 +60,21 @@ const Exercises: Component = () => {
           </Button>
         </Show>
       </Header>
-      <Container class="py-0 overflow-y-auto">
-        <Show
-          when={exercise.exercise != null && !!searchParams.exerciseId}
-          fallback={
+      <Show
+        when={exercise.exercise != null && !!searchParams.exerciseId}
+        fallback={
+          <Container class="py-0 overflow-y-auto">
             <ExerciseList
               onClick={(exercise) => setSearchParams({ exerciseId: exercise.id })}
               containerClass="pb-25"
             />
-          }
-        >
+          </Container>
+        }
+      >
+        <Container class="overflow-y-auto">
           <ExerciseForm exercise={exercise.exercise!} />
-        </Show>
-      </Container>
+        </Container>
+      </Show>
     </>
   );
 };

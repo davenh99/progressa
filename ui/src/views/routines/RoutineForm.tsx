@@ -2,7 +2,7 @@ import { Component, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import Delete from "lucide-solid/icons/x";
 
-import { AlertDialog, Button, DataTextArea, Input } from "../../components";
+import { AlertDialog, Button, TextArea, Input } from "../../components";
 import RoutineExerciseList from "./RoutineExerciseList";
 import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
@@ -42,11 +42,11 @@ export const RoutineForm: Component<Props> = (props) => {
         saveFunc={async (v) => v && (await routineUpdate("name", v))}
         onChange={(v) => props.setRoutine("routine", "name", v)}
       />
-      <DataTextArea
+      <TextArea
         label="Description"
         value={props.routine.description || ""}
         saveFunc={(v) => routineUpdate("description", v)}
-        onValueChange={(v) => props.setRoutine("routine", "description", v)}
+        onChange={(v) => props.setRoutine("routine", "description", v)}
       />
       <div class="mb-3">
         <p class="mt-3">Exercises</p>

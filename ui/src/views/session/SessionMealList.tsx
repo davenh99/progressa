@@ -5,7 +5,6 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 
-import { SessionMeal, Session } from "../../../Types";
 import { useAuthPB } from "../../config/pocketbase";
 import { Button, Input, NumberInput, IconButton } from "../../components";
 import CopyMealModal from "../meals/CopyMealModal";
@@ -15,10 +14,10 @@ import { DraggableRow } from "./SessionMealDraggableRow";
 import MealMoreModal from "../meals/MealMoreModal";
 
 interface Props {
-  meals: SessionMeal[];
+  meals: SessionMealsRecordExpand[];
   sessionID: string;
   setSession: SetStoreFunction<{
-    session: Session | null;
+    session: SessionsRecordExpand | null;
   }>;
 }
 
@@ -72,7 +71,7 @@ export const SessionMealList: Component<Props> = (props) => {
     ).catch(console.error);
   };
 
-  const insertRowAndSync = async (index: number, record: SessionMeal) => {
+  const insertRowAndSync = async (index: number, record: SessionMealsRecordExpand) => {
     const newMeals = [...props.meals];
 
     newMeals.splice(index, 0, record);
@@ -88,7 +87,7 @@ export const SessionMealList: Component<Props> = (props) => {
 
   const addRowAtIndex = async (index: number, duplicateInd?: number, createData?: { [k: string]: any }) => {
     if (createData) {
-      const record = await pb.collection<SessionMeal>("sessionMeals").create(
+      const record = await pb.collection<SessionMealsRecordExpand>("sessionMeals").create(
         { ...createData, session: props.sessionID },
         {
           expand: SESSION_MEAL_EXPAND,
@@ -98,21 +97,21 @@ export const SessionMealList: Component<Props> = (props) => {
       await insertRowAndSync(index + 1, record);
     } else if (duplicateInd !== undefined) {
       const record = await pb
-        .collection<SessionMeal>("sessionMeals")
+        .collection<SessionMealsRecordExpand>("sessionMeals")
         .create(extractMealData(props.meals[duplicateInd]), { expand: SESSION_MEAL_EXPAND });
 
       await insertRowAndSync(index + 1, record);
     }
   };
 
-  const addMeal = async (mealToCopy?: SessionMeal) => {
+  const addMeal = async (mealToCopy?: SessionMealsRecordExpand) => {
     const data = mealToCopy ? extractMealData(mealToCopy) : { name: "Meal" };
 
     addRowAtIndex(props.meals.length, undefined, data);
     setShowCopyMeal(false);
   };
 
-  const columns = createMemo<ColumnDef<SessionMeal>[]>(() => [
+  const columns = createMemo<ColumnDef<SessionMealsRecordExpand>[]>(() => [
     {
       header: "name",
       accessorKey: "name",
