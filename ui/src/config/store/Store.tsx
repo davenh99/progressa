@@ -4,6 +4,7 @@ import { ClientResponseError } from "pocketbase";
 
 import { StoreContext, TStore } from "./context";
 import { useAuthPB } from "../pocketbase";
+import { EXERCISE_EXPAND } from "../../../constants";
 
 const initialState: TStore = {
   exercises: {
@@ -26,12 +27,13 @@ export const Store: ParentComponent = (props) => {
 
     let page = 1;
     let total = -1;
-    let fetched: ExercisesRecord[] = [];
+    let fetched: ExercisesRecordExpand[] = [];
 
     try {
       while (total < 0 || fetched.length < total) {
-        const listResult = await pb.collection<ExercisesRecord>("exercises").getList(page, 500, {
+        const listResult = await pb.collection<ExercisesRecordExpand>("exercises").getList(page, 500, {
           sort: "name",
+          expand: EXERCISE_EXPAND,
         });
 
         fetched = [...fetched, ...listResult.items];

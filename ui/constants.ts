@@ -27,7 +27,8 @@ export const SESSION_EXERCISE_EXPAND =
 export const EXERCISE_EXPAND =
   "defaultMeasurementType.measurementValues_via_measurementType, " +
   "defaultMeasurementType2.measurementValues_via_measurementType, " +
-  "defaultMeasurementType2.measurementValues_via_measurementType";
+  "defaultMeasurementType2.measurementValues_via_measurementType, " +
+  "equipmentPrimary, equipmentSecondary, exercisePreferences_via_exercise";
 
 export const SESSION_MEAL_EXPAND = "tags";
 

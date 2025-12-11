@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, Show } from "solid-js";
 import { ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 import Filter from "lucide-solid/icons/list-filter-plus";
@@ -8,20 +8,30 @@ import EquipmentSelectModal from "./EquipmentSelectModal";
 import MuscleGroupSelectModal from "./MuscleGroupSelectModal";
 import List from "../app/List";
 import { useStore } from "../../config/store";
+import { useAuthPB } from "../../config/pocketbase";
 
 interface Props {
-  onClick: (exercise: ExercisesRecord) => void;
+  onClick: (exercise: ExercisesRecordExpand) => void;
   containerClass?: string;
 }
 
 export const ExerciseList: Component<Props> = (props) => {
   const { exercises } = useStore();
-  // TODO replace signals with query params
+  // TODO replace signals with query params?
   const [showEquipmentSelect, setShowEquipmentSelect] = createSignal(false);
   const [selectedEquipment, setSelectedEquipment] = createSignal<EquipmentsRecord>();
   const [showMuscleGroupSelect, setShowMuscleGroupSelect] = createSignal(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = createSignal<string>("");
   const [filterSaved, setFilterSaved] = createSignal(false);
+  const { pb } = useAuthPB();
+
+  const createExercise = async () => {
+    try {
+      const record = await pb.collection("exercises").create({});
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const filteredData = createMemo(() => {
     return exercises.data.filter((item) => {
@@ -38,6 +48,10 @@ export const ExerciseList: Component<Props> = (props) => {
       }
 
       if (!!selectedMuscleGroup() && !(item.targetMuscleGroup === selectedMuscleGroup())) {
+        validRow = false;
+      }
+
+      if (filterSaved() && !item.expand?.exercisePreferences_via_exercise?.[0].saved) {
         validRow = false;
       }
 
@@ -72,7 +86,7 @@ export const ExerciseList: Component<Props> = (props) => {
           selectMuscleGroup={(m) => setSelectedMuscleGroup(m.name)}
         />
       </Show>
-      <List<ExercisesRecord>
+      <List<ExercisesRecordExpand>
         headerActions={
           <>
             <div class="flex items-center space-x-2 mt-2 mb-1">
@@ -125,6 +139,7 @@ export const ExerciseList: Component<Props> = (props) => {
         showItemCount
         loading={exercises.loading}
         containerClass={props.containerClass}
+        createFunc={createExercise}
       />
     </>
   );

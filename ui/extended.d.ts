@@ -10,6 +10,8 @@ interface ExercisesRecordExpand extends ExercisesRecord {
     defaultMeasurementType2?: MeasurementTypeExpand;
     defaultMeasurementType3?: MeasurementTypeExpand;
     exercisePreferences_via_exercise?: ExercisePreferencesRecord[];
+    equipmentPrimary?: EquipmentsRecord;
+    equipmentSecondary?: EquipmentsRecord;
   };
 }
 

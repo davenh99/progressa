@@ -3,7 +3,7 @@ import { SetStoreFunction } from "solid-js/store";
 
 export type TStore = {
   exercises: {
-    data: ExercisesRecord[];
+    data: ExercisesRecordExpand[];
     loading: boolean;
     loaded: boolean;
   };

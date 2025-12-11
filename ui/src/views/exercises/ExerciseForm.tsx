@@ -198,6 +198,14 @@ export const ExerciseForm: Component<Props> = (props) => {
         <p class="text-md font-bold mt-1">Second measurement type (optional)</p>
         <p class="text-sm">{String(props.exercise.expand?.defaultMeasurementType2?.name)}</p>
       </Show>
+      <Show when={props.exercise.expand?.equipmentPrimary}>
+        <p class="text-md font-bold mt-1">Primary equipment</p>
+        <p class="text-sm">{String(props.exercise.expand?.equipmentPrimary?.name)}</p>
+      </Show>
+      <Show when={props.exercise.expand?.equipmentSecondary}>
+        <p class="text-md font-bold mt-1">Secondary equipment</p>
+        <p class="text-sm">{String(props.exercise.expand?.equipmentSecondary?.name)}</p>
+      </Show>
       <For each={Object.entries(fieldTitles) as [keyof typeof fieldTitles, string][]}>
         {([field, title]) => (
           <Show when={props.exercise[field] !== undefined && props.exercise[field] !== ""}>
