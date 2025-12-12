@@ -5,12 +5,12 @@ export type TStore = {
   exercises: {
     data: ExercisesRecordExpand[];
     loading: boolean;
-    loaded: boolean;
   };
 };
 
 export type TStoreContext = TStore & {
   setStore: SetStoreFunction<TStore>;
+  fetchAllExercises: () => Promise<void>;
 };
 
 export const StoreContext = createContext<TStoreContext>();

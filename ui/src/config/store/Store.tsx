@@ -10,7 +10,6 @@ const initialState: TStore = {
   exercises: {
     data: [],
     loading: false,
-    loaded: false,
   },
 };
 
@@ -19,7 +18,7 @@ export const Store: ParentComponent = (props) => {
   const { pb } = useAuthPB();
 
   const fetchAllExercises = async () => {
-    if (store.exercises.loading || store.exercises.loaded) {
+    if (store.exercises.loading) {
       return;
     }
 
@@ -41,10 +40,7 @@ export const Store: ParentComponent = (props) => {
         page = listResult.page + 1;
       }
 
-      setStore("exercises", {
-        data: fetched,
-        loaded: true,
-      });
+      setStore("exercises", { data: fetched });
     } catch (e) {
       if (e instanceof ClientResponseError && e.isAbort) {
       } else {
@@ -59,5 +55,9 @@ export const Store: ParentComponent = (props) => {
     fetchAllExercises();
   });
 
-  return <StoreContext.Provider value={{ setStore, ...store }}>{props.children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={{ setStore, ...store, fetchAllExercises }}>
+      {props.children}
+    </StoreContext.Provider>
+  );
 };

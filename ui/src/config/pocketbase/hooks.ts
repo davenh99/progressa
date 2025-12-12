@@ -79,6 +79,18 @@ export function useAuthPB() {
     }
   };
 
+  const safeGetRecord = async <T>(fn: () => Promise<T>): Promise<T | null> => {
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof ClientResponseError && e.status === 404) {
+        return null;
+      } else {
+        throw e;
+      }
+    }
+  };
+
   const updateRecord = async <T>(collectionName: string, recordID: string, field: string, newVal: any) => {
     const data: any = {};
     data[`${field}`] = newVal;
@@ -125,63 +137,57 @@ export function useAuthPB() {
     return newSession;
   };
 
-  const getSessionByDate = async (date: string): Promise<SessionsRecordExpand | null> => {
-    try {
-      return sessionToSortedExercisesAndMeals(
-        await pb.collection<SessionsRecordExpand>("sessions").getFirstListItem(`userDay = '${date}'`, {
-          expand: SESSION_EXPAND,
-        })
-      );
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  };
+  const getSessionByDate = async (date: string): Promise<SessionsRecordExpand | null> =>
+    safeGetRecord(async () => {
+      const session = await pb
+        .collection<SessionsRecordExpand>("sessions")
+        .getFirstListItem(`userDay = '${date}'`, { expand: SESSION_EXPAND });
 
-  const getSessionByID = async (id: string): Promise<SessionsRecordExpand | null> => {
-    try {
-      return sessionToSortedExercisesAndMeals(
-        await pb.collection<SessionsRecordExpand>("sessions").getOne(id, {
-          expand: SESSION_EXPAND,
-        })
-      );
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  };
+      return sessionToSortedExercisesAndMeals(session);
+    });
 
-  const getRoutineByID = async (id: string): Promise<RoutinesRecordExpand | null> => {
-    try {
-      return routineToSortedExercises(
-        await pb.collection<RoutinesRecordExpand>("routines").getOne(id, { expand: ROUTINE_EXPAND })
-      );
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  };
+  const getSessionByID = async (id: string): Promise<SessionsRecordExpand | null> =>
+    safeGetRecord(async () => {
+      const session = await pb
+        .collection<SessionsRecordExpand>("sessions")
+        .getOne(id, { expand: SESSION_EXPAND });
 
-  const getExerciseByID = async (id: string): Promise<ExercisesRecord | null> => {
-    try {
-      return await pb.collection<ExercisesRecordExpand>("exercises").getOne(id, { expand: EXERCISE_EXPAND });
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status === 404) {
-        return null;
-      } else {
-        throw e;
-      }
-    }
-  };
+      return sessionToSortedExercisesAndMeals(session);
+    });
+
+  const getRoutineByID = async (id: string): Promise<RoutinesRecordExpand | null> =>
+    safeGetRecord(async () => {
+      const routine = await pb
+        .collection<RoutinesRecordExpand>("routines")
+        .getOne(id, { expand: ROUTINE_EXPAND });
+
+      return routineToSortedExercises(routine);
+    });
+
+  const getExerciseByID = async (id: string): Promise<ExercisesRecordExpand | null> =>
+    safeGetRecord(
+      async () =>
+        await pb.collection<ExercisesRecordExpand>("exercises").getOne(id, { expand: EXERCISE_EXPAND })
+    );
+
+  const getExerciseByName = async (name: string): Promise<ExercisesRecordExpand | null> =>
+    safeGetRecord(
+      async () =>
+        await pb
+          .collection<ExercisesRecordExpand>("exercises")
+          .getFirstListItem(pb.filter("name = {:name}", { name }), { expand: EXERCISE_EXPAND })
+    );
+
+  const getExercisePreferences = async (exerciseId: string): Promise<ExercisePreferencesRecord | null> =>
+    safeGetRecord(
+      async () =>
+        await pb
+          .collection<ExercisePreferencesRecord>("exercisePreferences")
+          .getFirstListItem(
+            pb.filter("user = {:userId} && exercise = {:exerciseId}", { userId: user.id, exerciseId }),
+            { expand: "tags" }
+          )
+    );
 
   return {
     pb,
@@ -193,6 +199,8 @@ export function useAuthPB() {
     getSessionByID,
     getRoutineByID,
     getExerciseByID,
+    getExerciseByName,
+    getExercisePreferences,
     sessionToSortedExercisesAndMeals,
     routineToSortedExercises,
   };

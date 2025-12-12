@@ -1,6 +1,5 @@
 import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import { ClientResponseError } from "pocketbase";
 
 import { Button, DataCheckbox, TextArea, TagArea } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
@@ -68,7 +67,7 @@ const fieldTitles: Record<
 };
 
 export const ExerciseForm: Component<Props> = (props) => {
-  const { pb, user } = useAuthPB();
+  const { pb, user, getExercisePreferences } = useAuthPB();
   const [exercisePreferences, setExercisePreferences] = createStore<ExercisePreferencesExpand>({
     user: user.id,
     exercise: props.exercise.id,
@@ -87,7 +86,7 @@ export const ExerciseForm: Component<Props> = (props) => {
     newData[field] = val;
 
     try {
-      const curRecord = await getExercisePreferences();
+      const curRecord = await getExercisePreferences(props.exercise.id);
 
       if (curRecord) {
         await pb.collection<ExercisePreferencesExpand>("exercisePreferences").update(curRecord.id, newData);
@@ -105,25 +104,8 @@ export const ExerciseForm: Component<Props> = (props) => {
     // run from button
   };
 
-  const getExercisePreferences = async () => {
-    try {
-      const record = await pb
-        .collection<ExercisePreferencesRecord>("exercisePreferences")
-        .getFirstListItem(`user = '${user.id}' && exercise = '${props.exercise.id}'`, { expand: "tags" });
-
-      return record;
-    } catch (e) {
-      if (e instanceof ClientResponseError && e.status == 404) {
-      } else {
-        console.error(e);
-      }
-    }
-
-    return null;
-  };
-
   onMount(async () => {
-    const record = await getExercisePreferences();
+    const record = await getExercisePreferences(props.exercise.id);
     if (record) {
       setExercisePreferences(record);
     }

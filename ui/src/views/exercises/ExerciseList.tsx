@@ -24,24 +24,33 @@ interface Props {
 }
 
 export const ExerciseList: Component<Props> = (props) => {
-  const { exercises } = useStore();
+  const { exercises, fetchAllExercises } = useStore();
   const [showEquipmentSelect, setShowEquipmentSelect] = createSignal(false);
   const [showMuscleGroupSelect, setShowMuscleGroupSelect] = createSignal(false);
   const navigate = useNavigate();
-  const { pb, user } = useAuthPB();
+  const { pb, user, getExerciseByName } = useAuthPB();
 
   const createExercise = async () => {
-    const baseExercise = {
-      name: `${user.name}'s exercise`,
-      createdBy: user.id,
-    };
+    const baseName = `${user.name}'s exercise`;
+    let name = baseName;
+    let duplicateCount = 0;
+
+    // TODO yikes, do something else probably, need to move this backend
+    while (await getExerciseByName(name)) {
+      duplicateCount += 1;
+      name = `${baseName} (${duplicateCount})`;
+    }
+
+    const baseExercise = { name, createdBy: user.id };
+
     try {
       // TODO maybe better to have below in backend transaction? not urgent
       const exercise = await pb.collection<ExercisesRecord>("exercises").create(baseExercise);
-      const preferences = await pb
+      await pb
         .collection<ExercisePreferencesRecord>("exercisePreferences")
         .create({ exercise: exercise.id, user: user.id, saved: true });
 
+      fetchAllExercises();
       navigate(`/exercises?exerciseId=${exercise.id}`);
     } catch (e) {
       console.error(e);
