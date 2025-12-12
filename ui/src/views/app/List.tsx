@@ -82,21 +82,23 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
   const dataExists = createMemo(() => props.data?.() || props.loading);
   const rows = createMemo(() => table.getRowModel().rows);
 
-  const virtualizer = createVirtualizer({
-    get count() {
-      return rows().length;
-    },
-    getScrollElement: () => {
-      return parentRef;
-    },
-    estimateSize: () => 41,
-    get getItemKey() {
-      return (index: number) => rows()[index].id;
-    },
-  });
+  const virtualizer = createMemo(() =>
+    createVirtualizer({
+      get count() {
+        return rows().length;
+      },
+      getScrollElement: () => {
+        return parentRef;
+      },
+      estimateSize: () => 41,
+      get getItemKey() {
+        return (index: number) => rows()[index].id;
+      },
+    })
+  );
 
-  const virtualRows = createMemo(() => virtualizer.getVirtualItems());
-  const totalSize = createMemo(() => virtualizer.getTotalSize());
+  const virtualRows = createMemo(() => virtualizer().getVirtualItems());
+  const totalSize = createMemo(() => virtualizer().getTotalSize());
 
   const containerStyle = createMemo(() => containerClass({ class: props.containerClass }));
 
@@ -157,7 +159,7 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
                   return (
                     <div
                       data-index={virtualRow.index}
-                      ref={(el) => queueMicrotask(() => virtualizer.measureElement(el))}
+                      ref={(el) => queueMicrotask(() => virtualizer().measureElement(el))}
                       class="absolute w-full"
                       style={{ transform: `translateY(${virtualRow.start}px)` }}
                     >
