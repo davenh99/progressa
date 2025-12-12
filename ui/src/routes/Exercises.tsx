@@ -1,4 +1,4 @@
-import { Component, createEffect, Show } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import { ClientResponseError } from "pocketbase";
@@ -12,14 +12,29 @@ import { Button } from "../components";
 import ExerciseForm from "../views/exercises/ExerciseForm";
 
 type SearchParams = {
-  exerciseId: string;
+  exerciseId?: string;
+  muscleGroup?: string;
+  saved?: string;
+  equipment?: string;
 };
 
 const Exercises: Component = () => {
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
+  const [selectedEquipmentName, setSelectedEquipmentName] = createSignal<string>("");
   const [exercise, setExercise] = createStore<{ exercise: ExercisesRecordExpand | null }>({ exercise: null });
   const { getExerciseByID } = useAuthPB();
   const navigate = useNavigate();
+
+  const selectedMuscleGroup = createMemo(() => searchParams.muscleGroup || "");
+  const setSelectedMuscleGroup = (v?: string) =>
+    setSearchParams({ ...searchParams, muscleGroup: v ? v : "" });
+  const filterSaved = createMemo(() => searchParams.saved === "1" || false);
+  const setFilterSaved = (v?: boolean) => setSearchParams({ ...searchParams, saved: v ? "1" : "" });
+  const selectedEquipment = createMemo(() => searchParams.equipment || "");
+  const setSelectedEquipment = (v?: EquipmentsRecord) => {
+    setSelectedEquipmentName(v?.name || "");
+    setSearchParams({ ...searchParams, equipment: v ? v.id : "" });
+  };
 
   const _getExerciseByID = async () => {
     let id = searchParams.exerciseId;
@@ -65,7 +80,14 @@ const Exercises: Component = () => {
         fallback={
           <Container class="py-0 overflow-y-auto">
             <ExerciseList
-              onClick={(exercise) => setSearchParams({ exerciseId: exercise.id })}
+              selectedMuscleGroup={selectedMuscleGroup}
+              setSelectedMuscleGroup={setSelectedMuscleGroup}
+              selectedEquipmentName={selectedEquipmentName}
+              filterSaved={filterSaved}
+              setFilterSaved={setFilterSaved}
+              selectedEquipment={selectedEquipment}
+              setSelectedEquipment={setSelectedEquipment}
+              onClick={(exercise) => setSearchParams({ ...searchParams, exerciseId: exercise.id })}
               containerClass="pb-25"
             />
           </Container>

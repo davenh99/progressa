@@ -5,7 +5,7 @@ import { EquipmentList } from "./EquipmentList";
 
 interface Props {
   setModalVisible: (v: boolean) => void;
-  selectEquipment: (exercise: EquipmentsRecord) => void;
+  selectEquipment: (equipment: EquipmentsRecord) => void;
 }
 
 export const EquipmentSelectModal: Component<Props> = (props) => {

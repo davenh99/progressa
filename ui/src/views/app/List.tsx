@@ -110,7 +110,7 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
                 class="flex text-sm items-center pl-1 pr-2"
                 variant="solid"
                 variantColor="good"
-                onClick={() => {}}
+                onClick={props.createFunc}
               >
                 <Plus size={20} />
                 New

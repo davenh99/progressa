@@ -1,7 +1,8 @@
-import { Component, createEffect, createMemo, createSignal, Show } from "solid-js";
+import { Accessor, Component, createMemo, createSignal, Show } from "solid-js";
 import { ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 import Filter from "lucide-solid/icons/list-filter-plus";
+import { useNavigate } from "@solidjs/router";
 
 import { Button, Tag } from "../../components";
 import EquipmentSelectModal from "./EquipmentSelectModal";
@@ -13,21 +14,35 @@ import { useAuthPB } from "../../config/pocketbase";
 interface Props {
   onClick: (exercise: ExercisesRecordExpand) => void;
   containerClass?: string;
+  selectedMuscleGroup: Accessor<string>;
+  setSelectedMuscleGroup: (val: string) => void;
+  filterSaved: Accessor<boolean>;
+  setFilterSaved: (val: boolean) => void;
+  selectedEquipment: Accessor<string>;
+  selectedEquipmentName: Accessor<string>;
+  setSelectedEquipment: (val: EquipmentsRecord | undefined) => void;
 }
 
 export const ExerciseList: Component<Props> = (props) => {
   const { exercises } = useStore();
-  // TODO replace signals with query params?
   const [showEquipmentSelect, setShowEquipmentSelect] = createSignal(false);
-  const [selectedEquipment, setSelectedEquipment] = createSignal<EquipmentsRecord>();
   const [showMuscleGroupSelect, setShowMuscleGroupSelect] = createSignal(false);
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = createSignal<string>("");
-  const [filterSaved, setFilterSaved] = createSignal(false);
-  const { pb } = useAuthPB();
+  const navigate = useNavigate();
+  const { pb, user } = useAuthPB();
 
   const createExercise = async () => {
+    const baseExercise = {
+      name: `${user.name}'s exercise`,
+      createdBy: user.id,
+    };
     try {
-      const record = await pb.collection("exercises").create({});
+      // TODO maybe better to have below in backend transaction? not urgent
+      const exercise = await pb.collection<ExercisesRecord>("exercises").create(baseExercise);
+      const preferences = await pb
+        .collection<ExercisePreferencesRecord>("exercisePreferences")
+        .create({ exercise: exercise.id, user: user.id, saved: true });
+
+      navigate(`/exercises?exerciseId=${exercise.id}`);
     } catch (e) {
       console.error(e);
     }
@@ -38,20 +53,20 @@ export const ExerciseList: Component<Props> = (props) => {
       let validRow = true;
 
       if (
-        !!selectedEquipment() &&
+        !!props.selectedEquipment() &&
         !(
-          item.equipmentPrimary?.includes(selectedEquipment()!.id) ||
-          item.equipmentSecondary?.includes(selectedEquipment()!.id)
+          item.equipmentPrimary?.includes(props.selectedEquipment()) ||
+          item.equipmentSecondary?.includes(props.selectedEquipment())
         )
       ) {
         validRow = false;
       }
 
-      if (!!selectedMuscleGroup() && !(item.targetMuscleGroup === selectedMuscleGroup())) {
+      if (!!props.selectedMuscleGroup() && !(item.targetMuscleGroup === props.selectedMuscleGroup())) {
         validRow = false;
       }
 
-      if (filterSaved() && !item.expand?.exercisePreferences_via_exercise?.[0].saved) {
+      if (props.filterSaved() && !item.expand?.exercisePreferences_via_exercise?.[0].saved) {
         validRow = false;
       }
 
@@ -77,13 +92,13 @@ export const ExerciseList: Component<Props> = (props) => {
       <Show when={showEquipmentSelect()}>
         <EquipmentSelectModal
           setModalVisible={setShowEquipmentSelect}
-          selectEquipment={setSelectedEquipment}
+          selectEquipment={props.setSelectedEquipment}
         />
       </Show>
       <Show when={showMuscleGroupSelect()}>
         <MuscleGroupSelectModal
           setModalVisible={setShowMuscleGroupSelect}
-          selectMuscleGroup={(m) => setSelectedMuscleGroup(m.name)}
+          selectMuscleGroup={(m) => props.setSelectedMuscleGroup(m.name)}
         />
       </Show>
       <List<ExercisesRecordExpand>
@@ -106,27 +121,27 @@ export const ExerciseList: Component<Props> = (props) => {
               </Button>
               <Button
                 class="flex-1 py-0 flex items-center space-x-1 justify-center"
-                onClick={() => setFilterSaved(!filterSaved())}
-                variantColor={filterSaved() ? "good" : "neutral"}
+                onClick={() => props.setFilterSaved(!props.filterSaved())}
+                variantColor={props.filterSaved() ? "good" : "neutral"}
               >
                 <Filter size={16} />
                 <span>Saved</span>
               </Button>
             </div>
             <div class="flex items-center space-x-2 mt-2 mb-1 flex-wrap">
-              <Show when={!!selectedEquipment()}>
+              <Show when={!!props.selectedEquipment()}>
                 <Tag
-                  title={`Equipment: ${selectedEquipment()!.name}`}
+                  title={`Equipment: ${props.selectedEquipmentName()!}`}
                   colorHex="#4ADE80"
-                  onClick={() => setSelectedEquipment(undefined)}
+                  onClick={() => props.setSelectedEquipment(undefined)}
                   size="s"
                 />
               </Show>
-              <Show when={!!selectedMuscleGroup()}>
+              <Show when={!!props.selectedMuscleGroup()}>
                 <Tag
-                  title={`Muscles: ${selectedMuscleGroup()}`}
+                  title={`Muscles: ${props.selectedMuscleGroup()}`}
                   colorHex="#4ADE80"
-                  onClick={() => setSelectedMuscleGroup("")}
+                  onClick={() => props.setSelectedMuscleGroup("")}
                   size="s"
                 />
               </Show>
