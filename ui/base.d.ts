@@ -196,6 +196,7 @@ interface RoutineExercises {
   supersetParent?: string; // relation
   enduranceRating?: number; // number
   strengthRating?: number; // number
+  exerciseDuration?: number; // number
 }
 
 type RoutineExercisesRecord = RoutineExercises & BaseRecord;

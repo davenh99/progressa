@@ -183,6 +183,9 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
     },
     {
+      accessorKey: "",
+    },
+    {
       accessorFn: (row) =>
         row.expand?.exercise?.expand?.defaultMeasurementType?.numeric
           ? "measurementNumeric"
