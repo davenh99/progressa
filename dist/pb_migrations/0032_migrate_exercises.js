@@ -42,6 +42,13 @@ migrate(
       } else if (ex.get("defaultMeasurementType2") === "8ldlgtjjvy3ircl") {
         ex.set("isTimeBased", true);
         ex.set("defaultMeasurementType2", "");
+
+        for (const seEx of routineAndSessionExercises) {
+          if (seEx.get("exercise") == ex.id) {
+            seEx.set("exerciseDuration", seEx.get("measurement2Numeric"));
+            seEx.set("measurement2Numeric", 0);
+          }
+        }
       }
 
       for (const seOrRoEx of routineAndSessionExercises) {
