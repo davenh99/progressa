@@ -183,7 +183,27 @@ export const RoutineExerciseList: Component<Props> = (props) => {
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
     },
     {
-      accessorKey: "",
+      accessorKey: "exerciseDuration",
+      cell: (ctx) => {
+        return ctx.row.original.expand?.exercise?.isTimeBased ? (
+          <DataTime
+            value={ctx.getValue() as number}
+            onValueChange={(v: number) =>
+              props.setRoutine(
+                "routine",
+                "expand",
+                "routineExercises_via_routine",
+                ctx.row.index,
+                "exerciseDuration",
+                v
+              )
+            }
+            saveFunc={(v) => saveRow(ctx.row.original.id, "exerciseDuration", v)}
+          />
+        ) : (
+          <></>
+        );
+      },
     },
     {
       accessorFn: (row) =>

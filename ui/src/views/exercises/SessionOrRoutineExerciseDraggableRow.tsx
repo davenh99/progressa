@@ -213,6 +213,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           {/* column headers */}
           <div class="w-full flex flex-row justify-between text-center">
             <p class="flex-2">set</p>
+            {props.row.original.expand?.exercise?.isTimeBased && <p class="text-md">time</p>}
             {measurement && <p class={measurementHeaderClass()}>{measurementHeader()}</p>}
             {measurement2 && <p class={measurement2HeaderClass()}>{measurement2Header()}</p>}
             <p class="flex-2">+kg</p>

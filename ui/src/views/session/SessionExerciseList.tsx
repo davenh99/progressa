@@ -192,6 +192,29 @@ export const SessionExerciseList: Component<Props> = (props) => {
       cell: (ctx) => <p>{setNumbers()[ctx.row.index]}</p>,
     },
     {
+      accessorKey: "exerciseDuration",
+      cell: (ctx) => {
+        return ctx.row.original.expand?.exercise?.isTimeBased ? (
+          <DataTime
+            value={ctx.getValue() as number}
+            onValueChange={(v: number) =>
+              props.setSession(
+                "session",
+                "expand",
+                "sessionExercises_via_session",
+                ctx.row.index,
+                "exerciseDuration",
+                v
+              )
+            }
+            saveFunc={(v) => saveRow(ctx.row.original.id, "exerciseDuration", v)}
+          />
+        ) : (
+          <></>
+        );
+      },
+    },
+    {
       accessorFn: (row) =>
         row.expand?.exercise?.expand?.defaultMeasurementType?.numeric
           ? "measurementNumeric"
