@@ -6,10 +6,10 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
-import { Exercise, Routine, RoutineExercise, RoutineExerciseCreateData } from "../../../Types";
+import { RoutineExerciseCreateData } from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
-import { Button, DataTime, IconButton, MeasurementValueSelect, NumberInput } from "../../components";
+import { Button, DataTime, IconButton, MultiMeasurementValueSelect, NumberInput } from "../../components";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import { getGroupInds, getGroups, getSupersetInds } from "../../methods/sessionExercise";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
@@ -194,7 +194,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
         const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
-          <MeasurementValueSelect
+          <MultiMeasurementValueSelect
             value={ctx.row.original.expand?.measurementValue ?? null}
             values={
               ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
@@ -234,7 +234,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
         const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
-          <MeasurementValueSelect
+          <MultiMeasurementValueSelect
             value={ctx.row.original.expand?.measurement2Value ?? null}
             values={
               ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2?.expand

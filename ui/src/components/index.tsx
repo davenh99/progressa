@@ -16,3 +16,4 @@ export * from "./DateInput";
 export * from "./RatingSelector";
 export * from "./Popover";
 export * from "./AlertDialog";
+export * from "./Select";

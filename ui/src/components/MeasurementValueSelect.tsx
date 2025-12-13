@@ -13,7 +13,7 @@ interface Props {
   placeholder?: string;
 }
 
-export const Select: Component<Props> = (props) => {
+export const MeasurementValueSelect: Component<Props> = (props) => {
   return (
     <KobalteSelect
       multiple={false}
@@ -56,9 +56,9 @@ interface DataProps {
   saveFunc: (id: string) => Promise<void>;
 }
 
-export const DataSelect: Component<DataProps> = (props) => {
+export const DataMeasurementValueSelect: Component<DataProps> = (props) => {
   return (
-    <Select
+    <MeasurementValueSelect
       value={props.value}
       values={props.values}
       onChange={(v) => props.saveFunc(v?.id || "").then(() => props.onValueChange(v))}
@@ -66,7 +66,7 @@ export const DataSelect: Component<DataProps> = (props) => {
   );
 };
 
-export default Select;
+export default MeasurementValueSelect;
 
 interface MeasurementValueSelectProps {
   numeric: boolean;
@@ -85,12 +85,12 @@ interface MeasurementValueSelectProps {
   saveFunc: (v: any) => Promise<void>;
 }
 
-export const MeasurementValueSelect: Component<MeasurementValueSelectProps> = (props) => {
+export const MultiMeasurementValueSelect: Component<MeasurementValueSelectProps> = (props) => {
   return (
     <Show
       when={props.numeric}
       fallback={
-        <DataSelect
+        <DataMeasurementValueSelect
           values={props.values ?? []}
           value={props.value ?? null}
           onValueChange={(v) => props.onValueChange(v)}

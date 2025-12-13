@@ -1,4 +1,4 @@
-interface MeasurementTypeExpand extends MeasurementTypesRecord {
+interface MeasurementTypesExpand extends MeasurementTypesRecord {
   expand?: {
     measurementValues_via_measurementType: MeasurementValuesRecord[];
   };
@@ -6,9 +6,9 @@ interface MeasurementTypeExpand extends MeasurementTypesRecord {
 
 interface ExercisesRecordExpand extends ExercisesRecord {
   expand?: {
-    defaultMeasurementType?: MeasurementTypeExpand;
-    defaultMeasurementType2?: MeasurementTypeExpand;
-    defaultMeasurementType3?: MeasurementTypeExpand;
+    defaultMeasurementType?: MeasurementTypesExpand;
+    defaultMeasurementType2?: MeasurementTypesExpand;
+    defaultMeasurementType3?: MeasurementTypesExpand;
     exercisePreferences_via_exercise?: ExercisePreferencesRecord[];
     equipmentPrimary?: EquipmentsRecord;
     equipmentSecondary?: EquipmentsRecord;

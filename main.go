@@ -36,6 +36,7 @@ func main() {
 		gentypes.Register(app, gentypes.Config{
 			FilePath:                   "ui/base.d.ts",
 			CollectionAdditionalFields: c.ComputedFieldsCfg.ExtractFields(),
+			SelectOptionsPath:          "ui/selectOptions.ts",
 		})
 	}
 

@@ -51,7 +51,7 @@ export const ExerciseList: Component<Props> = (props) => {
         .create({ exercise: exercise.id, user: user.id, saved: true });
 
       fetchAllExercises();
-      navigate(`/exercises?exerciseId=${exercise.id}`);
+      navigate(`/exercises?exerciseId=${exercise.id}&editing=1`);
     } catch (e) {
       console.error(e);
     }

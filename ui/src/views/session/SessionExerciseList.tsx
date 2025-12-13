@@ -14,7 +14,7 @@ import {
   DataTime,
   NumberInput,
   RPESelect,
-  MeasurementValueSelect,
+  MultiMeasurementValueSelect,
 } from "../../components";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 import { getDropsetAddData, getGroupInds, getGroups, getSupersetInds } from "../../methods/sessionExercise";
@@ -203,7 +203,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
         const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
-          <MeasurementValueSelect
+          <MultiMeasurementValueSelect
             key={key}
             values={
               ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType?.expand
@@ -243,7 +243,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
         const path = mType?.numeric ? [key as any] : ["expand", key as any];
 
         return mType ? (
-          <MeasurementValueSelect
+          <MultiMeasurementValueSelect
             value={ctx.row.original.expand?.measurement2Value ?? null}
             values={
               ctx.row.original.expand?.exercise?.expand?.defaultMeasurementType2?.expand

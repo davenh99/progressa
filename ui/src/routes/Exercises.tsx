@@ -16,6 +16,7 @@ type SearchParams = {
   muscleGroup?: string;
   saved?: string;
   equipment?: string;
+  editing?: string;
 };
 
 const Exercises: Component = () => {
@@ -94,7 +95,13 @@ const Exercises: Component = () => {
         }
       >
         <Container class="overflow-y-auto">
-          <ExerciseForm exercise={exercise.exercise!} />
+          <ExerciseForm
+            exercise={exercise.exercise!}
+            editing={!!searchParams.editing}
+            setEditing={(v: boolean) =>
+              setSearchParams({ ...searchParams, editing: v ? "1" : "" }, { replace: true })
+            }
+          />
         </Container>
       </Show>
     </>

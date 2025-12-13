@@ -1,13 +1,29 @@
-import { Component, createSignal, For, onMount, Show } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Accessor, Component, createSignal, For, onMount, Show } from "solid-js";
+import { createStore, SetStoreFunction } from "solid-js/store";
+import Delete from "lucide-solid/icons/x";
 
-import { Button, DataCheckbox, TextArea, TagArea } from "../../components";
+import { Button, DataCheckbox, TextArea, TagArea, Input, Checkbox, Select } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import LoadFullScreen from "../app/LoadFullScreen";
 import { debounce } from "../../methods/debounce";
+import EquipmentSelectModal from "./EquipmentSelectModal";
+import MeasurementTypeSelectModal from "./MeasurementTypeSelectModal";
+import { useStore } from "../../config/store";
+import { ExercisesSelectOptions } from "../../../selectOptions";
+
+type ExerciseSelectField = keyof typeof ExercisesSelectOptions;
+
+type ExerciseSelectValue<K extends ExerciseSelectField> = (typeof ExercisesSelectOptions)[K][number];
 
 interface Props {
   exercise: ExercisesRecordExpand;
+  editing: boolean;
+  setEditing: (v: boolean) => void;
+}
+
+interface Field {
+  title: string;
+  component: string;
 }
 
 const fieldTitles: Record<
@@ -34,39 +50,297 @@ const fieldTitles: Record<
     | "equipmentSecondary"
     | "defaultMeasurementType"
     | "defaultMeasurementType2"
+    | "createdBy"
   >,
-  string
+  Field
 > = {
-  armCount: "One or two arms?",
-  armPattern: "Continuous or alternating arms",
-  bodyRegion: "Body region",
-  bodyweight: "Is this exercise bodyweight based?",
-  createdBy: "Created by",
-  difficulty: "Difficulty",
-  endLoadPosition: "Load position at end",
-  field: "Exercise classification",
-  footElevation: "Foot elevation",
-  forceType: "Force type",
-  grip: "Grip",
-  isCombination: "Combination exercise?",
-  isTimeBased: "Time based exercise?",
-  laterality: "Laterality",
-  legPattern: "Continuous or alternating legs",
-  mechanics: "Mechanics",
-  motionPlane: "Plane of motion #1",
-  motionPlane2: "Plane of motion #2",
-  motionPlane3: "Plane of motion #3",
-  movementPattern: "Movement pattern #1",
-  movementPattern2: "Movement pattern #2",
-  movementPattern3: "Movement pattern #3",
-  musclePrimary: "Primary muscle",
-  muscleSecondary: "Secondary muscle",
-  muscleTertiary: "Tertiary muscle",
-  posture: "Posture",
-  targetMuscleGroup: "Target muscle group",
+  isTimeBased: { title: "Is the exercise time based?", component: "checkbox" },
+  armCount: { title: "One or two arms?", component: "select" },
+  armPattern: { title: "Continuous or alternating arms", component: "select" },
+  bodyRegion: { title: "Body region", component: "select" },
+  bodyweight: { title: "Is this exercise bodyweight based?", component: "checkbox" },
+  difficulty: { title: "Difficulty", component: "select" },
+  endLoadPosition: { title: "Load position at end", component: "select" },
+  field: { title: "Exercise classification", component: "select" },
+  footElevation: { title: "Foot elevation", component: "select" },
+  forceType: { title: "Force type", component: "select" },
+  grip: { title: "Grip", component: "select" },
+  isCombination: { title: "Combination exercise?", component: "checkbox" },
+  laterality: { title: "Laterality", component: "select" },
+  legPattern: { title: "Continuous or alternating legs", component: "select" },
+  mechanics: { title: "Mechanics", component: "select" },
+  motionPlane: { title: "Plane of motion #1", component: "select" },
+  motionPlane2: { title: "Plane of motion #2", component: "select" },
+  motionPlane3: { title: "Plane of motion #3", component: "select" },
+  movementPattern: { title: "Movement pattern #1", component: "select" },
+  movementPattern2: { title: "Movement pattern #2", component: "select" },
+  movementPattern3: { title: "Movement pattern #3", component: "select" },
+  musclePrimary: { title: "Primary muscle", component: "select" },
+  muscleSecondary: { title: "Secondary muscle", component: "select" },
+  muscleTertiary: { title: "Tertiary muscle", component: "select" },
+  posture: { title: "Posture", component: "select" },
+  targetMuscleGroup: { title: "Target muscle group", component: "select" },
 };
 
 export const ExerciseForm: Component<Props> = (props) => {
+  const [loading, setLoading] = createSignal(false);
+  const [exercise, setExercise] = createStore<ExercisesRecordExpand>(props.exercise);
+
+  return (
+    <div class="pb-25">
+      <Show
+        when={props.editing}
+        fallback={
+          <ViewingContent exercise={exercise} editing={props.editing} setEditing={props.setEditing} />
+        }
+      >
+        <EditingContent
+          exercise={exercise}
+          loading={loading}
+          setLoading={setLoading}
+          setExercise={setExercise}
+          editing={props.editing}
+          setEditing={props.setEditing}
+        />
+      </Show>
+    </div>
+  );
+};
+
+interface EditContentProps extends Props {
+  setExercise: SetStoreFunction<ExercisesRecordExpand>;
+  loading: Accessor<boolean>;
+  setLoading: (v: boolean) => void;
+}
+
+interface MeasurementTypeModalShowOptions {
+  show: boolean;
+  key: "defaultMeasurementType" | "defaultMeasurementType2";
+}
+
+interface EquipmentModalShowOptions {
+  show: boolean;
+  key: "equipmentPrimary" | "equipmentSecondary";
+}
+
+const EditingContent: Component<EditContentProps> = (props) => {
+  const { fetchAllExercises } = useStore();
+  const [showEquipmentSelect, setShowEquipmentSelect] = createSignal<EquipmentModalShowOptions>({
+    show: false,
+    key: "equipmentPrimary",
+  });
+  const [showMeasurementTypeSelect, setShowMeasurementTypeSelect] =
+    createSignal<MeasurementTypeModalShowOptions>({
+      show: false,
+      key: "defaultMeasurementType",
+    });
+  const { pb } = useAuthPB();
+
+  const saveExercise = async () => {
+    props.setLoading(true);
+    try {
+      await pb.collection("exercises").update(props.exercise.id, props.exercise);
+      fetchAllExercises();
+    } catch (e) {
+      console.error(e);
+    }
+    props.setLoading(false);
+    props.setEditing(false);
+  };
+
+  return (
+    <>
+      <Show when={props.loading()}>
+        <LoadFullScreen />
+      </Show>
+      <Show when={showEquipmentSelect().show}>
+        <EquipmentSelectModal
+          setModalVisible={(v) => setShowEquipmentSelect({ ...showEquipmentSelect(), show: v })}
+          selectEquipment={(v) => {
+            props.setExercise("expand", showEquipmentSelect().key, v);
+            props.setExercise(showEquipmentSelect().key, v.id);
+          }}
+        />
+      </Show>
+      <Show when={showMeasurementTypeSelect().show}>
+        <MeasurementTypeSelectModal
+          setModalVisible={(v) => setShowMeasurementTypeSelect({ ...showMeasurementTypeSelect(), show: v })}
+          selectMeasurementType={(v) => {
+            props.setExercise("expand", showMeasurementTypeSelect().key, v);
+            props.setExercise(showMeasurementTypeSelect().key, v.id);
+          }}
+        />
+      </Show>
+      <div class="flex justify-end items-start">
+        <Button variant="text" variantColor="good" onClick={saveExercise}>
+          save
+        </Button>
+      </div>
+      <div class="space-y-2">
+        <Input
+          value={props.exercise.name}
+          label="Exercise Name"
+          labelPosition="above"
+          onChange={(v) => props.setExercise("name", v)}
+        />
+        <TextArea
+          value={props.exercise.description}
+          label="Description"
+          onChange={(v) => props.setExercise("description", v)}
+        />
+        <TextArea
+          value={props.exercise.instructions}
+          label="Instructions"
+          onChange={(v) => props.setExercise("instructions", v)}
+        />
+
+        <Show when={props.exercise.expand?.defaultMeasurementType}>
+          <p class="text-md font-bold mt-1">Measurement type</p>
+        </Show>
+        <div class="flex items-center">
+          <Button
+            class="flex-1 flex items-center space-x-1 justify-center w-full"
+            onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType" })}
+          >
+            <span>
+              {props.exercise.expand?.defaultMeasurementType
+                ? props.exercise.expand?.defaultMeasurementType?.name
+                : "Measurement type"}
+            </span>
+          </Button>
+          {props.exercise.expand?.defaultMeasurementType && (
+            <Button
+              variant="text"
+              variantColor="bad"
+              onClick={() => {
+                props.setExercise("expand", "defaultMeasurementType", undefined);
+                props.setExercise("defaultMeasurementType", "");
+              }}
+            >
+              <Delete />
+            </Button>
+          )}
+        </div>
+
+        <Show when={props.exercise.expand?.defaultMeasurementType2}>
+          <p class="text-md font-bold mt-1">Second measurement type</p>
+        </Show>
+        <div class="flex items-center">
+          <Button
+            class="flex-1 flex items-center space-x-1 justify-center w-full"
+            onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType2" })}
+          >
+            <span>
+              {props.exercise.expand?.defaultMeasurementType2
+                ? props.exercise.expand?.defaultMeasurementType2?.name
+                : "Second measurement type"}
+            </span>
+          </Button>
+          {props.exercise.expand?.defaultMeasurementType2 && (
+            <Button
+              variant="text"
+              variantColor="bad"
+              onClick={() => {
+                props.setExercise("expand", "defaultMeasurementType2", undefined);
+                props.setExercise("defaultMeasurementType2", "");
+              }}
+            >
+              <Delete />
+            </Button>
+          )}
+        </div>
+
+        <Show when={props.exercise.expand?.equipmentPrimary}>
+          <p class="text-md font-bold mt-1">Primary equipment</p>
+        </Show>
+        <div class="flex items-center">
+          <Button
+            class="flex-1 flex items-center space-x-1 justify-center w-full"
+            onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentPrimary" })}
+          >
+            <span>
+              {props.exercise.expand?.equipmentPrimary
+                ? props.exercise.expand?.equipmentPrimary?.name
+                : "Primary Equipment"}
+            </span>
+          </Button>
+          {props.exercise.expand?.equipmentPrimary && (
+            <Button
+              variant="text"
+              variantColor="bad"
+              onClick={() => {
+                props.setExercise("expand", "equipmentPrimary", undefined);
+                props.setExercise("equipmentPrimary", "");
+              }}
+            >
+              <Delete />
+            </Button>
+          )}
+        </div>
+
+        <Show when={props.exercise.expand?.equipmentSecondary}>
+          <p class="text-md font-bold mt-1">Secondary equipment</p>
+        </Show>
+        <div class="flex items-center">
+          <Button
+            class="flex-1 flex items-center space-x-1 justify-center w-full"
+            onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentSecondary" })}
+          >
+            <span>
+              {props.exercise.expand?.equipmentSecondary
+                ? props.exercise.expand?.equipmentSecondary?.name
+                : "Secondary equipment"}
+            </span>
+          </Button>
+          {props.exercise.expand?.equipmentSecondary && (
+            <Button
+              variant="text"
+              variantColor="bad"
+              onClick={() => {
+                props.setExercise("expand", "equipmentSecondary", undefined);
+                props.setExercise("equipmentSecondary", "");
+              }}
+            >
+              <Delete />
+            </Button>
+          )}
+        </div>
+
+        <For each={Object.entries(fieldTitles) as [keyof typeof fieldTitles, Field][]}>
+          {([fieldName, field]) => {
+            switch (field.component) {
+              case "checkbox":
+                return (
+                  <div class="mb-2 mt-3">
+                    <Checkbox
+                      checked={!!props.exercise[fieldName]}
+                      label={field.title}
+                      onChange={(v) => props.setExercise(fieldName, v)}
+                    />
+                  </div>
+                );
+              case "select":
+                return (
+                  <div class="mb-2">
+                    <p class="text-md font-bold mt-1">{field.title}</p>
+                    <Select
+                      value={props.exercise[fieldName] as string}
+                      values={ExercisesSelectOptions[fieldName as ExerciseSelectField] as string[]}
+                      // @ts-ignore TODO maybe can type this properly later
+                      onChange={(v) => props.setExercise(fieldName, v || "")}
+                      placeholder="Select"
+                    />
+                  </div>
+                );
+            }
+          }}
+        </For>
+      </div>
+    </>
+  );
+};
+
+const ViewingContent: Component<Props> = (props) => {
   const { pb, user, getExercisePreferences } = useAuthPB();
   const [exercisePreferences, setExercisePreferences] = createStore<ExercisePreferencesExpand>({
     user: user.id,
@@ -78,8 +352,6 @@ export const ExerciseForm: Component<Props> = (props) => {
       tags: [],
     },
   });
-  const [editing, setEditing] = createSignal(false);
-  const [loading, setLoading] = createSignal(false);
 
   const savePreferences = debounce(async (field: string, val: any) => {
     const newData: any = {};
@@ -100,10 +372,6 @@ export const ExerciseForm: Component<Props> = (props) => {
     }
   });
 
-  const saveExercise = async () => {
-    // run from button
-  };
-
   onMount(async () => {
     const record = await getExercisePreferences(props.exercise.id);
     if (record) {
@@ -112,34 +380,13 @@ export const ExerciseForm: Component<Props> = (props) => {
   });
 
   return (
-    <div class="pb-25">
+    <>
       <div class="flex justify-between items-start">
-        <Show when={loading()}>
-          <LoadFullScreen />
-        </Show>
         <h2>{props.exercise.name}</h2>
         <Show when={props.exercise.createdBy === user.id}>
-          <Show
-            when={editing()}
-            fallback={
-              <Button variant="text" variantColor="neutral" onClick={() => setEditing(true)}>
-                edit
-              </Button>
-            }
-          >
-            <Button
-              variant="text"
-              variantColor="good"
-              onClick={() => {
-                setLoading(true);
-                saveExercise()
-                  .then(() => setEditing(false))
-                  .finally(() => setLoading(false));
-              }}
-            >
-              save
-            </Button>
-          </Show>
+          <Button variant="text" variantColor="neutral" onClick={() => props.setEditing(true)}>
+            edit
+          </Button>
         </Show>
       </div>
       <Show when={props.exercise.description}>
@@ -177,7 +424,7 @@ export const ExerciseForm: Component<Props> = (props) => {
         <p class="text-sm">{String(props.exercise.expand?.defaultMeasurementType?.name)}</p>
       </Show>
       <Show when={props.exercise.expand?.defaultMeasurementType2}>
-        <p class="text-md font-bold mt-1">Second measurement type (optional)</p>
+        <p class="text-md font-bold mt-1">Second measurement type</p>
         <p class="text-sm">{String(props.exercise.expand?.defaultMeasurementType2?.name)}</p>
       </Show>
       <Show when={props.exercise.expand?.equipmentPrimary}>
@@ -188,20 +435,20 @@ export const ExerciseForm: Component<Props> = (props) => {
         <p class="text-md font-bold mt-1">Secondary equipment</p>
         <p class="text-sm">{String(props.exercise.expand?.equipmentSecondary?.name)}</p>
       </Show>
-      <For each={Object.entries(fieldTitles) as [keyof typeof fieldTitles, string][]}>
-        {([field, title]) => (
-          <Show when={props.exercise[field] !== undefined && props.exercise[field] !== ""}>
-            <p class="text-md font-bold mt-1">{title}</p>
+      <For each={Object.entries(fieldTitles) as [keyof typeof fieldTitles, Field][]}>
+        {([fieldName, field]) => (
+          <Show when={props.exercise[fieldName] !== undefined && props.exercise[fieldName] !== ""}>
+            <p class="text-md font-bold mt-1">{field.title}</p>
             <Show
-              when={typeof props.exercise[field] === "boolean"}
-              fallback={<p class="text-sm">{String(props.exercise[field])}</p>}
+              when={typeof props.exercise[fieldName] === "boolean"}
+              fallback={<p class="text-sm">{String(props.exercise[fieldName])}</p>}
             >
-              <p class="text-sm">{props.exercise[field] ? "yes" : "no"}</p>
+              <p class="text-sm">{props.exercise[fieldName] ? "yes" : "no"}</p>
             </Show>
           </Show>
         )}
       </For>
-    </div>
+    </>
   );
 };
 

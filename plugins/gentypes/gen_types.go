@@ -28,6 +28,7 @@ type Config struct {
 	FilePath                   string
 	Export                     bool
 	CollectionAdditionalFields map[string][]common.Field
+	SelectOptionsPath          string
 }
 
 func Register(app *pocketbase.PocketBase, cfg Config) {
@@ -74,6 +75,27 @@ func (c *Config) generateTypes(app *pocketbase.PocketBase) error {
 
 	c.printBaseType(f)
 
+	if c.SelectOptionsPath != "" {
+		optionsPath := filepath.Join(strings.Trim(root, "\t\n\r "), c.SelectOptionsPath)
+
+		fOptions, err := os.Create(optionsPath)
+		if err != nil {
+			return err
+		}
+		defer fOptions.Close()
+
+		fOptions.WriteString("/* This file was automatically generated, changes will be overwritten. */\n\n")
+
+		for _, collection := range collections {
+			if !collection.System {
+				if c.SelectOptionsPath != "" {
+					c.printCollectionSelectOptions(fOptions, collection)
+				}
+			}
+		}
+
+	}
+
 	for _, collection := range collections {
 		if !collection.System {
 			c.printCollectionTypes(f, collection)
@@ -98,14 +120,51 @@ func (c *Config) printBaseType(f *os.File) {
 	fmt.Fprint(f, "}\n\n")
 }
 
+func (c *Config) printCollectionSelectOptions(f *os.File, collection *core.Collection) {
+	collectionName := capitalise(collection.Name)
+
+	selectFields := make([]*core.SelectField, 0)
+
+	for _, field := range collection.Fields {
+		if field.Type() == "select" && !field.GetHidden() {
+			if sf, ok := field.(*core.SelectField); ok {
+				selectFields = append(selectFields, sf)
+			}
+		}
+	}
+
+	if len(selectFields) == 0 {
+		return
+	}
+
+	fmt.Fprintf(f, "export const %sSelectOptions = {\n", collectionName)
+
+	for _, sf := range selectFields {
+		fieldName := sf.GetName()
+
+		values := append([]string{}, sf.Values...)
+
+		fmt.Fprintf(f, "  %s: [", fieldName)
+		for i, v := range values {
+			fmt.Fprintf(f, "%q", v)
+			if i < len(values)-1 {
+				fmt.Fprint(f, ", ")
+			}
+		}
+		fmt.Fprintln(f, "],")
+	}
+
+	fmt.Fprint(f, "};\n\n")
+}
+
 func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
-	typeName := capitalise(collection.Name)
+	collectionName := capitalise(collection.Name)
 
 	fmt.Fprintf(f, "/* Collection type: %s */\n", collection.Type)
 	if c.Export {
 		fmt.Fprint(f, "export ")
 	}
-	fmt.Fprintf(f, "interface %s {\n", typeName)
+	fmt.Fprintf(f, "interface %s {\n", collectionName)
 
 	for _, field := range collection.Fields {
 		if field.Type() == "autodate" || field.GetName() == "id" || field.GetHidden() {
@@ -133,7 +192,7 @@ func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
 	if c.Export {
 		fmt.Fprint(f, "export ")
 	}
-	fmt.Fprintf(f, "type %sRecord = %s & BaseRecord;\n\n", typeName, typeName)
+	fmt.Fprintf(f, "type %sRecord = %s & BaseRecord;\n\n", collectionName, collectionName)
 }
 
 func capitalise(s string) string {

@@ -8,7 +8,7 @@ type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFi
 
 interface ExtraProps {
   label?: string;
-  saveFunc: (v: string) => Promise<any>;
+  saveFunc?: (v: string) => Promise<any>;
   inputProps?: InputProps;
 }
 
