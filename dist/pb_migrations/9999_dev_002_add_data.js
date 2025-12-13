@@ -1,0 +1,243 @@
+/// <reference path="../pb_data/types.d.ts" />
+migrate(
+  (app) => {
+    const collections = {
+      users: [
+        {
+          collectionId: "_pb_users_auth_",
+          collectionName: "users",
+          email: "test@test.com",
+          emailVisibility: false,
+          id: "m8atu5ac904rx0d",
+          name: "test",
+          verified: false,
+          password: "12345678",
+        },
+      ],
+      routines: [
+        {
+          collectionId: "pbc_884676139",
+          collectionName: "routines",
+          description: "routine 1 for testing",
+          exercisesOrder: ["kxd7bpjt6utv3qs", "xxmvskd9g1olbfx"],
+          id: "agoxssc6gu5b6sy",
+          name: "Routine1",
+          user: "m8atu5ac904rx0d",
+        },
+        {
+          collectionId: "pbc_884676139",
+          collectionName: "routines",
+          description: "second test routine",
+          exercisesOrder: ["5x5fmx8fo79adiq"],
+          id: "zkwbnif3qomyuyd",
+          name: "Routine2",
+          user: "m8atu5ac904rx0d",
+        },
+        {
+          collectionId: "pbc_884676139",
+          collectionName: "routines",
+          description: "complex routine with dropsets",
+          exercisesOrder: [
+            "baa27i0s22782ze",
+            "trnqakxgfyp1qdc",
+            "hmwqwceb56bg0iw",
+            "hc1ii6oz30ey02i",
+            "qn44x0nbhk1w7j1",
+          ],
+          id: "ju66888fbla85hi",
+          name: "Routine3",
+          user: "m8atu5ac904rx0d",
+        },
+      ],
+      sessions: [
+        {
+          collectionId: "pbc_415974452",
+          collectionName: "sessions",
+          exercisesOrder: ["rnf5rekdrg3cdv1", "76dloshevsizdrg"],
+          id: "y12drmbymefk7sv",
+          name: "Workout4",
+          user: "m8atu5ac904rx0d",
+          userDay: "2025-10-24",
+        },
+        {
+          collectionId: "pbc_415974452",
+          collectionName: "sessions",
+          id: "v34ogl10g2bbq7v",
+          name: "Workout3",
+          user: "m8atu5ac904rx0d",
+          userDay: "2025-10-23",
+        },
+        {
+          collectionId: "pbc_415974452",
+          collectionName: "sessions",
+          exercisesOrder: ["mj8kwiyamoryd7p", "xusbyjdyt1hdfu9"],
+          id: "ty5tm38yvydssc1",
+          name: "Workout2",
+          user: "m8atu5ac904rx0d",
+          userDay: "2025-10-22",
+        },
+        {
+          collectionId: "pbc_415974452",
+          collectionName: "sessions",
+          exercisesOrder: ["n488qowbocakkqv", "cqw0jw1qt7pwgqk", "r3z048lsu52qo3r"],
+          id: "huofnpqx7roxybz",
+          name: "Workout1",
+          user: "m8atu5ac904rx0d",
+          userDay: "2025-10-21",
+        },
+      ],
+      sessionExercises: [
+        {
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "abwheelstayhtr7",
+          id: "rnf5rekdrg3cdv1",
+          session: "y12drmbymefk7sv",
+        },
+        {
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "barbellseazozsz",
+          id: "76dloshevsizdrg",
+          session: "y12drmbymefk7sv",
+        },
+        {
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "singlearmksowou",
+          id: "mj8kwiyamoryd7p",
+          measurementNumeric: 7,
+          session: "ty5tm38yvydssc1",
+          updated: "2025-10-27 02:32:13.665Z",
+        },
+        {
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "singlearmksowou",
+          id: "xusbyjdyt1hdfu9",
+          notes: "yo",
+          session: "ty5tm38yvydssc1",
+          updated: "2025-10-27 02:32:03.166Z",
+        },
+        {
+          addedWeight: 2,
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          created: "2025-10-24 02:11:34.654Z",
+          exercise: "abwheelstayhtr7",
+          id: "n488qowbocakkqv",
+          measurementNumeric: 5,
+          perceivedEffort: 20,
+          session: "huofnpqx7roxybz",
+          updated: "2025-10-24 02:12:00.274Z",
+        },
+        {
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "abwheelstayhtr7",
+          id: "cqw0jw1qt7pwgqk",
+          measurementNumeric: 4,
+          perceivedEffort: 30,
+          restAfter: 1800,
+          session: "huofnpqx7roxybz",
+          supersetParent: "n488qowbocakkqv",
+        },
+        {
+          addedWeight: 5,
+          collectionId: "pbc_1563017532",
+          collectionName: "sessionExercises",
+          exercise: "alternatinvxlfp",
+          id: "r3z048lsu52qo3r",
+          measurementNumeric: 2,
+          perceivedEffort: 100,
+          session: "huofnpqx7roxybz",
+        },
+      ],
+      routineExercises: [
+        {
+          addedWeight: 50,
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "bulgarianbh2v1c",
+          id: "kxd7bpjt6utv3qs",
+          measurementNumeric: 30,
+          notes: "how",
+          routine: "agoxssc6gu5b6sy",
+        },
+        {
+          addedWeight: 5,
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "clubbellorxjgvv",
+          id: "xxmvskd9g1olbfx",
+          measurementNumeric: 2,
+          notes: "note",
+          routine: "agoxssc6gu5b6sy",
+        },
+        {
+          addedWeight: 10,
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "cablestraidmcm0",
+          id: "5x5fmx8fo79adiq",
+          measurementNumeric: 1,
+          notes: "hehe",
+          routine: "zkwbnif3qomyuyd",
+        },
+        {
+          addedWeight: 30,
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "plateoverhuucz6",
+          id: "trnqakxgfyp1qdc",
+          measurementNumeric: 60,
+          routine: "ju66888fbla85hi",
+        },
+        {
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "plateoverhuucz6",
+          id: "hmwqwceb56bg0iw",
+          measurementNumeric: 30,
+          routine: "ju66888fbla85hi",
+          supersetParent: "trnqakxgfyp1qdc",
+        },
+        {
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "plateoverhuucz6",
+          id: "hc1ii6oz30ey02i",
+          measurementNumeric: 20,
+          routine: "ju66888fbla85hi",
+          supersetParent: "trnqakxgfyp1qdc",
+        },
+        {
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "ringchestfvkeps",
+          id: "baa27i0s22782ze",
+          routine: "ju66888fbla85hi",
+        },
+        {
+          collectionId: "pbc_1139529185",
+          collectionName: "routineExercises",
+          exercise: "ringhangini74hr",
+          id: "qn44x0nbhk1w7j1",
+          routine: "ju66888fbla85hi",
+        },
+      ],
+    };
+
+    for (const col in collections) {
+      const coll = app.findCollectionByNameOrId(col);
+
+      for (const rec of collections[col]) {
+        const record = new Record(coll, rec);
+        app.save(record);
+      }
+    }
+  },
+  (app) => {
+    // no
+  }
+);

@@ -294,9 +294,9 @@ func TestRoutineDuplicateRowEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "73repeater00000", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+							{Exercise: "bulgarianbh2v1c", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
+							{Exercise: "clubbellorxjgvv", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+							{Exercise: "clubbellorxjgvv", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
 						},
 					},
 				}
@@ -316,14 +316,14 @@ func TestRoutineDuplicateRowEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 30},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 20},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 4},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 4},
-							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "ringchestfvkeps", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "plateoverhuucz6", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "plateoverhuucz6", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 30},
+							{Exercise: "plateoverhuucz6", SupersetParent: "trnqakxgfyp1qdc", Notes: "", MeasurementNumeric: 20},
+							{Exercise: "plateoverhuucz6", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 4},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 4},
+							{Exercise: "ringhangini74hr", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}
@@ -374,9 +374,9 @@ func TestRoutineImportRoutineEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "73repeater00000", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
-							{Exercise: "a5wjd65ifgrjt9q", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
+							{Exercise: "bulgarianbh2v1c", SupersetParent: "", Notes: "how", MeasurementNumeric: 30},
+							{Exercise: "clubbellorxjgvv", SupersetParent: "", Notes: "note", MeasurementNumeric: 2},
+							{Exercise: "cablestraidmcm0", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
 						},
 					},
 				}
@@ -396,12 +396,12 @@ func TestRoutineImportRoutineEndpoint(t *testing.T) {
 				expected := MockRoutineResponse{
 					Expand: MockRoutineExpand{
 						RoutineExercises_via_routine: []MockSessionOrRoutineExercise{
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
-							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 2},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 2},
-							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "cablestraidmcm0", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
+							{Exercise: "ringchestfvkeps", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "plateoverhuucz6", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 2},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 2},
+							{Exercise: "ringhangini74hr", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}
@@ -452,10 +452,10 @@ func TestSessionDuplicateRowEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
-							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
-							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
+							{Exercise: "alternatinvxlfp", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+							{Exercise: "alternatinvxlfp", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
 						},
 					},
 				}
@@ -475,11 +475,11 @@ func TestSessionDuplicateRowEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
-							{Exercise: "70vlzfveuudrmax", SupersetParent: "?", Notes: "", MeasurementNumeric: 4, ParendInd: 2},
-							{Exercise: "a5wjd65ifgrjt9j", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "n488qowbocakkqv", Notes: "", MeasurementNumeric: 4},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "", Notes: "", MeasurementNumeric: 5},
+							{Exercise: "abwheelstayhtr7", SupersetParent: "?", Notes: "", MeasurementNumeric: 4, ParendInd: 2},
+							{Exercise: "alternatinvxlfp", SupersetParent: "", Notes: "", MeasurementNumeric: 2},
 						},
 					},
 				}
@@ -530,7 +530,7 @@ func TestSessionImportRoutineEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "a5wjd65ifgrjt9m", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
+							{Exercise: "cablestraidmcm0", SupersetParent: "", Notes: "hehe", MeasurementNumeric: 1},
 						},
 					},
 				}
@@ -550,13 +550,13 @@ func TestSessionImportRoutineEndpoint(t *testing.T) {
 				expected := MockSessionResponse{
 					Expand: MockSessionExpand{
 						SessionExercises_via_session: []MockSessionOrRoutineExercise{
-							{Exercise: "b5wjd65ifgrjt9p", SupersetParent: "", Notes: "", MeasurementNumeric: 7},
-							{Exercise: "b5wjd65ifgrjt9p", SupersetParent: "", Notes: "yo", MeasurementNumeric: 0},
-							{Exercise: "a5wjd65ifgrjt9r", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 3},
-							{Exercise: "b5wjd65ifgrjt9k", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 3},
-							{Exercise: "a5wjd65ifgrjt9k", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "singlearmksowou", SupersetParent: "", Notes: "", MeasurementNumeric: 7},
+							{Exercise: "singlearmksowou", SupersetParent: "", Notes: "yo", MeasurementNumeric: 0},
+							{Exercise: "ringchestfvkeps", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
+							{Exercise: "plateoverhuucz6", SupersetParent: "", Notes: "", MeasurementNumeric: 60},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 30, ParendInd: 3},
+							{Exercise: "plateoverhuucz6", SupersetParent: "?", Notes: "", MeasurementNumeric: 20, ParendInd: 3},
+							{Exercise: "ringhangini74hr", SupersetParent: "", Notes: "", MeasurementNumeric: 0},
 						},
 					},
 				}

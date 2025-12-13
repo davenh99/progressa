@@ -1,6 +1,7 @@
 
 progressa
 pb_data*/
+test_pb_data_backup
 
 .env
 coverage.out
