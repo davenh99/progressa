@@ -1,6 +1,6 @@
 
 progressa
-pb_data/
+pb_data*/
 
 .env
 coverage.out

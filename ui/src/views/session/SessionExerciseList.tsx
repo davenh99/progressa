@@ -416,6 +416,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
                     saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
                   />
                 }
+                lastRow={row.index === props.sessionExercises.length - 1}
               />
             );
           }}

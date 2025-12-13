@@ -13,8 +13,6 @@ import { ExercisesSelectOptions } from "../../../selectOptions";
 
 type ExerciseSelectField = keyof typeof ExercisesSelectOptions;
 
-type ExerciseSelectValue<K extends ExerciseSelectField> = (typeof ExercisesSelectOptions)[K][number];
-
 interface Props {
   exercise: ExercisesRecordExpand;
   editing: boolean;
@@ -194,116 +192,124 @@ const EditingContent: Component<EditContentProps> = (props) => {
           onChange={(v) => props.setExercise("instructions", v)}
         />
 
-        <Show when={props.exercise.expand?.defaultMeasurementType}>
-          <p class="text-md font-bold mt-1">Measurement type</p>
-        </Show>
-        <div class="flex items-center">
-          <Button
-            class="flex-1 flex items-center space-x-1 justify-center w-full"
-            onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType" })}
-          >
-            <span>
-              {props.exercise.expand?.defaultMeasurementType
-                ? props.exercise.expand?.defaultMeasurementType?.name
-                : "Measurement type"}
-            </span>
-          </Button>
-          {props.exercise.expand?.defaultMeasurementType && (
+        <div>
+          <Show when={props.exercise.expand?.defaultMeasurementType}>
+            <p class="text-md font-bold mt-1">Measurement type</p>
+          </Show>
+          <div class="flex items-center">
             <Button
-              variant="text"
-              variantColor="bad"
-              onClick={() => {
-                props.setExercise("expand", "defaultMeasurementType", undefined);
-                props.setExercise("defaultMeasurementType", "");
-              }}
+              class="flex-1 flex items-center space-x-1 justify-center w-full"
+              onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType" })}
             >
-              <Delete />
+              <span>
+                {props.exercise.expand?.defaultMeasurementType
+                  ? props.exercise.expand?.defaultMeasurementType?.name
+                  : "Measurement type"}
+              </span>
             </Button>
-          )}
+            {props.exercise.expand?.defaultMeasurementType && (
+              <Button
+                variant="text"
+                variantColor="bad"
+                onClick={() => {
+                  props.setExercise("expand", "defaultMeasurementType", undefined);
+                  props.setExercise("defaultMeasurementType", "");
+                }}
+              >
+                <Delete />
+              </Button>
+            )}
+          </div>
         </div>
 
-        <Show when={props.exercise.expand?.defaultMeasurementType2}>
-          <p class="text-md font-bold mt-1">Second measurement type</p>
-        </Show>
-        <div class="flex items-center">
-          <Button
-            class="flex-1 flex items-center space-x-1 justify-center w-full"
-            onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType2" })}
-          >
-            <span>
-              {props.exercise.expand?.defaultMeasurementType2
-                ? props.exercise.expand?.defaultMeasurementType2?.name
-                : "Second measurement type"}
-            </span>
-          </Button>
-          {props.exercise.expand?.defaultMeasurementType2 && (
+        <div>
+          <Show when={props.exercise.expand?.defaultMeasurementType2}>
+            <p class="text-md font-bold mt-1">Second measurement type</p>
+          </Show>
+          <div class="flex items-center">
             <Button
-              variant="text"
-              variantColor="bad"
-              onClick={() => {
-                props.setExercise("expand", "defaultMeasurementType2", undefined);
-                props.setExercise("defaultMeasurementType2", "");
-              }}
+              class="flex-1 flex items-center space-x-1 justify-center w-full"
+              onClick={() => setShowMeasurementTypeSelect({ show: true, key: "defaultMeasurementType2" })}
             >
-              <Delete />
+              <span>
+                {props.exercise.expand?.defaultMeasurementType2
+                  ? props.exercise.expand?.defaultMeasurementType2?.name
+                  : "Second measurement type"}
+              </span>
             </Button>
-          )}
+            {props.exercise.expand?.defaultMeasurementType2 && (
+              <Button
+                variant="text"
+                variantColor="bad"
+                onClick={() => {
+                  props.setExercise("expand", "defaultMeasurementType2", undefined);
+                  props.setExercise("defaultMeasurementType2", "");
+                }}
+              >
+                <Delete />
+              </Button>
+            )}
+          </div>
         </div>
 
-        <Show when={props.exercise.expand?.equipmentPrimary}>
-          <p class="text-md font-bold mt-1">Primary equipment</p>
-        </Show>
-        <div class="flex items-center">
-          <Button
-            class="flex-1 flex items-center space-x-1 justify-center w-full"
-            onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentPrimary" })}
-          >
-            <span>
-              {props.exercise.expand?.equipmentPrimary
-                ? props.exercise.expand?.equipmentPrimary?.name
-                : "Primary Equipment"}
-            </span>
-          </Button>
-          {props.exercise.expand?.equipmentPrimary && (
+        <div>
+          <Show when={props.exercise.expand?.equipmentPrimary}>
+            <p class="text-md font-bold mt-1">Primary equipment</p>
+          </Show>
+          <div class="flex items-center">
             <Button
-              variant="text"
-              variantColor="bad"
-              onClick={() => {
-                props.setExercise("expand", "equipmentPrimary", undefined);
-                props.setExercise("equipmentPrimary", "");
-              }}
+              class="flex-1 flex items-center space-x-1 justify-center w-full"
+              onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentPrimary" })}
             >
-              <Delete />
+              <span>
+                {props.exercise.expand?.equipmentPrimary
+                  ? props.exercise.expand?.equipmentPrimary?.name
+                  : "Primary Equipment"}
+              </span>
             </Button>
-          )}
+            {props.exercise.expand?.equipmentPrimary && (
+              <Button
+                variant="text"
+                variantColor="bad"
+                onClick={() => {
+                  props.setExercise("expand", "equipmentPrimary", undefined);
+                  props.setExercise("equipmentPrimary", "");
+                }}
+              >
+                <Delete />
+              </Button>
+            )}
+          </div>
         </div>
 
-        <Show when={props.exercise.expand?.equipmentSecondary}>
-          <p class="text-md font-bold mt-1">Secondary equipment</p>
-        </Show>
-        <div class="flex items-center">
-          <Button
-            class="flex-1 flex items-center space-x-1 justify-center w-full"
-            onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentSecondary" })}
-          >
-            <span>
-              {props.exercise.expand?.equipmentSecondary
-                ? props.exercise.expand?.equipmentSecondary?.name
-                : "Secondary equipment"}
-            </span>
-          </Button>
-          {props.exercise.expand?.equipmentSecondary && (
+        <div>
+          <Show when={props.exercise.expand?.equipmentSecondary}>
+            <p class="text-md font-bold mt-1">Secondary equipment</p>
+          </Show>
+          <div class="flex items-center">
             <Button
-              variant="text"
-              variantColor="bad"
-              onClick={() => {
-                props.setExercise("expand", "equipmentSecondary", undefined);
-                props.setExercise("equipmentSecondary", "");
-              }}
+              class="flex-1 flex items-center space-x-1 justify-center w-full"
+              onClick={() => setShowEquipmentSelect({ show: true, key: "equipmentSecondary" })}
             >
-              <Delete />
+              <span>
+                {props.exercise.expand?.equipmentSecondary
+                  ? props.exercise.expand?.equipmentSecondary?.name
+                  : "Secondary equipment"}
+              </span>
             </Button>
-          )}
+            {props.exercise.expand?.equipmentSecondary && (
+              <Button
+                variant="text"
+                variantColor="bad"
+                onClick={() => {
+                  props.setExercise("expand", "equipmentSecondary", undefined);
+                  props.setExercise("equipmentSecondary", "");
+                }}
+              >
+                <Delete />
+              </Button>
+            )}
+          </div>
         </div>
 
         <For each={Object.entries(fieldTitles) as [keyof typeof fieldTitles, Field][]}>
@@ -390,10 +396,12 @@ const ViewingContent: Component<Props> = (props) => {
         </Show>
       </div>
       <Show when={props.exercise.description}>
-        <p class="text-sm">{props.exercise.description}</p>
+        <p class="text-md font-bold mt-1">Description</p>
+        <p class="text-sm whitespace-pre-line">{props.exercise.description}</p>
       </Show>
       <Show when={props.exercise.instructions}>
-        <p class="text-sm">{props.exercise.instructions}</p>
+        <p class="text-md font-bold mt-1">Instructions</p>
+        <p class="text-sm whitespace-pre-line">{props.exercise.instructions}</p>
       </Show>
       <div class="mt-3 mb-2">
         <DataCheckbox

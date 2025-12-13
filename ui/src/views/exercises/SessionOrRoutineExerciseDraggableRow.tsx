@@ -25,6 +25,7 @@ interface DraggableRowProps {
   saveRow: (recordID: string, field: string, newVal: any) => Promise<void>;
   timeInput: JSX.Element;
   groupTitle: string;
+  lastRow: boolean;
 }
 
 export const DraggableRow: Component<DraggableRowProps> = (props) => {
@@ -32,14 +33,13 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
   let groupRef: HTMLDivElement | undefined = undefined;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
-  const measurementHeader = createMemo(
-    () => props.row.original.expand?.exercise?.expand?.defaultMeasurementType?.displayName ?? "?"
-  );
+  const measurement = props.row.original.expand?.exercise?.expand?.defaultMeasurementType;
+  const measurementHeader = createMemo(() => measurement?.displayName ?? "");
   const measurementHeaderClass = createMemo(() =>
     measurementHeader().length > 5 ? "text-sm flex-2" : "flex-2"
   );
   const measurement2 = props.row.original.expand?.exercise?.expand?.defaultMeasurementType2;
-  const measurement2Header = createMemo(() => measurement2?.displayName ?? "?");
+  const measurement2Header = createMemo(() => measurement2?.displayName ?? "");
   const measurement2HeaderClass = createMemo(() =>
     measurement2Header().length > 5 ? "text-sm flex-2" : "flex-2"
   );
@@ -213,7 +213,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
           {/* column headers */}
           <div class="w-full flex flex-row justify-between text-center">
             <p class="flex-2">set</p>
-            <p class={measurementHeaderClass()}>{measurementHeader()}</p>
+            {measurement && <p class={measurementHeaderClass()}>{measurementHeader()}</p>}
             {measurement2 && <p class={measurement2HeaderClass()}>{measurement2Header()}</p>}
             <p class="flex-2">+kg</p>
             <Show when={"perceivedEffort" in props.row.original}>
@@ -259,7 +259,7 @@ export const DraggableRow: Component<DraggableRowProps> = (props) => {
               }}
             </For>
           </div>
-          <Show when={props.lastOfSuperset}>
+          <Show when={props.lastOfSuperset && !props.lastRow}>
             <div class="flex flex-row justify-around">
               <div class="rounded-sm bg-dark-slate-gray-800/50">{props.timeInput}</div>
             </div>

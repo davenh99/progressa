@@ -390,6 +390,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
                     saveFunc={(v: number) => saveRow(row.original.id, "restAfter", v)}
                   />
                 }
+                lastRow={row.index === props.routineExercises.length - 1}
               />
             );
           }}
