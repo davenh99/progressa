@@ -1,4 +1,4 @@
-import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createMemo, createSignal, For, Show } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import { ColumnDef, createSolidTable, getCoreRowModel } from "@tanstack/solid-table";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -22,6 +22,7 @@ import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import SessionExerciseMoreModal from "./SessionExerciseMoreModal";
 import RoutineSelectModal from "../routines/RoutineSelectModal";
+import { createDisposableEffect } from "../../methods/disposable";
 
 interface Props {
   sessionExercises: SessionExercisesRecordExpand[];
@@ -356,44 +357,46 @@ export const SessionExerciseList: Component<Props> = (props) => {
     getRowId: (row) => row.id, // required because row indexes will change
   });
 
-  createEffect(() => {
-    return monitorForElements({
-      canMonitor({ source }) {
-        return source.data.isExerciseRow as boolean;
-      },
-      onDrop({ location, source }) {
-        const target = location.current.dropTargets[0];
-        if (!target) {
-          return;
-        }
+  createDisposableEffect(
+    () => props.sessionExercises.length > 0,
+    () =>
+      monitorForElements({
+        canMonitor({ source }) {
+          return source.data.isExerciseRow as boolean;
+        },
+        onDrop({ location, source }) {
+          const target = location.current.dropTargets[0];
+          if (!target) {
+            return;
+          }
 
-        const sourceData = source.data;
-        const targetData = target.data;
+          const sourceData = source.data;
+          const targetData = target.data;
 
-        if (!sourceData.isExerciseRow || !targetData.isExerciseRow) {
-          return;
-        }
+          if (!sourceData.isExerciseRow || !targetData.isExerciseRow) {
+            return;
+          }
 
-        if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
-          return;
-        }
+          if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
+            return;
+          }
 
-        const closestEdgeOfTarget = extractClosestEdge(targetData);
+          const closestEdgeOfTarget = extractClosestEdge(targetData);
 
-        const newInd =
-          closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+          const newInd =
+            closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
 
-        let inds = [];
-        if (sourceData.isGroup as boolean) {
-          inds = getGroupInds(sourceData.ind as number, groups());
-        } else {
-          inds = getSupersetInds(sourceData.ind as number, props.sessionExercises);
-        }
+          let inds = [];
+          if (sourceData.isGroup as boolean) {
+            inds = getGroupInds(sourceData.ind as number, groups());
+          } else {
+            inds = getSupersetInds(sourceData.ind as number, props.sessionExercises);
+          }
 
-        reorderRows(sourceData.ind as number, newInd, inds.length);
-      },
-    });
-  });
+          reorderRows(sourceData.ind as number, newInd, inds.length);
+        },
+      })
+  );
 
   return (
     <div class="flex flex-col items-center">

@@ -1,4 +1,4 @@
-import { Component, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { Component, createMemo, createSignal, For, Show } from "solid-js";
 import { ColumnDef, createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-table";
 import { SetStoreFunction } from "solid-js/store";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -12,6 +12,7 @@ import { SESSION_MEAL_EXPAND } from "../../../constants";
 import { extractMealData } from "../../methods/sessionMeal";
 import { DraggableRow } from "./SessionMealDraggableRow";
 import MealMoreModal from "../meals/MealMoreModal";
+import { createDisposableEffect } from "../../methods/disposable";
 
 interface Props {
   meals: SessionMealsRecordExpand[];
@@ -200,37 +201,40 @@ export const SessionMealList: Component<Props> = (props) => {
     getRowId: (row) => row.id, // required because row indexes will change
   });
 
-  createEffect(() => {
-    return monitorForElements({
-      canMonitor({ source }) {
-        return source.data.isMealRow as boolean;
-      },
-      onDrop({ location, source }) {
-        const target = location.current.dropTargets[0];
-        if (!target) {
-          return;
-        }
+  createDisposableEffect(
+    () => props.meals.length > 0,
+    () => {
+      return monitorForElements({
+        canMonitor({ source }) {
+          return source.data.isMealRow as boolean;
+        },
+        onDrop({ location, source }) {
+          const target = location.current.dropTargets[0];
+          if (!target) {
+            return;
+          }
 
-        const sourceData = source.data;
-        const targetData = target.data;
+          const sourceData = source.data;
+          const targetData = target.data;
 
-        if (!sourceData.isMealRow || !targetData.isMealRow) {
-          return;
-        }
+          if (!sourceData.isMealRow || !targetData.isMealRow) {
+            return;
+          }
 
-        if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
-          return;
-        }
+          if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
+            return;
+          }
 
-        const closestEdgeOfTarget = extractClosestEdge(targetData);
+          const closestEdgeOfTarget = extractClosestEdge(targetData);
 
-        const newInd =
-          closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+          const newInd =
+            closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
 
-        reorderRows(sourceData.ind as number, newInd);
-      },
-    });
-  });
+          reorderRows(sourceData.ind as number, newInd);
+        },
+      });
+    }
+  );
 
   return (
     <div class="mt-1">
