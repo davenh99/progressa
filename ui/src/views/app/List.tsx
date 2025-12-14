@@ -30,6 +30,8 @@ interface ListProps<T> {
   renderRow?: (row: Row<T>, onRowClick: (item: T) => void) => JSXElement;
   showItemCount?: boolean;
   containerClass?: string;
+  search?: boolean;
+  headers?: boolean;
 }
 
 const containerClass = tv({
@@ -43,7 +45,7 @@ export const DefaultRowRenderer = <T,>(props: {
 }): JSXElement => {
   return (
     <div
-      class="flex items-center hover:bg-gray-700/50 cursor-pointer text-sm border-b border-gray-700 py-2"
+      class="flex justify-between items-center hover:bg-gray-700/50 cursor-pointer text-sm border-b border-gray-700 py-2"
       onClick={() => props.onClick(props.row.original)}
     >
       <For each={props.row.getVisibleCells()}>
@@ -105,40 +107,61 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
   return (
     <div class="flex flex-col h-full max-h-[inherit]">
       <Show when={dataExists()} fallback={props.loadingFallback || <LoadFullScreen />}>
-        <div class="pb-1 sticky top-0 bg-charcoal-500/95 backdrop-blur-xs pt-3">
-          <div class="flex items-center space-x-2">
-            <Show when={props.createFunc}>
-              <Button
-                class="flex text-sm items-center pl-1 pr-2"
-                variant="solid"
-                variantColor="good"
-                onClick={props.createFunc}
-              >
-                <Plus size={20} />
-                New
-              </Button>
-            </Show>
+        <div class="sticky top-0 bg-charcoal-500/95 backdrop-blur-xs">
+          <Show when={props.search}>
+            <div class="flex items-center space-x-2 mt-3 mb-1">
+              <Show when={props.createFunc}>
+                <Button
+                  class="flex text-sm items-center pl-1 pr-2"
+                  variant="solid"
+                  variantColor="good"
+                  onClick={props.createFunc}
+                >
+                  <Plus size={20} />
+                  New
+                </Button>
+              </Show>
 
-            <div class="w-full relative">
-              <Input
-                noPadding
-                class="w-full"
-                value={globalFilter()}
-                onChange={setGlobalFilter}
-                inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}
-              />
-              {props.loading && (
-                <Loader size={16} class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2" />
-              )}
+              <div class="w-full relative">
+                <Input
+                  noPadding
+                  class="w-full"
+                  value={globalFilter()}
+                  onChange={setGlobalFilter}
+                  inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}
+                />
+                {props.loading && (
+                  <Loader
+                    size={16}
+                    class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2"
+                  />
+                )}
+              </div>
             </div>
-          </div>
+          </Show>
 
           <Show when={props.headerActions}>{props.headerActions}</Show>
 
           <Show when={props.showItemCount}>
-            <p class="text-xs italic">{rowCount()} items</p>
+            <p class="text-xs italic mb-1">{rowCount()} items</p>
           </Show>
         </div>
+
+        <Show when={props.headers}>
+          <For each={table.getHeaderGroups()}>
+            {(headerGroup) => (
+              <div class="flex flex-row w-full justify-between sticky top-0 bg-charcoal-500/95 text-dark-slate-gray-900 backdrop-blur-sm p-2 z-10">
+                <For each={headerGroup.headers}>
+                  {(header) => (
+                    <div class="text-left font-bold">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </div>
+                  )}
+                </For>
+              </div>
+            )}
+          </For>
+        </Show>
 
         <div ref={parentRef} class={containerStyle()}>
           <Show

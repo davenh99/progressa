@@ -164,6 +164,7 @@ export const ExerciseList: Component<Props> = (props) => {
         loading={exercises.loading}
         containerClass={props.containerClass}
         createFunc={createExercise}
+        search
       />
     </>
   );

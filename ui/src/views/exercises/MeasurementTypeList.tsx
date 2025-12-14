@@ -51,6 +51,7 @@ export const MeasurementTypeList: Component<Props> = (props) => {
       onRowClick={props.onClick}
       data={data}
       loading={loading()}
+      search
     />
   );
 };

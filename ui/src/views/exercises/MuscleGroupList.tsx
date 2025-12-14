@@ -25,7 +25,7 @@ export const MuscleGroupList: Component<Props> = (props) => {
     },
   ]);
 
-  return <List<{ name: string }> columns={columns} onRowClick={props.onClick} data={data} />;
+  return <List<{ name: string }> columns={columns} onRowClick={props.onClick} data={data} search />;
 };
 
 export default MuscleGroupList;

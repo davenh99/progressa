@@ -46,6 +46,12 @@ export const EquipmentList: Component<Props> = (props) => {
   });
 
   return (
-    <List<EquipmentsRecord> columns={columns} onRowClick={props.onClick} data={data} loading={loading()} />
+    <List<EquipmentsRecord>
+      columns={columns}
+      onRowClick={props.onClick}
+      data={data}
+      loading={loading()}
+      search
+    />
   );
 };
