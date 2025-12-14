@@ -16,7 +16,7 @@ export function usePB() {
   if (!context) {
     throw new Error("usePB must be used within PBProvider");
   }
-  const { pb } = context;
+  const { pb, store } = context;
 
   const login = async (usernameOrEmail: string, password: string) => {
     await pb.collection("users").authWithPassword(usernameOrEmail, password);
@@ -53,7 +53,7 @@ export function usePB() {
     }
   };
 
-  return { ...context, login, signUp, logout, OAuthSignIn };
+  return { ...context, login, signUp, logout, OAuthSignIn, store };
 }
 
 export function useAuthPB() {

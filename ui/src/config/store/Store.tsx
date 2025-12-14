@@ -1,9 +1,9 @@
-import { onMount, ParentComponent } from "solid-js";
+import { createEffect, ParentComponent, untrack } from "solid-js";
 import { createStore } from "solid-js/store";
 import { ClientResponseError } from "pocketbase";
 
 import { StoreContext, TStore } from "./context";
-import { useAuthPB } from "../pocketbase";
+import { usePB } from "../pocketbase";
 import { EXERCISE_EXPAND } from "../../../constants";
 
 const initialState: TStore = {
@@ -15,7 +15,7 @@ const initialState: TStore = {
 
 export const Store: ParentComponent = (props) => {
   const [store, setStore] = createStore<TStore>(initialState);
-  const { pb } = useAuthPB();
+  const { pb, store: pbStore } = usePB();
 
   const fetchAllExercises = async () => {
     if (store.exercises.loading) {
@@ -51,8 +51,10 @@ export const Store: ParentComponent = (props) => {
     }
   };
 
-  onMount(() => {
-    fetchAllExercises();
+  createEffect(() => {
+    if (pbStore.user) {
+      untrack(fetchAllExercises);
+    }
   });
 
   return (
