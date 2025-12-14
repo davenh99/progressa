@@ -12,8 +12,8 @@ This is a basic roadmap of what I would like to implement before being happy to 
 - [x] Can log sleep and mental health metrics
 - [x] Can create saved routines
 - [x] Can log meals data
-- [ ] Use exercise database with richer data (in progress)
-- [ ] Allow making custom exercises (in progress)
+- [x] Use exercise database with richer data (in progress)
+- [x] Allow making custom exercises (in progress)
 - [ ] Comprehensive analysis page, with custom analyses (in progress)
 - [ ] Use nutrition info database to make up meals
 - [ ] UI/UX overhaul to be clean and consistent
