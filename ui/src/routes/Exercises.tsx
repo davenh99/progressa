@@ -10,6 +10,7 @@ import { ExerciseList } from "../views/exercises/ExerciseList";
 import { useAuthPB } from "../config/pocketbase";
 import { Button } from "../components";
 import ExerciseForm from "../views/exercises/ExerciseForm";
+import { useStore } from "../config/store";
 
 type SearchParams = {
   exerciseId?: string;
@@ -23,6 +24,8 @@ const Exercises: Component = () => {
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
   const [selectedEquipmentName, setSelectedEquipmentName] = createSignal<string>("");
   const [exercise, setExercise] = createStore<{ exercise: ExercisesRecordExpand | null }>({ exercise: null });
+  const [changedPreferences, setChangedPreferences] = createSignal(false);
+  const { fetchAllExercises } = useStore();
   const { getExerciseByID } = useAuthPB();
   const navigate = useNavigate();
 
@@ -69,7 +72,13 @@ const Exercises: Component = () => {
           <Button
             variant="text"
             class="flex justify-start items-center space-x-1"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (changedPreferences()) {
+                fetchAllExercises();
+                setChangedPreferences(false);
+              }
+              navigate(-1);
+            }}
           >
             <ArrowLeft />
             <h1 class="text-xl font-bold">Back to Exercises</h1>
@@ -101,6 +110,7 @@ const Exercises: Component = () => {
             setEditing={(v: boolean) =>
               setSearchParams({ ...searchParams, editing: v ? "1" : "" }, { replace: true })
             }
+            setChangedPreferences={setChangedPreferences}
           />
         </Container>
       </Show>

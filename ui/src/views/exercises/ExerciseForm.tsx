@@ -1,4 +1,4 @@
-import { Accessor, Component, createSignal, For, onMount, Show } from "solid-js";
+import { Accessor, Component, createSignal, For, onMount, Setter, Show } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import Delete from "lucide-solid/icons/x";
 import { useNavigate } from "@solidjs/router";
@@ -27,6 +27,7 @@ interface Props {
   exercise: ExercisesRecordExpand;
   editing: boolean;
   setEditing: (v: boolean) => void;
+  setChangedPreferences: Setter<boolean>;
 }
 
 interface Field {
@@ -99,7 +100,12 @@ export const ExerciseForm: Component<Props> = (props) => {
       <Show
         when={props.editing}
         fallback={
-          <ViewingContent exercise={exercise} editing={props.editing} setEditing={props.setEditing} />
+          <ViewingContent
+            exercise={exercise}
+            editing={props.editing}
+            setEditing={props.setEditing}
+            setChangedPreferences={props.setChangedPreferences}
+          />
         }
       >
         <EditingContent
@@ -115,7 +121,7 @@ export const ExerciseForm: Component<Props> = (props) => {
   );
 };
 
-interface EditContentProps extends Props {
+interface EditContentProps extends Omit<Props, "setChangedPreferences"> {
   setExercise: SetStoreFunction<ExercisesRecordExpand>;
   loading: Accessor<boolean>;
   setLoading: (v: boolean) => void;
@@ -421,6 +427,8 @@ const ViewingContent: Component<Props> = (props) => {
           .collection<ExercisePreferencesExpand>("exercisePreferences")
           .create({ ...exercisePreferences, ...newData });
       }
+
+      props.setChangedPreferences(true);
     } catch (e) {
       console.error(e);
     }
