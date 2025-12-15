@@ -1,8 +1,18 @@
 import { Accessor, Component, createSignal, For, onMount, Show } from "solid-js";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import Delete from "lucide-solid/icons/x";
+import { useNavigate } from "@solidjs/router";
 
-import { Button, DataCheckbox, TextArea, TagArea, Input, Checkbox, Select } from "../../components";
+import {
+  Button,
+  DataCheckbox,
+  TextArea,
+  TagArea,
+  Input,
+  Checkbox,
+  Select,
+  AlertDialog,
+} from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import LoadFullScreen from "../app/LoadFullScreen";
 import { debounce } from "../../methods/debounce";
@@ -122,6 +132,7 @@ interface EquipmentModalShowOptions {
 }
 
 const EditingContent: Component<EditContentProps> = (props) => {
+  const [dialogOpen, setDialogOpen] = createSignal(false);
   const { fetchAllExercises } = useStore();
   const [showEquipmentSelect, setShowEquipmentSelect] = createSignal<EquipmentModalShowOptions>({
     show: false,
@@ -133,6 +144,7 @@ const EditingContent: Component<EditContentProps> = (props) => {
       key: "defaultMeasurementType",
     });
   const { pb } = useAuthPB();
+  const navigate = useNavigate();
 
   const saveExercise = async () => {
     props.setLoading(true);
@@ -144,6 +156,15 @@ const EditingContent: Component<EditContentProps> = (props) => {
     }
     props.setLoading(false);
     props.setEditing(false);
+  };
+
+  const deleteExercise = async () => {
+    try {
+      await pb.collection("exercises").delete(props.exercise.id);
+      navigate("/exercises");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -341,6 +362,33 @@ const EditingContent: Component<EditContentProps> = (props) => {
             }
           }}
         </For>
+        <AlertDialog
+          title="Delete Exercise"
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          decsription="Are you sure you want to delete this exercise?"
+          buttons={
+            <>
+              <Button
+                variantColor="bad"
+                onClick={() => {
+                  deleteExercise();
+                  setDialogOpen(false);
+                }}
+              >
+                Delete
+              </Button>
+              <Button variantColor="neutral" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+            </>
+          }
+        >
+          <Button class="flex items-center space-x-1 w-full justify-center" variantColor="bad" variant="text">
+            <Delete size={20} />
+            <span>Delete Exercise</span>
+          </Button>
+        </AlertDialog>
       </div>
     </>
   );
