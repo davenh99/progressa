@@ -167,6 +167,7 @@ const EditingContent: Component<EditContentProps> = (props) => {
   const deleteExercise = async () => {
     try {
       await pb.collection("exercises").delete(props.exercise.id);
+      fetchAllExercises();
       navigate("/exercises");
     } catch (e) {
       console.error(e);
