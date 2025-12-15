@@ -5,8 +5,7 @@ import Copy from "lucide-solid/icons/copy";
 import Delete from "lucide-solid/icons/x";
 import ArrowUp from "lucide-solid/icons/arrow-up-right";
 
-import { Exercise } from "../../../Types";
-import { Button, Checkbox, Modal, TagArea, TextArea, useModalLoading } from "../../components";
+import { Button, Checkbox, Modal, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 
@@ -102,21 +101,11 @@ const ModalContent: Component<ModalProps> = (props) => {
       <TextArea
         class="my-2"
         label="Notes"
-        placeholder="Feeling strong..."
         value={props.exercise.notes}
-        onInput={(e) => props.setExercise("notes", e.currentTarget.value)}
-      />
-      <TagArea
-        tags={props.exercise.expand?.tags ?? []}
-        setTags={(tags) => {
-          props.setExercise("expand", "tags", tags);
-          props.setExercise(
-            "tags",
-            tags.map((t) => t.id)
-          );
+        onChange={(v) => props.setExercise("notes", v)}
+        inputProps={{
+          placeholder: "Feeling strong...",
         }}
-        modelName="routineExercises"
-        recordID={props.exercise.id}
       />
       <div class="flex flex-col mt-3">
         <Button

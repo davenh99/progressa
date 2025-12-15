@@ -137,9 +137,11 @@ const ModalContent: Component<ModalProps> = (props) => {
       <TextArea
         class="my-2"
         label="Notes"
-        placeholder="Feeling strong..."
         value={props.exercise.notes}
-        onInput={(e) => props.setExercise("notes", e.currentTarget.value)}
+        onChange={(v) => props.setExercise("notes", v)}
+        inputProps={{
+          placeholder: "Feeling strong...",
+        }}
       />
       <TagArea
         tags={props.exercise.expand?.tags ?? []}

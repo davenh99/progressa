@@ -71,9 +71,11 @@ const ModalContent: Component<ModalProps> = (props) => {
       <Input label="Name" value={props.meal.name} onChange={(v) => props.setMeal("name", v)} />
       <TextArea
         label="Description"
-        placeholder="My go-to lunch..."
         value={props.meal.description}
-        onInput={(e) => props.setMeal("description", e.currentTarget.value)}
+        onChange={(v) => props.setMeal("description", v)}
+        inputProps={{
+          placeholder: "My go-to lunch...",
+        }}
       />
       <div class="flex space-x-1">
         <NumberInput
