@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
 	"progressa/plugins/computedfields"
 	"strings"
@@ -30,6 +31,19 @@ var ComputedFieldsCfg = computedfields.Config{
 						return ""
 					}
 
+					// get exercises order for sorting
+					var exercisesOrder []string
+					raw := e.Record.GetString("exercisesOrder")
+					if err := json.Unmarshal([]byte(raw), &exercisesOrder); err != nil {
+						e.App.Logger().Error("couldn't unmarshal exercisesOrder string")
+					}
+
+					idPositions := map[string]int{}
+
+					for i, id := range exercisesOrder {
+						idPositions[id] = i
+					}
+
 					// --- 1. Load routineExercises for this routine ---
 					routineExs, err := e.App.FindRecordsByFilter(
 						"routineExercises",
@@ -43,6 +57,12 @@ var ComputedFieldsCfg = computedfields.Config{
 						return ""
 					}
 
+					// sort the exercises properly.
+					routineExsSorted := make([]*core.Record, len(routineExs))
+					for _, ex := range routineExs {
+						routineExsSorted[idPositions[ex.Id]] = ex
+					}
+
 					// cache for exercise names
 					exerciseNameCache := map[string]string{}
 
@@ -52,8 +72,9 @@ var ComputedFieldsCfg = computedfields.Config{
 						Amount     string // reps, minutes, distance, etc.
 					}
 					grouped := map[key]int{}
+					orderedKeys := []key{}
 
-					for _, r := range routineExs {
+					for _, r := range routineExsSorted {
 						exId := r.GetString("exercise")
 						if exId == "" {
 							continue
@@ -98,12 +119,17 @@ var ComputedFieldsCfg = computedfields.Config{
 						}
 
 						k := key{ExerciseId: exId, Amount: amount}
+
+						if _, exists := grouped[k]; !exists {
+							orderedKeys = append(orderedKeys, k)
+						}
 						grouped[k]++
 					}
 
 					// --- 4. Turn grouped entries into readable preview ---
 					parts := []string{}
-					for k, count := range grouped {
+					for _, k := range orderedKeys {
+						count := grouped[k]
 						name := exerciseNameCache[k.ExerciseId]
 
 						switch {
