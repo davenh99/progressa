@@ -53,7 +53,7 @@ const Privacy: Component = () => {
       <h2>Contact</h2>
       <p>For questions or concerns about privacy, contact:</p>
       <p>
-        📧 <A href="mailto:davenh99@gmail.com">davenh99@gmail.com</A>
+        📧 <a href="mailto:davenh99@gmail.com">davenh99@gmail.com</a>
       </p>
     </div>
   );
