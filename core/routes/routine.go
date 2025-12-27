@@ -33,6 +33,7 @@ var importRoutineCopyFields = []string{
 	"measurementValue",
 	"measurement2Value",
 	"measurement3Value",
+	"exerciseDuration",
 }
 
 func (h *RoutesHandler) importRoutineIntoRoutine(e *core.RequestEvent) error {
