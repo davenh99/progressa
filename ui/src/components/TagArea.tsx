@@ -1,4 +1,4 @@
-import { Component, createSignal, For, JSX, Show } from "solid-js";
+import { Component, createSignal, For, JSX } from "solid-js";
 
 import Input from "./Input";
 import { useAuthPB } from "../config/pocketbase";

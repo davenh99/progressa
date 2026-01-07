@@ -7,7 +7,9 @@ import (
 )
 
 type Config struct {
-	Env string
+	Env               string
+	SuperuserName     string
+	SuperuserPassword string
 }
 
 var Env Config = initConfig()
@@ -16,7 +18,9 @@ func initConfig() Config {
 	godotenv.Load()
 
 	return Config{
-		Env: getEnv("ENV", "production"),
+		Env:               getEnv("ENV", "production"),
+		SuperuserName:     getEnv("SUPERUSER_NAME", ""),
+		SuperuserPassword: getEnv("SUPERUSER_PASSWORD", ""),
 	}
 }
 

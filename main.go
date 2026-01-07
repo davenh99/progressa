@@ -13,9 +13,10 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/plugins/jsvm"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/pocketbase/pocketbase/tools/hook"
+
+	_ "progressa/migrations"
 )
 
 var Version = "dev"
@@ -29,9 +30,9 @@ func main() {
 
 	computedfields.Register(app, c.ComputedFieldsCfg)
 
-	migrationsFilePattern := `^\d.*\.(js|ts)`
+	// migrationsFilePattern := `^\d.*\.(js|ts)`
 	if env == "development" {
-		migrationsFilePattern = `^.*\.(js|ts)$`
+		// migrationsFilePattern = `^.*\.(js|ts)$`
 
 		gentypes.Register(app, gentypes.Config{
 			FilePath:                   "ui/base.d.ts",
@@ -40,16 +41,26 @@ func main() {
 		})
 	}
 
-	jsvm.MustRegister(app, jsvm.Config{
-		MigrationsDir:          "./pb_migrations",
-		MigrationsFilesPattern: migrationsFilePattern,
+	// jsvm.MustRegister(app, jsvm.Config{
+	// 	MigrationsDir:          "./pb_migrations",
+	// 	MigrationsFilesPattern: migrationsFilePattern,
+	// })
+
+	migrationsDir := "./migrations"
+	if env == "development" {
+		migrationsDir = "../migrations"
+	}
+
+	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
+		Automigrate: env == "development",
+		Dir:         migrationsDir,
 	})
 
-	// migrate command (with js templates)
-	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-		TemplateLang: migratecmd.TemplateLangJS,
-		Automigrate:  env == "development",
-	})
+	// // migrate command (with js templates)
+	// migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
+	// 	TemplateLang: migratecmd.TemplateLangJS,
+	// 	Automigrate:  env == "development",
+	// })
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 		routesHandler := routes.NewHandler(app)

@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import { MealList } from "../meals/MealList";
+import { MealList } from "./MealList";
 import { Modal } from "../../components";
 
 interface Props {

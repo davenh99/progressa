@@ -1,7 +1,7 @@
 import { createSignal, ParentComponent, Show, useContext } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { Button } from "./";
+import { Button } from ".";
 import LoadFullScreen from "../views/app/LoadFullScreen";
 import { ModalContext } from "./modalContext";
 
