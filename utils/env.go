@@ -10,6 +10,7 @@ type Config struct {
 	Env               string
 	SuperuserName     string
 	SuperuserPassword string
+	GithubToken       string
 }
 
 var Env Config = initConfig()
@@ -21,6 +22,7 @@ func initConfig() Config {
 		Env:               getEnv("ENV", "production"),
 		SuperuserName:     getEnv("SUPERUSER_NAME", ""),
 		SuperuserPassword: getEnv("SUPERUSER_PASSWORD", ""),
+		GithubToken:       getEnv("GH_TOKEN", ""),
 	}
 }
 

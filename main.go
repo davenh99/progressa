@@ -13,6 +13,7 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/pocketbase/pocketbase/plugins/ghupdate"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/pocketbase/pocketbase/tools/hook"
 
@@ -26,41 +27,35 @@ var embeddedFiles embed.FS
 
 func main() {
 	app := pocketbase.New()
-	env := utils.Env.Env
+	env := utils.Env
 
 	computedfields.Register(app, c.ComputedFieldsCfg)
 
-	// migrationsFilePattern := `^\d.*\.(js|ts)`
-	if env == "development" {
-		// migrationsFilePattern = `^.*\.(js|ts)$`
+	migrationsDir := "./migrations"
+
+	switch env.Env {
+	case "development":
+		migrationsDir = "../migrations"
 
 		gentypes.Register(app, gentypes.Config{
 			FilePath:                   "ui/base.d.ts",
 			CollectionAdditionalFields: c.ComputedFieldsCfg.ExtractFields(),
 			SelectOptionsPath:          "ui/selectOptions.ts",
 		})
-	}
-
-	// jsvm.MustRegister(app, jsvm.Config{
-	// 	MigrationsDir:          "./pb_migrations",
-	// 	MigrationsFilesPattern: migrationsFilePattern,
-	// })
-
-	migrationsDir := "./migrations"
-	if env == "development" {
-		migrationsDir = "../migrations"
+	case "production":
+		ghupdate.MustRegister(app, app.RootCmd, ghupdate.Config{
+			Owner:             "davenh99",
+			Repo:              "progressa",
+			ArchiveExecutable: "progressa",
+		})
+	default:
+		log.Fatalf("Unknown ENV value: %s", env.Env)
 	}
 
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-		Automigrate: env == "development",
+		Automigrate: env.Env == "development",
 		Dir:         migrationsDir,
 	})
-
-	// // migrate command (with js templates)
-	// migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-	// 	TemplateLang: migratecmd.TemplateLangJS,
-	// 	Automigrate:  env == "development",
-	// })
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 		routesHandler := routes.NewHandler(app)
