@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testDataDir = "./dist/test_pb_data"
+const testDataDir = "./dist/pb_data"
 
 type MockSessionOrRoutineExercise struct {
 	Id                 string  `json:"id"`

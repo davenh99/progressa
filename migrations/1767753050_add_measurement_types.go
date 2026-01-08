@@ -7,31 +7,50 @@ import (
 
 func init() {
 	m.Register(func(app core.App) error {
-		// add up queries...
+		collection, err := app.FindCollectionByNameOrId("measurementTypes")
+		if err != nil {
+			return err
+		}
 
-		const newMeasurementTypes = [
-      { id: "m01s8yx7wfk2gxd", s: true, dn: "reps", n: "Reps", num: true, p: true },
-      { id: "8ldlgtjjvy3ircl", s: true, dn: "time", n: "Time", num: true, p: true },
-      { id: "8ldlgghjvy4ircl", s: true, dn: "grade", n: "Boulder grade (hueco)", num: false, p: true },
-      { id: "8ldlgghjvy5yrcl", s: true, dn: "grade", n: "Boulder grade (font)", num: false, p: true },
-      { id: "8ldlgghjvt7yrcl", s: true, dn: "grade", n: "Route grade (ewbanks)", num: false, p: true },
-      { id: "8ldlyyhjvt7yrbl", s: true, dn: "grade", n: "Route grade (french)", num: false, p: true },
-	  { id: "distancem000000", dn: "distance (m)", n: "distance (m)", num: true },
-      { id: "distancekm00000", dn: "distance (km)", n: "distance (km)", num: true },
-      { id: "egdesizemm00000", dn: "edge (mm)", n: "edge size (mm)", num: true },
-    ];
+		type MeasurementType struct {
+			ID          string
+			System      bool
+			DisplayName string
+			Name        string
+			Numeric     bool
+			Public      bool
+		}
 
-	for (const m of newMeasurementTypes) {
-      let record = new Record(measurementTypes);
-      record.set("id", m.id);
-      record.set("system", m.s);
-      record.set("name", m.n);
-      record.set("displayName", m.dn);
-      record.set("numeric", m.num);
-      record.set("public", m.p);
+		measurementTypes := []MeasurementType{
+			{ID: "m01s8yx7wfk2gxd", Name: "Reps", DisplayName: "reps", Numeric: true},
+			{ID: "8ldlgtjjvy3ircl", Name: "Time", DisplayName: "time", Numeric: true},
+			{ID: "8ldlgghjvy4ircl", Name: "Boulder grade (hueco)", DisplayName: "grade", Numeric: false},
+			{ID: "8ldlgghjvy5yrcl", Name: "Boulder grade (font)", DisplayName: "grade", Numeric: false},
+			{ID: "8ldlgghjvt7yrcl", Name: "Route grade (ewbanks)", DisplayName: "grade", Numeric: false},
+			{ID: "8ldlyyhjvt7yrbl", Name: "Route grade (french)", DisplayName: "grade", Numeric: false},
+			{ID: "distancem000000", Name: "distance (m)", DisplayName: "distance (m)", Numeric: true},
+			{ID: "distancekm00000", Name: "distance (km)", DisplayName: "distance (km)", Numeric: true},
+			{ID: "egdesizemm00000", Name: "edge size (mm)", DisplayName: "edge (mm)", Numeric: true},
+		}
 
-      app.save(record);
-    }
+		for _, m := range measurementTypes {
+			existing, _ := app.FindRecordById(collection.Id, m.ID)
+			if existing != nil {
+				continue // already exists
+			}
+
+			record := core.NewRecord(collection)
+			record.Set("id", m.ID)
+			record.Set("system", true)
+			record.Set("displayName", m.DisplayName)
+			record.Set("name", m.Name)
+			record.Set("numeric", m.Numeric)
+			record.Set("public", true)
+
+			if err := app.Save(record); err != nil {
+				return err
+			}
+		}
 
 		return nil
 	}, func(app core.App) error {
