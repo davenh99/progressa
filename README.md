@@ -16,5 +16,6 @@ This is a basic roadmap of what I would like to implement before being happy to 
 - [x] Allow making custom exercises
 - [ ] Allow timing workout with start/stop button and rest timers
 - [ ] Comprehensive analysis page, with custom analyses (in progress)
-- [ ] Use nutrition info database to make up meals
+- [ ] Use nutrition info database to make up meals and overall meals overhaul.
 - [ ] UI/UX overhaul to be clean and consistent
+- [ ] custom metrics tracking. can attach same as notes, tags.
