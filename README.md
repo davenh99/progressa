@@ -19,3 +19,4 @@ This is a basic roadmap of what I would like to implement before being happy to 
 - [ ] Use nutrition info database to make up meals and overall meals overhaul.
 - [ ] UI/UX overhaul to be clean and consistent
 - [ ] custom metrics tracking. can attach same as notes, tags.
+- [ ] proper email and ui support for reset password, delete account, change password, etc.
