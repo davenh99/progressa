@@ -6,7 +6,6 @@ import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/ad
 import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
-import { RoutineExerciseCreateData } from "../../../Types";
 import RoutineExerciseMoreModal from "./RoutineExerciseMoreModal";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
 import { Button, DataTime, IconButton, MultiMeasurementValueSelect, NumberInput } from "../../components";
@@ -17,6 +16,7 @@ import RoutineSelectModal from "./RoutineSelectModal";
 import { getDropsetAddData } from "../../methods/routineExercise";
 import { DraggableRow } from "../exercises/SessionOrRoutineExerciseDraggableRow";
 import { createDisposableEffect } from "../../methods/disposable";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   routineExercises: RoutineExercisesRecordExpand[];
@@ -63,7 +63,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
 
     try {
       const delPromises = indices.map((index) =>
-        pb.collection("routineExercises").delete(props.routineExercises[index].id)
+        pb.collection(Collections.RoutineExercises).delete(props.routineExercises[index].id)
       );
       await Promise.all(delPromises);
       await updateRecord(
@@ -114,7 +114,7 @@ export const RoutineExerciseList: Component<Props> = (props) => {
   };
 
   const addRoutineExercise = async (exercise: ExercisesRecordExpand) => {
-    const data: RoutineExerciseCreateData = {
+    const data: RoutineExercisesUpdatePayload = {
       routine: props.routineId,
       exercise: exercise.id,
     };

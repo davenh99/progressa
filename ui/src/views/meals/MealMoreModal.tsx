@@ -14,6 +14,7 @@ import {
   Checkbox,
 } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
@@ -32,7 +33,7 @@ export const MealMoreModal: Component<Props> = (props) => {
 
   const save = async () => {
     try {
-      await pb.collection("sessionMeals").update(meal.id, meal);
+      await pb.collection(Collections.SessionMeals).update(meal.id, meal);
       // lazy way to refresh the session for now. could also set the state.
       const updatedSession = await getSessionByID(props.sessionID);
       props.setSession({ session: updatedSession });

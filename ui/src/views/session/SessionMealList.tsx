@@ -13,6 +13,7 @@ import { extractMealData } from "../../methods/sessionMeal";
 import { DraggableRow } from "./SessionMealDraggableRow";
 import MealMoreModal from "../meals/MealMoreModal";
 import { createDisposableEffect } from "../../methods/disposable";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   meals: SessionMealsRecordExpand[];
@@ -40,7 +41,7 @@ export const SessionMealList: Component<Props> = (props) => {
     const newMeals = props.meals.filter((_, ind) => ind !== index);
 
     try {
-      await pb.collection("sessionMeals").delete(props.meals[index].id);
+      await pb.collection(Collections.SessionMeals).delete(props.meals[index].id);
       await updateRecord(
         "sessions",
         props.sessionID,

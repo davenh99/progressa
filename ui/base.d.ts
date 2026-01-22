@@ -19,7 +19,6 @@ interface Users {
   weight: number; // number
   dob: string; // date
 }
-
 type UsersRecord = Users & BaseRecord;
 type UsersUpdatePayload = Partial<UsersRecord>;
 
@@ -32,7 +31,6 @@ interface MeasurementTypes {
   public: boolean; // bool
   displayName: string; // text
 }
-
 type MeasurementTypesRecord = MeasurementTypes & BaseRecord;
 type MeasurementTypesUpdatePayload = Partial<MeasurementTypesRecord>;
 
@@ -43,7 +41,6 @@ interface MeasurementValues {
   createdBy: string; // relation
   public: boolean; // bool
 }
-
 type MeasurementValuesRecord = MeasurementValues & BaseRecord;
 type MeasurementValuesUpdatePayload = Partial<MeasurementValuesRecord>;
 
@@ -93,7 +90,6 @@ interface Exercises {
   field: "Powerlifting" | "Postural" | "Bodybuilding" | "Ballistics" | "Mobility" | "Grinds" | "Calisthenics" | "Plyometric" | "Balance" | "Olympic Weightlifting" | "Animal Flow" | ""; // select
   isTimeBased: boolean; // bool
 }
-
 type ExercisesRecord = Exercises & BaseRecord;
 type ExercisesUpdatePayload = Partial<ExercisesRecord>;
 
@@ -116,7 +112,6 @@ interface Sessions {
   timeEnd: string; // date
   sessionDuration: number; // number
 }
-
 type SessionsRecord = Sessions & BaseRecord;
 type SessionsUpdatePayload = Partial<SessionsRecord>;
 
@@ -127,7 +122,6 @@ interface Tags {
   public: boolean; // bool
   colorHex: string; // text
 }
-
 type TagsRecord = Tags & BaseRecord;
 type TagsUpdatePayload = Partial<TagsRecord>;
 
@@ -154,7 +148,6 @@ interface SessionExercises {
   timeEnd: string; // date
   exerciseDuration: number; // number
 }
-
 type SessionExercisesRecord = SessionExercises & BaseRecord;
 type SessionExercisesUpdatePayload = Partial<SessionExercisesRecord>;
 
@@ -170,7 +163,6 @@ interface SessionMeals {
   description: string; // text
   saved: boolean; // bool
 }
-
 type SessionMealsRecord = SessionMeals & BaseRecord;
 type SessionMealsUpdatePayload = Partial<SessionMealsRecord>;
 
@@ -182,7 +174,6 @@ interface Routines {
   exercisesOrder: any; // json
   readonly preview: string; // text
 }
-
 type RoutinesRecord = Routines & BaseRecord;
 type RoutinesUpdatePayload = Partial<RoutinesRecord>;
 
@@ -207,7 +198,6 @@ interface RoutineExercises {
   strengthRating: number; // number
   exerciseDuration: number; // number
 }
-
 type RoutineExercisesRecord = RoutineExercises & BaseRecord;
 type RoutineExercisesUpdatePayload = Partial<RoutineExercisesRecord>;
 
@@ -215,7 +205,6 @@ type RoutineExercisesUpdatePayload = Partial<RoutineExercisesRecord>;
 interface Equipments {
   name: string; // text
 }
-
 type EquipmentsRecord = Equipments & BaseRecord;
 type EquipmentsUpdatePayload = Partial<EquipmentsRecord>;
 
@@ -228,7 +217,6 @@ interface ExercisePreferences {
   tags: string[]; // relation
   preferredMeasurementType: string; // relation
 }
-
 type ExercisePreferencesRecord = ExercisePreferences & BaseRecord;
 type ExercisePreferencesUpdatePayload = Partial<ExercisePreferencesRecord>;
 

@@ -17,6 +17,7 @@ import {
 } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
@@ -38,7 +39,7 @@ export const SessionExerciseMoreModal: Component<Props> = (props) => {
 
   const save = async () => {
     try {
-      await pb.collection("sessionExercises").update(exercise.id, exercise);
+      await pb.collection(Collections.SessionExercises).update(exercise.id, exercise);
       // lazy way to refresh the session for now. could also set the state.
       const updatedSession = await getSessionByID(props.sessionID);
       props.setSession({ session: updatedSession });
@@ -78,9 +79,9 @@ const ModalContent: Component<ModalProps> = (props) => {
     props.setExercise("measurementNumeric", 0);
     props.setExercise("measurement2Numeric", 0);
     props.setExercise("measurement3Numeric", 0);
-    props.setExercise("measurementValue", undefined);
-    props.setExercise("measurement2Value", undefined);
-    props.setExercise("measurement3Value", undefined);
+    props.setExercise("measurementValue", "");
+    props.setExercise("measurement2Value", "");
+    props.setExercise("measurement3Value", "");
 
     setWarning("Warning: changing the exercise will reset measurements");
     setShowExerciseSelectModal(false);

@@ -3,7 +3,7 @@ module progressa
 go 1.25.5
 
 require (
-	github.com/davenh99/pb-typescript v0.1.1
+	github.com/davenh99/pb-typescript v0.1.2
 	github.com/joho/godotenv v1.5.1
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.36.1

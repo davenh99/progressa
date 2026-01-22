@@ -19,7 +19,8 @@ import { debounce } from "../../methods/debounce";
 import EquipmentSelectModal from "./EquipmentSelectModal";
 import MeasurementTypeSelectModal from "./MeasurementTypeSelectModal";
 import { useStore } from "../../config/store";
-import { ExercisesSelectOptions } from "../../../selectOptions";
+import { ExercisesSelectOptions } from "../../../select-options";
+import { Collections } from "../../../pocketbase";
 
 type ExerciseSelectField = keyof typeof ExercisesSelectOptions;
 
@@ -155,7 +156,7 @@ const EditingContent: Component<EditContentProps> = (props) => {
   const saveExercise = async () => {
     props.setLoading(true);
     try {
-      await pb.collection("exercises").update(props.exercise.id, props.exercise);
+      await pb.collection(Collections.Exercises).update(props.exercise.id, props.exercise);
       fetchAllExercises();
     } catch (e) {
       console.error(e);
@@ -166,7 +167,7 @@ const EditingContent: Component<EditContentProps> = (props) => {
 
   const deleteExercise = async () => {
     try {
-      await pb.collection("exercises").delete(props.exercise.id);
+      await pb.collection(Collections.Exercises).delete(props.exercise.id);
       fetchAllExercises();
       navigate("/exercises");
     } catch (e) {
@@ -403,7 +404,7 @@ const EditingContent: Component<EditContentProps> = (props) => {
 
 const ViewingContent: Component<Props> = (props) => {
   const { pb, user, getExercisePreferences } = useAuthPB();
-  const [exercisePreferences, setExercisePreferences] = createStore<ExercisePreferencesExpand>({
+  const [exercisePreferences, setExercisePreferences] = createStore<Partial<ExercisePreferencesExpand>>({
     user: user.id,
     exercise: props.exercise.id,
     notes: "",

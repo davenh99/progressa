@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import List from "../app/List";
-import { ExercisesSelectOptions } from "../../../selectOptions";
+import { ExercisesSelectOptions } from "../../../select-options";
 
 interface Props {
   onClick: (muscleGroup: { name: string }) => void;

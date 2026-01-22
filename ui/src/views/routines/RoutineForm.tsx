@@ -6,6 +6,7 @@ import { AlertDialog, Button, TextArea, Input } from "../../components";
 import RoutineExerciseList from "./RoutineExerciseList";
 import { useAuthPB } from "../../config/pocketbase";
 import { SetStoreFunction } from "solid-js/store";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   routine: RoutinesRecordExpand;
@@ -25,7 +26,7 @@ export const RoutineForm: Component<Props> = (props) => {
 
   const deleteRoutine = async () => {
     try {
-      await pb.collection("routines").delete(props.routine.id);
+      await pb.collection(Collections.Routines).delete(props.routine.id);
       navigate("/routines");
     } catch (e) {
       console.error(e);

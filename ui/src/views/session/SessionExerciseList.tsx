@@ -7,7 +7,6 @@ import Ellipsis from "lucide-solid/icons/ellipsis-vertical";
 import Plus from "lucide-solid/icons/plus";
 
 import { useAuthPB } from "../../config/pocketbase";
-import { SessionExerciseCreateData } from "../../../Types";
 import {
   Button,
   IconButton,
@@ -23,6 +22,7 @@ import { SESSION_EXERCISE_EXPAND } from "../../../constants";
 import SessionExerciseMoreModal from "./SessionExerciseMoreModal";
 import RoutineSelectModal from "../routines/RoutineSelectModal";
 import { createDisposableEffect } from "../../methods/disposable";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   sessionExercises: SessionExercisesRecordExpand[];
@@ -69,7 +69,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
 
     try {
       const delPromises = indices.map((index) =>
-        pb.collection("sessionExercises").delete(props.sessionExercises[index].id)
+        pb.collection(Collections.SessionExercises).delete(props.sessionExercises[index].id)
       );
       await Promise.all(delPromises);
       await updateRecord(
@@ -120,8 +120,7 @@ export const SessionExerciseList: Component<Props> = (props) => {
   };
 
   const addSessionExercise = async (exercise: ExercisesRecord) => {
-    const data: SessionExerciseCreateData = {
-      user: user.id,
+    const data: SessionExercisesUpdatePayload = {
       session: props.sessionID,
       exercise: exercise.id,
       perceivedEffort: 0,

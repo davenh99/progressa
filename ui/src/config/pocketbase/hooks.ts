@@ -4,6 +4,7 @@ import { ClientResponseError } from "pocketbase";
 import { EXERCISE_EXPAND, ROUTINE_EXPAND, SESSION_EXPAND } from "../../../constants";
 import { sortSessionOrRoutineExercises } from "../../methods/sessionExercise";
 import { sortMeals } from "../../methods/sessionMeal";
+import { Collections } from "../../../pocketbase";
 
 const BaseSignUpData = {
   dob: "",
@@ -19,11 +20,13 @@ export function usePB() {
   const { pb, store } = context;
 
   const login = async (usernameOrEmail: string, password: string) => {
-    await pb.collection("users").authWithPassword(usernameOrEmail, password);
+    await pb.collection(Collections.Users).authWithPassword(usernameOrEmail, password);
   };
 
   const signUp = async (email: string, name: string, password: string, passwordConfirm: string) => {
-    await pb.collection("users").create({ ...BaseSignUpData, name, email, password, passwordConfirm });
+    await pb
+      .collection(Collections.Users)
+      .create({ ...BaseSignUpData, name, email, password, passwordConfirm });
     await login(email, password);
   };
 
@@ -32,7 +35,7 @@ export function usePB() {
   };
 
   const OAuthSignIn = async (provider: string) => {
-    const authData = await pb.collection("users").authWithOAuth2({
+    const authData = await pb.collection(Collections.Users).authWithOAuth2({
       provider,
       createData: { ...BaseSignUpData, name: "user" },
     });
@@ -45,7 +48,7 @@ export function usePB() {
           formData.append("name", authData.meta.name);
         }
 
-        await pb.collection("users").update(authData.record.id, formData);
+        await pb.collection(Collections.Users).update(authData.record.id, formData);
       } catch (e: any) {
         alert(`${e}: ${e.originalError}`);
         alert("could not update name");

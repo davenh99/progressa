@@ -7,6 +7,7 @@ import AuthEmail from "../views/auth/AuthEmail";
 import OAuthButton from "../views/auth/OAuthButton";
 import { Button } from "../components";
 import Card from "../views/app/Card";
+import { Collections } from "../../pocketbase";
 
 const Auth: Component = () => {
   const [emailLogin, setEmailLogin] = createSignal(false);
@@ -14,7 +15,7 @@ const Auth: Component = () => {
   const { pb } = usePB();
 
   const getAuthMethods = async () => {
-    const methods = await pb.collection("users").listAuthMethods();
+    const methods = await pb.collection(Collections.Users).listAuthMethods();
 
     if (methods.oauth2.enabled) {
       setOAuthProviders(methods.oauth2.providers);

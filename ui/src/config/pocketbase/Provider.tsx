@@ -3,6 +3,7 @@ import PocketBase, { ClientResponseError } from "pocketbase";
 import { createStore } from "solid-js/store";
 
 import { PBContext } from "./context";
+import { Collections, TypedPocketBase } from "../../../pocketbase";
 
 const apiUrl =
   import.meta.env.VITE_PUBLIC_API_URL ||
@@ -11,7 +12,7 @@ const apiUrl =
     : window.location.origin);
 
 export const PBProvider: ParentComponent = (props) => {
-  const pb = new PocketBase(apiUrl);
+  const pb = new PocketBase(apiUrl) as TypedPocketBase;
   const [pbStore, setPBStore] = createStore({
     user: pb.authStore.record as UsersRecord | null,
     loading: true,
@@ -26,7 +27,7 @@ export const PBProvider: ParentComponent = (props) => {
     if (pb.authStore.token) {
       if (pb.authStore.isValid) {
         try {
-          await pb.collection("users").authRefresh();
+          await pb.collection(Collections.Users).authRefresh();
           setPBStore("networkError", false);
         } catch (e) {
           if (e instanceof ClientResponseError && [401, 403].includes(e.status)) {
@@ -50,7 +51,7 @@ export const PBProvider: ParentComponent = (props) => {
   createEffect(() => {
     if (!pb.authStore.record?.id) return;
 
-    const unsubscribe = pb.collection("users").subscribe(pb.authStore.record.id, (e) => {
+    const unsubscribe = pb.collection(Collections.Users).subscribe(pb.authStore.record.id, (e) => {
       if (e.action == "delete") {
         pb.authStore.clear();
       } else {

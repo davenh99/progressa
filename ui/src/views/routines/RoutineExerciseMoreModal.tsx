@@ -8,6 +8,7 @@ import ArrowUp from "lucide-solid/icons/arrow-up-right";
 import { Button, Checkbox, Modal, TextArea, useModalLoading } from "../../components";
 import { useAuthPB } from "../../config/pocketbase";
 import ExerciseSelectModal from "../exercises/ExerciseSelectModal";
+import { Collections } from "../../../pocketbase";
 
 interface Props {
   setModalVisible: (visible: boolean) => void;
@@ -27,7 +28,7 @@ export const RoutineExerciseMoreModal: Component<Props> = (props) => {
 
   const save = async () => {
     try {
-      await pb.collection("routineExercises").update(exercise.id, exercise);
+      await pb.collection(Collections.RoutineExercises).update(exercise.id, exercise);
       // lazy way to refresh the routine for now. could also set the state.
       const updatedRoutine = await getRoutineByID(props.routineId);
       props.setRoutine({ routine: updatedRoutine });
@@ -69,9 +70,9 @@ const ModalContent: Component<ModalProps> = (props) => {
     props.setExercise("measurementNumeric", 0);
     props.setExercise("measurement2Numeric", 0);
     props.setExercise("measurement3Numeric", 0);
-    props.setExercise("measurementValue", undefined);
-    props.setExercise("measurement2Value", undefined);
-    props.setExercise("measurement3Value", undefined);
+    props.setExercise("measurementValue", "");
+    props.setExercise("measurement2Value", "");
+    props.setExercise("measurement3Value", "");
 
     setWarning("Warning: changing the exercise will reset measurements");
     setShowExerciseSelectModal(false);
