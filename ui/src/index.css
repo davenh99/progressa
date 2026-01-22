@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: pastel --default, forest --prefersdark;
+}
+@source "../node_modules/@solidpb/ui-kit";
 
 :root {
   font-family: "Ubuntu", "Helvetica Neue", sans-serif;

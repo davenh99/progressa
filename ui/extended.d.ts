@@ -58,3 +58,13 @@ interface ExercisePreferencesExpand extends ExercisePreferences {
     tags?: TagsRecord[];
   };
 }
+
+type SleepQuality = "terrible" | "poor" | "fair" | "good" | "great" | "";
+type DraggingState = "idle" | "dragging" | "dragging-over";
+type Rating = 0 | 1 | 2 | 3 | 4 | 5;
+
+interface RatingOption<T extends string | number> {
+  emoji: string;
+  label: string;
+  value: T;
+}

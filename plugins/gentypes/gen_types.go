@@ -26,7 +26,6 @@ func (f Field) IsReadOnly() bool { return f.ReadOnly }
 
 type Config struct {
 	FilePath                   string
-	Export                     bool
 	CollectionAdditionalFields map[string][]common.Field
 	SelectOptionsPath          string
 }
@@ -72,7 +71,6 @@ func (c *Config) generateTypes(app *pocketbase.PocketBase) error {
 	defer f.Close()
 
 	f.WriteString("/* This file was automatically generated, changes will be overwritten. */\n\n")
-
 	c.printBaseType(f)
 
 	if c.SelectOptionsPath != "" {
@@ -106,15 +104,12 @@ func (c *Config) generateTypes(app *pocketbase.PocketBase) error {
 }
 
 func (c *Config) printBaseType(f *os.File) {
-	if c.Export {
-		fmt.Fprint(f, "export ")
-	}
 	fmt.Fprint(f, "interface BaseRecord {\n")
 
 	baseFields := []string{"id", "collectionName", "collectionId", "created", "updated"}
 
 	for _, field := range baseFields {
-		fmt.Fprintf(f, "  %s: string;\n", field)
+		fmt.Fprintf(f, "  readonly %s: string;\n", field)
 	}
 
 	fmt.Fprint(f, "}\n\n")
@@ -161,9 +156,6 @@ func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
 	collectionName := capitalise(collection.Name)
 
 	fmt.Fprintf(f, "/* Collection type: %s */\n", collection.Type)
-	if c.Export {
-		fmt.Fprint(f, "export ")
-	}
 	fmt.Fprintf(f, "interface %s {\n", collectionName)
 
 	for _, field := range collection.Fields {
@@ -187,12 +179,11 @@ func (c *Config) printCollectionTypes(f *os.File, collection *core.Collection) {
 		)
 	}
 
-	fmt.Fprint(f, "}\n\n")
+	fmt.Fprintln(f, "}")
 
-	if c.Export {
-		fmt.Fprint(f, "export ")
-	}
-	fmt.Fprintf(f, "type %sRecord = %s & BaseRecord;\n\n", collectionName, collectionName)
+	recordName := collectionName + "Record"
+	fmt.Fprintf(f, "type %s = %s & BaseRecord;\n", recordName, collectionName)
+	fmt.Fprintf(f, "type %sUpdatePayload = Partial<%s>;\n\n", collectionName, recordName)
 }
 
 func capitalise(s string) string {
@@ -224,62 +215,29 @@ func projectRoot() (string, error) {
 func toTypeScriptType(f core.Field) string {
 	switch f.Type() {
 	case "password":
-		if sf, ok := f.(*core.PasswordField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "text":
-		if sf, ok := f.(*core.TextField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "email":
-		if sf, ok := f.(*core.EmailField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "relation":
 		if sf, ok := f.(*core.RelationField); ok {
 			res := ""
-			if !sf.Required {
-				res += "?"
-			}
 			res += ": string"
 			if sf.MaxSelect > 1 {
 				res += "[]"
 			}
 			return res
 		}
-		return "?: string"
+		return ": string"
 	case "autodate":
 		return ": string"
 	case "date":
-		if sf, ok := f.(*core.DateField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "url":
-		if sf, ok := f.(*core.FileField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "file":
-		if sf, ok := f.(*core.FileField); ok {
-			if sf.Required {
-				return ": string"
-			}
-		}
-		return "?: string"
+		return ": string"
 	case "select":
 		if sf, ok := f.(*core.SelectField); ok {
 			res := ""
@@ -300,36 +258,17 @@ func toTypeScriptType(f core.Field) string {
 			if sf.MaxSelect > 1 {
 				res = fmt.Sprintf("(%s)[]", res)
 			}
-			if sf.Required {
-				return fmt.Sprintf(": %s", res)
-			} else {
-				return fmt.Sprintf("?: %s", res)
-			}
+			return fmt.Sprintf(": %s", res)
 		}
 		return "?: string"
 	case "number":
-		if sf, ok := f.(*core.NumberField); ok {
-			if sf.Required {
-				return ": number"
-			}
-		}
-		return "?: number"
+		return ": number"
 	case "bool":
-		if sf, ok := f.(*core.BoolField); ok {
-			if sf.Required {
-				return ": boolean"
-			}
-		}
-		return "?: boolean"
+		return ": boolean"
 	case "json":
-		if sf, ok := f.(*core.JSONField); ok {
-			if sf.Required {
-				return ": any"
-			}
-		}
-		return "?: any"
+		return ": any"
 	default:
-		return "?: unknown"
+		return ": unknown"
 	}
 }
 

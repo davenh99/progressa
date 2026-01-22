@@ -3,14 +3,14 @@ import { ColumnDef } from "@tanstack/solid-table";
 import ArrowRight from "lucide-solid/icons/arrow-right";
 
 import List from "../app/List";
-import { MuscleGroups } from "../../../Types";
+import { ExercisesSelectOptions } from "../../../selectOptions";
 
 interface Props {
   onClick: (muscleGroup: { name: string }) => void;
 }
 
 export const MuscleGroupList: Component<Props> = (props) => {
-  const data = createMemo(() => MuscleGroups.map((mg) => ({ name: mg })));
+  const data = createMemo(() => ExercisesSelectOptions.targetMuscleGroup.map((mg) => ({ name: mg })));
 
   const columns = createMemo<ColumnDef<{ name: string }>[]>(() => [
     {

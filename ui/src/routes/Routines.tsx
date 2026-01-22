@@ -8,7 +8,6 @@ import Container from "../views/app/Container";
 import Header from "../views/app/Header";
 import { Button } from "../components";
 import RoutineList from "../views/routines/RoutineList";
-import { RoutineCreateData } from "../../Types";
 import { useAuthPB } from "../config/pocketbase";
 import { ROUTINE_EXPAND } from "../../constants";
 import { RoutineForm } from "../views/routines/RoutineForm";
@@ -24,7 +23,7 @@ const Routines: Component = () => {
   const navigate = useNavigate();
 
   const createRoutine = async () => {
-    const createData: RoutineCreateData = {
+    const createData: RoutinesUpdatePayload = {
       name: "Routine",
       description: "",
       user: user.id,

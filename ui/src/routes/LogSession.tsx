@@ -7,20 +7,11 @@ import { ClientResponseError } from "pocketbase";
 import { useAuthPB } from "../config/pocketbase";
 import { Input, TextArea, TagArea, Button, DateInput, RatingSelector } from "../components";
 import Container from "../views/app/Container";
-import {
-  type SleepQuality,
-  type Session,
-  type SessionCreateData,
-  moodOptions,
-  stressOptions,
-  anxietyOptions,
-  sleepOptions,
-} from "../../Types";
 import LogSessionNav from "../views/session/LogSessionNav";
 import Header from "../views/app/Header";
 import { NumberInput } from "../components/NumberInput";
 import Card from "../views/app/Card";
-import { SESSION_EXPAND } from "../../constants";
+import { anxietyOptions, moodOptions, SESSION_EXPAND, sleepOptions, stressOptions } from "../../constants";
 import { SessionExerciseList } from "../views/session/SessionExerciseList";
 import { SessionMealList } from "../views/session/SessionMealList";
 import LoadFullScreen from "../views/app/LoadFullScreen";
@@ -42,7 +33,7 @@ const LogSession: Component = () => {
     if (!searchParams.date) {
       throw new Error("Tried to create a session without a date");
     }
-    const createData: SessionCreateData = {
+    const createData: SessionsUpdatePayload = {
       name: "Workout",
       notes: "",
       tags: [],
@@ -65,7 +56,7 @@ const LogSession: Component = () => {
 
   const sessionUpdate = async (field: string, newVal: any) => {
     if (session.session?.id) {
-      return await updateRecord<Session>("sessions", session.session?.id, field, newVal);
+      return await updateRecord<SessionsRecord>("sessions", session.session?.id, field, newVal);
     } else {
       throw new Error("Tried to update a session when missing id");
     }
