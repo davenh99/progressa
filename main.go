@@ -7,9 +7,9 @@ import (
 	c "progressa/core"
 	"progressa/core/routes"
 	"progressa/plugins/computedfields"
-	"progressa/plugins/gentypes"
 	"progressa/utils"
 
+	"github.com/davenh99/pb-typescript/gentypes"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
@@ -38,9 +38,9 @@ func main() {
 		migrationsDir = "../migrations"
 
 		gentypes.Register(app, gentypes.Config{
-			FilePath:                   "ui/base.d.ts",
+			FilePath:                   "ui",
 			CollectionAdditionalFields: c.ComputedFieldsCfg.ExtractFields(),
-			SelectOptionsPath:          "ui/selectOptions.ts",
+			PrintSelectOptions:         true,
 		})
 	case "production":
 		ghupdate.MustRegister(app, app.RootCmd, ghupdate.Config{

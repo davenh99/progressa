@@ -2,8 +2,8 @@ package computedfields
 
 import (
 	"fmt"
-	"progressa/common"
 
+	"github.com/davenh99/pb-typescript/gentypes"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
 )
@@ -62,8 +62,8 @@ func Register(app *pocketbase.PocketBase, cfg Config) {
 	}
 }
 
-func (c *Config) ExtractFields() map[string][]common.Field {
-	extracted := make(map[string][]common.Field)
+func (c *Config) ExtractFields() map[string][]gentypes.AdditionalField {
+	extracted := make(map[string][]gentypes.AdditionalField)
 
 	for collection, fields := range c.CollectionComputedFields {
 		for _, f := range fields {
