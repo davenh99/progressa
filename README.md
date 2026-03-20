@@ -1,6 +1,6 @@
 # Progressa
 
-Advanced workout tracking for in-depth analysis
+Open-source fitness and nutrition tracker, self-hostable
 
 This app uses an exercise database found [here](https://strengthtoovercome.com/functional-fitness-exercise-database).
 Thanks a lot to that guy for making it available for free!
@@ -16,7 +16,7 @@ This is a basic roadmap of what I would like to implement before being happy to 
 - [x] Allow making custom exercises
 - [ ] Allow timing workout with start/stop button and rest timers
 - [ ] Comprehensive analysis page, with custom analyses (in progress)
-- [ ] Use nutrition info database to make up meals and overall meals overhaul.
+- [ ] Use nutrition info database to make up meals and overall meals overhaul -> use 'open-food-facts' database.
 - [ ] UI/UX overhaul to be clean and consistent
 - [ ] custom metrics tracking. can attach same as notes, tags.
 - [ ] proper email and ui support for reset password, delete account, change password, etc.
