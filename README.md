@@ -1,3 +1,5 @@
+## Moved to [Codeberg](https://codeberg.org/davenh99/progressa)
+
 # Progressa
 
 Open-source fitness and nutrition tracker, self-hostable
